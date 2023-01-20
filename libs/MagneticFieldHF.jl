@@ -104,9 +104,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     while norm_convergence > hf.precision
         α = 0.0
         hf.H .= hf.H0 * α
-        @time add_Hartree(hf;β=1.0,V0=hf.V0)
+        add_Hartree(hf;β=1.0,V0=hf.V0)
         # add_Fock(hf;β=1.0,V0=hf.V0)
-        @time add_Fock_vectorize(hf;β=1.0,V0=hf.V0)
+        add_Fock_vectorize(hf;β=1.0,V0=hf.V0)
         Etot = compute_HF_energy(hf.H .- α*hf.H0,α*hf.H0,hf.P,hf.ν)
         #Δ is a projector to make it closed shell
         if norm_convergence <1e-4
