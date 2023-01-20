@@ -20,11 +20,13 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     colorbar(pl)
     ϵF = minimum(ϵsorted)
     δν = 1/length(ϵsorted) * 8
+    Δ = 0.0 
     for i in 2:length(ϵsorted)
         ν = (i / length(ϵsorted) -0.5) * 8 
         if ν>=νF+δν/2 
             ϵF = (ν==νF) ? (ϵsorted[i] + ϵsorted[i+1])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
-            println("Gap size: ", (ν==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1]))
+            Δ = (ν==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
+            println("Gap size: ", Δ)
             break 
         end
     end
@@ -34,12 +36,13 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # legend()
     # ylim([-0.4,0.8])
     tight_layout()
-    savefig(savename)
+    savefig(savename,dpi=500)
     display(fig)
     close(fig)
     println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)
     # println("Total energy: ",(0.25*sum(ϵsorted[ϵsorted.<ϵF])-0.25*sum(ϵsorted[ϵsorted.>=ϵF]))/size(hf.ϵk,2)/size(hf.ϵk,1)*8)
-    return sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8
+    # return sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8
+    return Δ/Vcoulomb
 end
 
 ## plot error and energies under Hartree Fock iterations 
