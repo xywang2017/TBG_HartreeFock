@@ -13,7 +13,7 @@ w0cs = Float64[]
 w0s = ["00","02","03","05","06","07"]
 w0snum = [0.0;0.2;0.3;0.5;0.6;0.7]
 σz = []
-p,q = 1, 8
+p,q = 1, 7
 νF = 2 + 2*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
@@ -78,7 +78,7 @@ plot(w0snum,reshape(σz,6,2)[:,1],"r-x",label="Chern")
 plot(w0snum,reshape(σz,6,2)[:,2],"b-+",label="Flavor")
 xlabel(L"w_0/w_1")
 # ylabel("⟨σzτz⟩")
-ylabel("Δ/V(Lm)")
+ylabel(L"Δ (E_c)")
 title(L"s=2, t=2, ϕ/ϕ_0=%$(p)/%$(q)")
 legend()
 tight_layout()
@@ -127,12 +127,12 @@ writedlm("w0cs.txt",[[1/4;1/5;1/6;1/7;1/8] w0cs])
 fig = figure(figsize=(4,3))
 tmp = readdlm("w0cs.txt")
 plot(tmp[:,1],tmp[:,2],"bx-")
-ylabel(L"w_0")
+ylabel(L"w_0/w_1")
 xlabel(L"ϕ/ϕ_0")
 ylim([0,0.8])
 xlim([0,0.3])
 tight_layout()
-savefig("first_order_phase_transition.pdf",transparent=true)
+savefig("figures/first_order_phase_transition.pdf",transparent=true)
 display(fig)
 close(fig)
 ## plot density matrix 
