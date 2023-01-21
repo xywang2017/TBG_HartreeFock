@@ -204,7 +204,8 @@ function init_P_flavor_polarization(hf::HartreeFock)
     num_full_flavors_to_populate = νmax ÷ n_per_valley_spin 
     num_part_flavors_to_populate = (νmax % n_per_valley_spin ==0) ? 0 : 1
     
-    flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    # flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
 
     for iηs in flavors_to_populate[1:(end-num_part_flavors_to_populate)], iq in 1:size(tmpP,1)
         tmpP[iq,iηs,iq,iηs,:] .= 1.0 
