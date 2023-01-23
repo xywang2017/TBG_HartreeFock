@@ -9,7 +9,7 @@ q = parse(Int,ARGS[2])
 νstr = round(Int,1000*ν)
 flag = ARGS[4]
 w0 = ARGS[5]
-savename = joinpath(fpath,"data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+savename = joinpath(fpath,"yacoby/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 ϕ = p//q 
 if isequal(flag,"flavor")
     _Init = "Flavor U(4)"
@@ -21,13 +21,14 @@ end
 
 println("Running parameters: ","ϕ=",ϕ,", ν=",ν,", Init=",flag,", w0=",w0)
 println(savename)
-params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056)
+# params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056)
+params = Params()
 # initParamsWithStrain(params)
 hf = HartreeFock()
-iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="data_w$(w0)/_$(p)_$(q)/",_Init=_Init)
-# savename1 = joinpath(fpath,"data_w02/_chern_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=_Init)
+
 # P0 = load(savename,"P")
-# iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="data_w$(w0)/_chiral",_Init=" ",P0=P0,precision=1e-6)
+# iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=" ",P0=P0)
 
 save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
 #

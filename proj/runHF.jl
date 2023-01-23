@@ -146,11 +146,12 @@ display(fig)
 close(fig)
 
 ## strong coupling basis 
-H0=load(joinpath(fpath,"data_w07/_flavor_init_HF_1_4_nu_250.jld2"),"H");
-ik = 8
-tmpH0 = reshape(view(H0,:,:,ik),8,4,8,4)
-P0 = reshape(view(P,:,:,ik)+0.5I,8,4,8,4)
-Pstrong = zeros(ComplexF64,8,8,4)
+H0 = load(joinpath(fpath,"data_w06/_1_5/_flavor_init_HF_1_5_nu_0.jld2"),"H");
+P = load(joinpath(fpath,"data_w06/_1_5/_flavor_init_HF_1_5_nu_400.jld2"),"P");
+ik = 5
+tmpH0 = reshape(view(H0,:,:,ik),10,4,10,4)
+P0 = reshape(view(P,:,:,ik)+0.5I,10,4,10,4)
+Pstrong = zeros(ComplexF64,10,10,4)
 for iηs in 1:4
     F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
     vec = F.vectors
