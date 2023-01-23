@@ -14,7 +14,7 @@ w0s = ["06"]
 w0snum = [0.6]
 σz = []
 p,q = 1, 4
-νF = 0 + (0.5)*p/q
+νF = 0 + (1)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"yacoby/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -50,8 +50,8 @@ close(fig)
 
 ## strong coupling basis
 H0 = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_0.jld2"),"H");
-P = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_400.jld2"),"P");
-ik = 4
+P = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_500.jld2"),"P");
+ik = 1
 tmpH0 = view(H0,:,:,ik)
 P0 = view(P,:,:,ik)+0.5I
 F = eigen(Hermitian(tmpH0))
