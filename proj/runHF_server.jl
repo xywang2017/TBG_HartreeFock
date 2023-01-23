@@ -25,10 +25,10 @@ println(savename)
 params = Params()
 # initParamsWithStrain(params)
 hf = HartreeFock()
-# iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=_Init)
+iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=_Init)
 
-P0 = load(savename,"P")
-iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=" ",P0=P0)
+# P0 = load(savename,"P")
+# iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="yacoby/data_w$(w0)/_$(p)_$(q)/",_Init=" ",P0=P0)
 
 save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
 #

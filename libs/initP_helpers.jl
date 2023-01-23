@@ -20,7 +20,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     end
     # valley x spin U(4) rotation --- otherwise above initializations do not access valley spin coherent states
     # init_P_valley_spin_roation(hf)
-    init_P_random_rotation(hf)
+    # init_P_random_rotation(hf)
+    init_P_valley_roation(hf)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -32,6 +33,17 @@ function init_P_valley_spin_roation(hf::HartreeFock)
     for ik in 1:size(hf.P,3), iband in 1:size(P0,1)
         vecs .= eigvecs(Hermitian(rand(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)))
         P0[iband,:,iband,:,ik] .= vecs' * view(P0,iband,:,iband,:,ik) * vecs
+    end
+    return nothing
+end
+
+function init_P_valley_roation(hf::HartreeFock)
+    α = 0.3
+    P0 = reshape(hf.P,hf.nb*hf.q*hf.nη,hf.ns,hf.nb*hf.q*hf.nη,hf.ns,hf.q*hf.nq^2)
+    vecs = zeros(ComplexF64,hf.nb*hf.q*hf.nη,hf.nb*hf.q*hf.nη)
+    for ik in 1:size(hf.P,3), is in 1:hf.ns
+        vecs .= eigvecs(Hermitian(rand(ComplexF64,size(vecs))))
+        P0[:,is,:,is,ik] .= (1-α) *view(P0,:,is,:,is,ik) .+ α* vecs' * view(P0,:,is,:,is,ik) * vecs
     end
     return nothing
 end
