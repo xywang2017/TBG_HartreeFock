@@ -38,7 +38,7 @@ function init_P_valley_spin_roation(hf::HartreeFock)
 end
 
 function init_P_valley_roation(hf::HartreeFock)
-    α = 0.3
+    α = 0.2
     P0 = reshape(hf.P,hf.nb*hf.q*hf.nη,hf.ns,hf.nb*hf.q*hf.nη,hf.ns,hf.q*hf.nq^2)
     vecs = zeros(ComplexF64,hf.nb*hf.q*hf.nη,hf.nb*hf.q*hf.nη)
     for ik in 1:size(hf.P,3), is in 1:hf.ns
@@ -196,15 +196,15 @@ function init_P_sublattice_no_momentum(hf::HartreeFock)
         states_to_populate .= shuffle(idx_chern_minus)[1:νmax]
     else
         states_to_populate[1:length(idx_chern_minus)] .= idx_chern_minus
-        # states_to_populate[(length(idx_chern_minus)+1):end] .= shuffle(idx_chern_plus)[1:(νmax-length(idx_chern_minus))] 
-        id_running = length(idx_chern_minus)+1
-        for iplus in idx_chern_plus 
-            if (iplus-1)÷(size(H0,1)÷4) +1 < 3
-                # println(iplus)
-                states_to_populate[id_running]=iplus
-                id_running = id_running+1
-            end
-        end
+        states_to_populate[(length(idx_chern_minus)+1):end] .= shuffle(idx_chern_plus)[1:(νmax-length(idx_chern_minus))] 
+        # id_running = length(idx_chern_minus)+1
+        # for iplus in idx_chern_plus 
+        #     if (iplus-1)÷(size(H0,1)÷4) +1 < 3
+        #         # println(iplus)
+        #         states_to_populate[id_running]=iplus
+        #         id_running = id_running+1
+        #     end
+        # end
     end
     
     for ik in 1:size(hf.P,3)

@@ -110,7 +110,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         Etot = compute_HF_energy(hf.H .- α*hf.H0,α*hf.H0,hf.P,hf.ν)
         #Δ is a projector to make it closed shell
         if norm_convergence <1e-4
-            Δ = 0.0 
+            Δ = 0.0
         else 
             Δ = 0.0
         end

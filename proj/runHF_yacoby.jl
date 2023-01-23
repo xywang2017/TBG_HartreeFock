@@ -13,8 +13,8 @@ w0cs = Float64[]
 w0s = ["06"]
 w0snum = [0.6]
 σz = []
-p,q = 1, 5
-νF = 0 + 2*p/q
+p,q = 1, 4
+νF = 0 + (0.5)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"yacoby/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -27,9 +27,9 @@ for w0 in w0s
 end 
 
 ## BM basis 
-P = load(joinpath(fpath,"yacoby/data_w06/_1_5/_$(flag)_init_HF_1_5_nu_$(νstr).jld2"),"P");
+P = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"),"P");
 ik = 3
-P0 = reshape(view(P,:,:,ik)+0.5I,10,4,10,4);
+P0 = reshape(view(P,:,:,ik)+0.5I,2q,4,2q,4);
 fig,ax = subplots(2,2,figsize=(8,8))
 states = ["K↑","K'↑","K↓","K'↓"]
 for r in 1:2, c in 1:2 
@@ -42,16 +42,16 @@ display(fig)
 close(fig)
 
 fig = figure(figsize=(6,6))
-pl = imshow(abs.(reshape(P0,40,:)),vmin=0,vmax=1)
+pl = imshow(abs.(reshape(P0,8q,:)),vmin=0,vmax=1)
 colorbar(pl)
 tight_layout()
 display(fig)
 close(fig)
 
 ## strong coupling basis
-H0 = load(joinpath(fpath,"yacoby/data_w06/_1_5/_$(flag)_init_HF_1_5_nu_0.jld2"),"H");
-P = load(joinpath(fpath,"yacoby/data_w06/_1_5/_$(flag)_init_HF_1_5_nu_400.jld2"),"P");
-ik = 5
+H0 = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_0.jld2"),"H");
+P = load(joinpath(fpath,"yacoby/data_w06/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_400.jld2"),"P");
+ik = 4
 tmpH0 = view(H0,:,:,ik)
 P0 = view(P,:,:,ik)+0.5I
 F = eigen(Hermitian(tmpH0))
