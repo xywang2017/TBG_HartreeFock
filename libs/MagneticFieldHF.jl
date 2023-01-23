@@ -42,7 +42,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 5.0
+    ϵr = 10.0
     # return  ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*Lm/2)
 end
@@ -102,7 +102,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     iter_err = Float64[]
     iter_energy = Float64[]
     while norm_convergence > hf.precision
-        α = 0.0
+        α = 1.0
         hf.H .= hf.H0 * α
         add_Hartree(hf;β=1.0,V0=hf.V0)
         # add_Fock(hf;β=1.0,V0=hf.V0)

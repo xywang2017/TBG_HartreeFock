@@ -14,16 +14,17 @@ q = parse(Int,ARGS[4])
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
-    if !isdir(joinpath(fpath,"data_w$(w0str)/_$(p)_$(q)"))
-        mkdir(joinpath(fpath,"data_w$(w0str)/_$(p)_$(q)"))
+    if !isdir(joinpath(fpath,"yacoby/data_w$(w0str)/_$(p)_$(q)"))
+        mkdir(joinpath(fpath,"yacoby/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
-    nq = (denominator(ϕ)>6) ? 1 : 1
+    nq = (denominator(ϕ)>4) ? 1 : 2
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+    # fname = joinpath(fpath,"data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = joinpath(fpath,"yacoby/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     constructbmLL(bm;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true)
+        _hBN=true,_strain=false, _σrotation=true, _valley=str,_calculate_overlap=true)
     return bm
 end
 
@@ -32,27 +33,27 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 # ##
 
-# jldopen(joinpath(fpath,"data_w02/_1_7/_1_7_K_metadata.jld2")) do file 
-#     # for m in -3:3, n in -12:12 
-#     #     Λ = file["$(m)_$(n)"]
-#     #     if n%4 !=0
-#     #         println(norm(tr(Λ)))
-#     #     end
-#     # end
-#     Λ = file["3_21"]
-#     fig = figure(figsize=(5,4))
-#     pl=imshow(abs.(Λ),origin="lower")
-#     colorbar(pl)
-#     axis("equal")
-#     display(fig)
-#     close(fig)
-#     println(norm(Λ))
+jldopen(joinpath(fpath,"yacoby/data_w06/_1_5/_1_5_Kprime_metadata.jld2")) do file 
+    # for m in -3:3, n in -12:12 
+    #     Λ = file["$(m)_$(n)"]
+    #     if n%4 !=0
+    #         println(norm(tr(Λ)))
+    #     end
+    # end
+    Λ = file["0_0"]
+    fig = figure(figsize=(5,4))
+    pl=imshow(abs.(Λ),origin="lower")
+    colorbar(pl)
+    axis("equal")
+    display(fig)
+    close(fig)
+    println(norm(Λ))
 
-#     energies = file["E"]
-#     fig = figure(figsize=(5,4))
-#     plot(ones(length(energies)),energies[:],"b_")
-#     colorbar(pl)
-#     axis("equal")
-#     display(fig)
-#     close(fig)
-# end
+    energies = file["E"]
+    fig = figure(figsize=(5,4))
+    plot(ones(length(energies)),energies[:],"b_")
+    colorbar(pl)
+    axis("equal")
+    display(fig)
+    close(fig)
+end

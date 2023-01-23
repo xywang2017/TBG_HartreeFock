@@ -5,7 +5,7 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     ee = 1.6e-19
     ϵϵ = 8.8541878128e−12	
     aa = 2.46e-10
-    ϵr = 5.0
+    ϵr = 10.0
     Vcoulomb = ee/(4π*ϵϵ*ϵr* abs(params.a1)*aa) * 1e3
     
     fig = figure(figsize=(3,3))
