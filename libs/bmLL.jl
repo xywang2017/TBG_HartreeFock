@@ -64,7 +64,7 @@ function constructbmLL(A::bmLL;
     A.nH = A.nLL * A.nγ - 1
     A.nq = nq
     
-    A.params = Params(w1=96.056,w0=96.056*α)
+    A.params = Params(w1=110,w0=110*α)
     if (A._strain==true)
         initParamsWithStrain(A.params)
     end
