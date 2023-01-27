@@ -121,9 +121,10 @@ function find_gaps(ϕs::Vector{Rational{Int}},str::String)
     ylabel("Δ (meV)")
     # ylim([0,2.5])
     tight_layout() 
+    savefig("ratio_0665_w0_08.pdf")
     display(fig)
     close(fig)
     return nothing
 end
 
-find_gaps(1 .// collect(2:20),"095")
+find_gaps(1 .// collect(2:20),"08")
