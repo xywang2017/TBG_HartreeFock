@@ -67,7 +67,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.precision = precision
     hf.nb, hf.nη, hf.ns, hf.nfl = 2, 2, 2, 8
     hf.ng = 3
-    hf.nq = (q>4) ? 1 : 2
+    hf.nq = (q>4) ? 2 : 2
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     
@@ -98,10 +98,11 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     
     # --------- Hartree Fock Iterations ---------- #
     norm_convergence = 10.0 
-    iter = 0
+    iter = 1
     iter_err = Float64[]
     iter_energy = Float64[]
     while norm_convergence > hf.precision
+        println("Iter: ",iter)
         α = 1.0
         hf.H .= hf.H0 * α
         add_Hartree(hf;β=1.0,V0=hf.V0)
@@ -116,12 +117,12 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         end
         norm_convergence = update_P(hf;Δ=Δ,α=0.3)
         
-        iter +=1
-        println("Iter: ",iter)
         println("Running HF energy (per moire u.c.): ",Etot)
         println("Running norm convergence: ",norm_convergence)
         push!(iter_energy,Etot)
         push!(iter_err,norm_convergence)
+        iter +=1
+        
         if iter > 200
             break 
         end
@@ -319,10 +320,29 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,α::Float64=0.2)
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
     end
 
+    # α = compute_optimal_λ(hf.H-hf.H0,hf.H0,hf.P,P_new,hf.ν)
     norm_convergence = norm(P_new .- hf.P) ./ norm(P_new)
     hf.P .= α*P_new .+(1-α)*hf.P
+    println("ODA value α is: ",α)
     # println("Trace of P is: ", sum([tr(P_new[:,:,ik]) for ik in 1:size(P,3)]) )
     return norm_convergence
+end
+
+function compute_optimal_λ(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P1::Array{ComplexF64,3},P2::Array{ComplexF64,3},ν::Float64)
+    # assuming a simple parabolic dependence on λ
+    λ = 0.9
+    step_λ = 0.02
+    E_tot0 = compute_HF_energy(H_HF,H0,(1-λ)*P1+λ*P2,ν)
+    while λ>0.1 
+        λ -= step_λ
+        E_tot = compute_HF_energy(H_HF,H0,(1-λ)*P1+λ*P2,ν)
+        if E_tot < E_tot0 
+            E_tot0 = E_tot 
+        else 
+            break 
+        end
+    end
+    return λ
 end
 
 function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::Array{ComplexF64,3},ν::Float64)

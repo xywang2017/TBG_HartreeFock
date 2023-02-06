@@ -4,7 +4,7 @@
     μ::Float64 = 0.0
     w0::Float64 = 66 # 110*0.8 ## AA tunneling chiral limit
     w1::Float64 = 110 ## AB tunneling #96.056
-    δ::Float64 = 15 # 17.0 # hBN alignment induced C2 symmetry breaking, only bottom layer
+    δ::Float64 = 0 # 17.0 # hBN alignment induced C2 symmetry breaking, only bottom layer
 
     # distance between Kt and Kb
     kb::Float64 = 8π/3*sin(dθ/2)
@@ -33,7 +33,7 @@ end
 
 @with_kw mutable struct Strain
     # this contains info about strain based on Bi Zhen and Fu Liang 
-    ϵ::Float64 = 0.00
+    ϵ::Float64 = 0.002
     φ::Float64 = 0.0*π/180
     ν::Float64 =  0.16
     ϵxx::Float64 = -ϵ * cos(φ)^2 + ν * ϵ * sin(φ)^2
@@ -43,7 +43,7 @@ end
     A::Vector{Float64} = (sqrt(3)*βg/2)*[ϵxx-ϵyy;-2ϵxy]
     Rφ::Matrix{Float64} = [cos(φ) -sin(φ);sin(φ) cos(φ)]
     S::Matrix{Float64} = Rφ' * [-ϵ 0; 0 ν*ϵ] * Rφ
-    Da::Float64 = 0.0 #-4100.0
+    Da::Float64 = -4100.0
 end
 
 
