@@ -8,13 +8,13 @@ params = Params()
 initParamsWithStrain(params)
 
 ##
-flag = "flavor"
+flag = "random"
 w0cs = Float64[]
 w0s = ["06"]
 w0snum = [0.6]
 σz = []
 p,q = 1, 4
-νF = 0 + (2)*p/q
+νF = 0.75 + (0)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")

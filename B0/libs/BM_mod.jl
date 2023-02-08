@@ -1,4 +1,3 @@
-using Arpack
 include("Parameters_mod.jl")
 include("Lattice_mod.jl")
 # --------------------------------------------------------------------------------------------------------------- #
@@ -21,12 +20,12 @@ mutable struct HBM
     HBM() = new()
 end
 
-
-function initHBM(blk::HBM,latt::Lattice,params::Params;lg::Int=9,_σrotation::Bool=true)
+function initHBM(blk::HBM,latt::Lattice,params::Params;
+        lg::Int=9,_σrotation::Bool=true,_calculate_overlap::Bool=true,_flag_valley::String="Both",fname::String="holder.txt")
     blk._σrotation = _σrotation
     blk.params = params 
     blk.latt = latt
-    blk.flag_valley = "Both"
+    blk.flag_valley = _flag_valley
     blk.nη = 2
     blk.ns = 2
     blk.nb = 2 # flat bands 
@@ -63,11 +62,13 @@ function initHBM(blk::HBM,latt::Lattice,params::Params;lg::Int=9,_σrotation::Bo
     Uk = zeros(ComplexF64,nlocal*lg^2,blk.nb,latt.nk)
     Hk =zeros(Float64,blk.nb,latt.nk)
     for ik in 1:latt.nk
-        kval = real(latt.kvec[ik])*params.g1 + imag(latt.kvec[ik])*params.g2
+        kval = latt.kvec[ik]
         ComputeH(H,kval,gvec,lg,params,_σrotation)
         H .= H + T12 - params.μ*I
         # Find the smallest eigenvalue and eigenvectors close to zero
-        vals, vecs = eigs(Hermitian(H),nev=blk.nb,which=:SM)
+        # vals, vecs = eigs(Hermitian(H),nev=blk.nb,which=:SM)
+        idx_mid = size(H,1)÷2
+        vals, vecs = eigen(Hermitian(H),idx_mid:(idx_mid+blk.nb-1))
         # C2T is broken for hBN alignment
         vecs = vecs + C2T*conj(vecs)
         for i in 1:blk.nb
@@ -101,9 +102,13 @@ function initHBM(blk::HBM,latt::Lattice,params::Params;lg::Int=9,_σrotation::Bo
         println("Wrong flag_valley value")
     end
 
-    if true
+    jldopen(fname, "w") do file
+        file["E"] = blk.hbm 
+    end
+
+    if _calculate_overlap
         # construct Λ matrices 
-        lG = 7 
+        lG = 7
         Gs = collect((-(lG-1)÷2):((lG-1)÷2))
         blk.Gs = (reshape(Gs,:,1)*params.g1 .+ reshape(Gs,1,:)*params.g2)[:]
         λkp = zeros(ComplexF64,blk.nb*latt.nk,blk.nb*latt.nk)
@@ -133,6 +138,17 @@ function initHBM(blk::HBM,latt::Lattice,params::Params;lg::Int=9,_σrotation::Bo
             end
         else 
             println("Wrong flag_valley value")
+        end
+
+        jldopen(fname, "a") do file
+            file["Gs"] = blk.Gs
+            file["lG"] = lG
+        end
+        for ig in 1:size(blk.Λkp,3)
+            m,n = Gs[(ig-1)%lG+1],Gs[(ig-1)÷lG+1]
+            jldopen(fname, "a") do file
+                file["$(m)_$(n)"] = blk.Λkp[:,:,ig]
+            end
         end
     end
 
