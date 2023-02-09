@@ -1,8 +1,8 @@
 @with_kw mutable struct Params
-    vf::Float64 =  2422.76 #2135.4  #2445.38  #2135.4 # 2422.76   # Weizmann
+    vf::Float64 =  2482 #2135.4  #2445.38  #2135.4 # 2422.76   # Weizmann
     dθ::Float64 = 1.06π/180
     μ::Float64 = 0.0
-    w0::Float64 = 66 # 110*0.8 ## AA tunneling chiral limit
+    w0::Float64 = 77 # 110*0.8 ## AA tunneling chiral limit
     w1::Float64 = 110 ## AB tunneling #96.056
     δ::Float64 = 0 # 17.0 # hBN alignment induced C2 symmetry breaking, only bottom layer
 

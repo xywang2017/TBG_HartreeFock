@@ -36,7 +36,7 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # legend()
     # ylim([-0.4,0.8])
     tight_layout()
-    savefig(savename,dpi=500)
+    # savefig(savename,dpi=500)
     display(fig)
     close(fig)
     println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)

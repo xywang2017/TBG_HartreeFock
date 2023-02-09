@@ -5,8 +5,8 @@ include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
-lk = 13
-params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+lk = 19
+params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
@@ -26,8 +26,8 @@ save(joinpath(fpath,"data/hf_strain_nu2.jld2"),"hf",hf);
 # ----------------- Hartree-Fock analysis part ---------------- # 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[4,:,:],points=[params.Kt/abs(params.g1)])
-iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
-kcut = real(kvec[:,iΓ])
-Ecut = ϵ0[:,:,iΓ]
-plot_energy_cuts(kcut,Ecut)
+plot_contour_maps(kvec,ϵ0[6,:,:],points=[params.Kt/abs(params.g1)])
+# iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
+# kcut = real(kvec[:,iΓ])
+# Ecut = ϵ0[:,:,iΓ]
+# plot_energy_cuts(kcut,Ecut)
