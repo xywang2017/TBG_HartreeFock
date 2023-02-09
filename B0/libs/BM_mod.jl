@@ -1,209 +1,212 @@
 include("Parameters_mod.jl")
 include("Lattice_mod.jl")
+include("helpers.jl")
 # --------------------------------------------------------------------------------------------------------------- #
 mutable struct HBM
-    flag_valley::String # if "K" only calculate K valey; if "Both" construct opposite valley by symmetry 
     _σrotation::Bool # flag on whether to add σ matrix rotation 
 
     params::Params 
     latt::Lattice
     
+    nlocal::Int  # layer x sublattice
     nη::Int # number of valleys 
     ns::Int # number of spins
     nb::Int # number of bands 
-    nfl::Int # total number of flavors
+    nt::Int # total number of flavors
 
-    hbm::Vector{Float64} # Hbm energies nfl x nk
-    Λkp::Array{ComplexF64,3} # αk x βp x G 
+    H::Array{ComplexF64,4}
+    Uk::Array{ComplexF64,4}
+    spectrum::Array{Float64,3} # Hbm energies nb x nη x nk
+    lg::Int 
+    gvec::Vector{ComplexF64}
+
+
+    Λ::Array{ComplexF64,2} # αk x βp 
     Gs::Vector{ComplexF64} # Gs for Λkp
+
+    fname::String # file store name
 
     HBM() = new()
 end
 
-function initHBM(blk::HBM,latt::Lattice,params::Params;
-        lg::Int=9,_σrotation::Bool=true,_calculate_overlap::Bool=true,_flag_valley::String="Both",fname::String="holder.txt")
-    blk._σrotation = _σrotation
-    blk.params = params 
-    blk.latt = latt
-    blk.flag_valley = _flag_valley
-    blk.nη = 2
-    blk.ns = 2
-    blk.nb = 2 # flat bands 
-    blk.nfl = blk.nη*blk.nb # treat spin separately 
+function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
+        _σrotation::Bool=true,_calculate_overlap::Bool=true,fname::String="holder.jld2")
+    A._σrotation = _σrotation
+    A.params = params 
+    A.latt = latt
+    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 2, 4
+    A.nt = A.nη*A.ns*A.nb 
+    A.fname = fname
 
+    @assert (lg-1)%2 == 0   # we deal with lg being odd, such that -g and g are related easily
+    A.lg = lg
+    A.gvec = ( reshape(collect((-lg÷2):(lg÷2)),:,1)*params.g1 .+ reshape(collect((-lg÷2):(lg÷2)),1,:)*params.g2 )[:]
+
+    constructHBM(A)
+    computeSpectrum(A)
+    enforceSymmetry(A)
+
+    jldopen(A.fname, "w") do file
+        hbm = zeros(Float64,A.nt,A.latt.nk)
+        tmp_hbm = reshape(hbm,A.ns,A.nη,A.nb,A.latt.nk)
+        for is in 1:A.ns, iη in 1:A.nη
+            tmp_hbm[is,iη,:,:] = A.spectrum[:,iη,:] 
+        end
+        file["E"] = hbm
+        file["nη"] = A.nη
+        file["nb"] = A.nb
+        file["ns"] = A.ns
+    end
+
+    if _calculate_overlap 
+        lG = 7
+        Gs = collect((-(lG-1)÷2):((lG-1)÷2))
+        A.Gs = (reshape(Gs,:,1)*A.params.g1 .+ reshape(Gs,1,:)*A.params.g2)[:]
+        A.Λ = zeros(ComplexF64,A.nt*A.latt.nk,A.nt*A.latt.nk)
+        jldopen(A.fname,"a") do file
+            file["Gs"] = A.Gs
+            file["lG"] = lG
+            for ig in eachindex(A.Gs)
+                m,n = Gs[(ig-1)%lG+1],Gs[(ig-1)÷lG+1]
+                println("m: ",m," n:",n)
+                calculate_overlap(A,m,n)
+                file["$(m)_$(n)"] = A.Λ
+            end
+        end
+    end
+    
+    return nothing 
+end
+
+function constructHBM(A::HBM)
+    A.H = zeros(ComplexF64,A.nlocal*A.lg^2,A.nlocal*A.lg^2,A.nη,A.latt.nk)
+    T12 = zeros(ComplexF64,A.nlocal*A.lg^2,A.nlocal*A.lg^2)
+    H0 = zeros(ComplexF64,size(A.H,1),size(A.H,2))
+    for iη in 1:A.nη
+        ζ = 3-2iη
+        generate_T12(T12,ζ,A)
+        for ik in 1:A.latt.nk
+            kval = latt.kvec[ik]
+            constructDiagonals(H0,kval,ζ,A)
+            A.H[:,:,iη,ik] = H0 + T12 - params.μ*I
+        end
+    end
+    return nothing 
+end 
+
+function computeSpectrum(A::HBM)
+    A.spectrum = zeros(Float64,A.nb,A.nη,A.latt.nk)
+    A.Uk = zeros(ComplexF64,A.nlocal*A.lg^2,A.nb,A.nη,A.latt.nk)
+
+    for ik in 1:A.latt.nk, iη in 1:A.nη
+        # check_Hermitian(A.H[:,:,iη,ik])
+        H0 = view(A.H,:,:,iη,ik)
+        idx_mid = size(H0,1)÷2
+        A.spectrum[:,iη,ik], A.Uk[:,:,iη,ik] = eigen(Hermitian(H0),idx_mid:(idx_mid+A.nb-1))
+    end
+
+    return nothing
+end
+
+function enforceSymmetry(A::HBM)
     s0 = Float64[1 0; 0 1]
     s1 = Float64[0 1; 1 0]
     is2 = Float64[0 1; -1 0]
-
-    @assert (lg-1)%2 == 0   # we deal with lg being odd, such that -g and g are related easily
-    
-    gvec = zeros(ComplexF64,lg^2)
-    for ig in 1:lg^2
-        ig1, ig2 = (ig-1)%lg+1 -(lg+1)÷2 , (ig-1)÷lg+1 - (lg+1)÷2
-        gvec[ig] = params.g1 * ig1 + params.g2 * ig2
-    end
-
     # this gives i mu_y I operation in the Bloch basis
-    Ig = reverse(Array{Float64}(I,lg^2,lg^2),dims=1)
+    Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
     Ph = -kron(Ig,kron(is2,s0))
 
     # this gives C2T eigenstates
-    Ig = Array{Float64}(I,lg^2,lg^2)
+    Ig = Array{Float64}(I,A.lg^2,A.lg^2)
     C2T = kron(Ig,kron(s0,s1)) # × conj(...)
 
-    nlocal = 4 # layer x sublattice
-
-    T12 = zeros(ComplexF64,nlocal*lg^2,nlocal*lg^2)
-    generate_T12(T12,lg,params)
-
-    # temporary container H for each k
-    H = zeros(ComplexF64,nlocal*lg^2,nlocal*lg^2)
-    # temporary basis vectors and eigenenergies for constructing HBM
-    Uk = zeros(ComplexF64,nlocal*lg^2,blk.nb,latt.nk)
-    Hk =zeros(Float64,blk.nb,latt.nk)
-    for ik in 1:latt.nk
-        kval = latt.kvec[ik]
-        ComputeH(H,kval,gvec,lg,params,_σrotation)
-        H .= H + T12 - params.μ*I
-        # Find the smallest eigenvalue and eigenvectors close to zero
-        # vals, vecs = eigs(Hermitian(H),nev=blk.nb,which=:SM)
-        idx_mid = size(H,1)÷2
-        vals, vecs = eigen(Hermitian(H),idx_mid:(idx_mid+blk.nb-1))
-        # C2T is broken for hBN alignment
-        vecs = vecs + C2T*conj(vecs)
-        for i in 1:blk.nb
-            tmp = view(vecs,:,i)
-            normalize!(tmp)
-        end
-
-        if (norm(imag(vals))<1e-6)
-            perm = sortperm(real(vals[:]))
-            Uk[:,:,ik] = view(vecs,:,perm)
-            Hk[:,ik] = real(vals[perm])
-        else
-            print("Error with Hermiticity of Hamiltonian!\n")
+    # if C2T is preserved then xxx. note that it is broken for hBN alignment
+    for ik in 1:size(A.Uk,3), iη in 1:A.nη
+        A.Uk[:,:,iη,ik] = (view(A.Uk,:,:,iη,ik) .+ C2T*conj.(view(A.Uk,:,:,iη,ik)))
+        for j in 1:size(A.Uk,2)
+            normalize!(view(A.Uk,:,j,iη,ik))
         end
     end
-
-    if isequal(blk.flag_valley,"Both")
-        blk.hbm = zeros(Float64,blk.nfl*latt.nk)
-        tmp_hbm = reshape(blk.hbm,blk.nη,blk.nb,latt.nk)
-        tmp_hbm[1,:,:] = Hk
-        if latt.flag_inv == true
-            tmp_hbm[2,:,:] = Hk[:,latt.nk:(-1):1]
-        else
-            println("Lattice is not inversion symmetric! Function initBM")
-        end
-    elseif isequal(blk.flag_valley,"K")
-        blk.hbm = zeros(Float64,blk.nb*latt.nk)
-        tmp_hbm = reshape(blk.hbm,blk.nb,latt.nk)
-        tmp_hbm[:,:] = Hk
-    else 
-        println("Wrong flag_valley value")
-    end
-
-    jldopen(fname, "w") do file
-        file["E"] = blk.hbm 
-    end
-
-    if _calculate_overlap
-        # construct Λ matrices 
-        lG = 7
-        Gs = collect((-(lG-1)÷2):((lG-1)÷2))
-        blk.Gs = (reshape(Gs,:,1)*params.g1 .+ reshape(Gs,1,:)*params.g2)[:]
-        λkp = zeros(ComplexF64,blk.nb*latt.nk,blk.nb*latt.nk)
-        λkpKprime = zeros(ComplexF64,blk.nb*latt.nk,blk.nb*latt.nk)
-        ur = zeros(ComplexF64,nlocal*lg^2,blk.nb*latt.nk)
-        ul = reshape(Uk,:,blk.nb*latt.nk)'
-        if isequal(blk.flag_valley,"Both")
-            blk.Λkp = zeros(ComplexF64,blk.nfl*latt.nk,blk.nfl*latt.nk,lG^2)
-            tmp_Λkp = reshape(blk.Λkp,blk.nη,blk.nb*latt.nk,blk.nη,blk.nb*latt.nk,lG^2)
-            tmp_Uk = reshape(Uk,nlocal,lg,lg,blk.nb*latt.nk)
-            for ig in 1:size(blk.Λkp,3)
-                m,n = Gs[(ig-1)%lG+1],Gs[(ig-1)÷lG+1]
-                ur .= reshape(circshift(tmp_Uk,(0,-m,-n,0)),nlocal*lg^2,blk.nb*latt.nk)
-                λkp .= ul * ur
-                tmp_Λkp[1,:,1,:,ig] = λkp
-                λkpKprime .= reshape(reshape(λkp,blk.nb,latt.nk,blk.nb,latt.nk)[:,latt.nk:(-1):1,:,latt.nk:(-1):1],blk.nb*latt.nk,blk.nb*latt.nk)
-                tmp_Λkp[2,:,2,:,lG^2-ig+1] = λkpKprime
-            end
-        elseif isequal(blk.flag_valley,"K")
-            blk.Λkp = zeros(ComplexF64,blk.nb*latt.nk,blk.nb*latt.nk,lG^2)
-            tmp_Uk = reshape(Uk,nlocal,lg,lg,blk.nb*latt.nk)
-            for ig in 1:size(blk.Λkp,3)
-                m,n = Gs[(ig-1)%lG+1],Gs[(ig-1)÷lG+1]
-                ur .= reshape(circshift(tmp_Uk,(0,-m,-n,0)),nlocal*lg^2,blk.nb*latt.nk)
-                λkp .= ul * ur
-                blk.Λkp[:,:,ig] = λkp
-            end
-        else 
-            println("Wrong flag_valley value")
-        end
-
-        jldopen(fname, "a") do file
-            file["Gs"] = blk.Gs
-            file["lG"] = lG
-        end
-        for ig in 1:size(blk.Λkp,3)
-            m,n = Gs[(ig-1)%lG+1],Gs[(ig-1)÷lG+1]
-            jldopen(fname, "a") do file
-                file["$(m)_$(n)"] = blk.Λkp[:,:,ig]
-            end
-        end
-    end
-
     return nothing
 end
 
-@inline function dirac(k::ComplexF64,θ0::Float64) ::Matrix{ComplexF64}
-    return  abs(k)*[0 exp(-1im*(angle(k)-θ0));exp(1im*(angle(k)-θ0)) 0]
+@inline function dirac(k::ComplexF64,ζ::Int,θ0::Float64) ::Matrix{ComplexF64}
+    #ζ = 1 (K) and -1 (K')
+    return  ζ*abs(k)*[0 exp(-1im*ζ*(angle(k)-θ0));exp(1im*ζ*(angle(k)-θ0)) 0]
 end
 
-function generate_T12(T12::Matrix{ComplexF64},lg::Int,params::Params)
+function generate_T12(T12::Matrix{ComplexF64},ζ::Int,A::HBM)
+    T12 .= 0.0 + 0.0im
     # p.b.c. is used 
-    idg = reshape(collect(1:lg^2),lg,lg)
+    idg = reshape(collect(1:A.lg^2),A.lg,A.lg)
     # per Oskar & Jian choice of g1 and g2
-    idg_nn1 = circshift(idg,(0,1))  # T1 * (|t><b|)
-    idg_nn2 = circshift(idg,(1,1))  # T2 * (|t><b|)
+    idg_nn1 = circshift(idg,(0,ζ))  # T1 * (|t><b|)
+    idg_nn2 = circshift(idg,(ζ,ζ))  # T2 * (|t><b|)
     idg_nn12 = circshift(idg,(0,0))  # T0 * (|t><b|)
 
-    tmp = reshape(T12,4,lg^2,4,lg^2)
-    for ig in eachindex(idg)
-        tmp[3:4,idg[ig],1:2,idg_nn1[ig]] = params.T2
-        tmp[1:2,idg_nn1[ig],3:4,idg[ig]] = params.T2'
-        tmp[3:4,idg[ig],1:2,idg_nn2[ig]] = params.T1
-        tmp[1:2,idg_nn2[ig],3:4,idg[ig]] = params.T1'
-        tmp[3:4,idg[ig],1:2,idg_nn12[ig]] = params.T0
-        tmp[1:2,idg_nn12[ig],3:4,idg[ig]] = params.T0'
+    tmp = reshape(T12,A.nlocal,A.lg^2,A.nlocal,A.lg^2)
+    if ζ ==1 
+        T0, T1, T2 = A.params.T0, A.params.T1, A.params.T2 
+    elseif ζ == -1
+        T0, T1, T2 = A.params.T0, A.params.T2, A.params.T1
+    else 
+        println("T12: Wrong value of ζ (valley) flag!")
     end
+
+    for ig in eachindex(idg)
+        tmp[3:4,idg[ig],1:2,idg_nn1[ig]] = T2
+        tmp[1:2,idg_nn1[ig],3:4,idg[ig]] = T2
+        tmp[3:4,idg[ig],1:2,idg_nn2[ig]] = T1
+        tmp[1:2,idg_nn2[ig],3:4,idg[ig]] = T1
+        tmp[3:4,idg[ig],1:2,idg_nn12[ig]] = T0
+        tmp[1:2,idg_nn12[ig],3:4,idg[ig]] = T0
+    end
+    
     return nothing
 end
 
-function ComputeH(H::Matrix{ComplexF64},k::ComplexF64,gvec::Vector{ComplexF64},lg::Int,params::Params,_σrotation::Bool;ig::Vector{Int}=[0;0])
+function constructDiagonals(H::Matrix{ComplexF64},k::ComplexF64,ζ::Int,A::HBM)
     """
         Dirac Hamiltonian in the Bloch band basis; Note here k only takes values within first mBZ 
+        ζ = 1 (K), -1 (K')
     """
     H .= 0.0 + 0.0im
     σz = ComplexF64[1 0 ; 0 -1]
     σ0 = ComplexF64[1 0; 0 1]
-    itr = reshape(collect(1:lg^2),lg,lg)
-    idg = view(circshift(itr,(ig[1],ig[2])),:)
-    R = params.dθ/2 * Float64[0 -1;1 0]
-    ∇u = (params.S[1,1] + params.S[2,2])/2
+    R = A.params.dθ/2 * Float64[0 -1;1 0]
+    ∇u = (A.params.S[1,1] + A.params.S[2,2])/2
     # dispersive part
-    for ig in 1:lg^2
-        qc = gvec[ig]
-        kb = k - params.Kb + qc
-        kt = k - params.Kt + qc
-        if (_σrotation==true)
-            k1 = (I + R - params.S*params.α)*[real(kb);imag(kb)]
-            k2 = (I - R + params.S*(1-params.α))*[real(kt);imag(kt)]
+    for ig in 1:A.lg^2
+        qc = A.gvec[ig]
+        kb = k - ζ*A.params.Kb + qc
+        kt = k - ζ*A.params.Kt + qc
+        if (A._σrotation==true)
+            k1 = (I + R - A.params.S*A.params.α)*[real(kb);imag(kb)]
+            k2 = (I - R + A.params.S*(1-A.params.α))*[real(kt);imag(kt)]
         else
             k1 = [real(kb);imag(kb)]
             k2 = [real(kt);imag(kt)]
         end
-        H[(4idg[ig]-3):(4idg[ig]-2),(4idg[ig]-3):(4idg[ig]-2)] = params.vf*dirac(k1[1]+1im*k1[2],0.0) .- (params.Da * ∇u)*σ0
-        H[(4idg[ig]-1):(4idg[ig]),(4idg[ig]-1):(4idg[ig])] = params.vf*dirac(k2[1]+1im*k2[2],0.0) .+ (params.Da * ∇u)*σ0
+        H[(4ig-3):(4ig-2),(4ig-3):(4ig-2)] = A.params.vf*dirac(k1[1]+1im*k1[2],ζ,0.0) .- (A.params.Da * ∇u)*σ0
+        H[(4ig-1):(4ig),(4ig-1):(4ig)] = A.params.vf*dirac(k2[1]+1im*k2[2],ζ,0.0) .+ (A.params.Da * ∇u)*σ0
+    end
+    return nothing
+end
+
+function calculate_overlap(A::HBM,m::Int,n::Int)
+    nlocal, nb, nη, ns, nk,lg = A.nlocal, A.nb,A.nη, A.ns, A.latt.nk,A.lg
+    A.Λ .= 0.0+0.0im
+    tmpΛ = reshape(A.Λ,ns,nη,nb*nk,ns,nη,nb*nk)
+
+    λkp = zeros(ComplexF64,nb*nk,nb*nk)
+    ur = zeros(ComplexF64,nlocal*lg^2,nb*nk)
+    for iη in 1:A.nη 
+        ul = reshape(view(A.Uk,:,:,iη,:),:,nb*nk) 
+        ur .= reshape( circshift(reshape(ul,nlocal,lg,lg,nb*nk),(0,-m,-n,0)) ,nlocal*lg^2,nb*nk)
+        λkp .= ul' * ur
+        for is in 1:A.ns 
+            tmpΛ[is,iη,:,is,iη,:] = λkp 
+        end 
     end
     return nothing
 end

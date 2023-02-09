@@ -42,7 +42,7 @@ end
 
 function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::String;
             ν::Float64=0.0,savename::String="placeholder.txt",_Init::String="flavor")
-    hf.ns, hf.nη, hf.nb, hf.nt = 2,2,2,8
+    
     hf.params = params 
     hf.latt = latt
 
@@ -50,8 +50,12 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     hf.precision = 1e-5
 
     hf.fname = fname
+    jldopen(hf.fname,"r") do file 
+        hf.ns, hf.nη, hf.nb = file["ns"],file["nη"],file["nb"]
+        hf.nt = hf.ns*hf.nη*hf.nb
+    end
 
-    hf.P = zeros(ComplexF64,hf.nt,hf.nt,latt.nk)
+    hf.P = zeros(ComplexF64,hf.nt,hf.nt,hf.latt.nk)
     hf.H = zeros(ComplexF64,size(hf.P))
     hf.ϵk = zeros(Float64,hf.nt,latt.nk)
 
@@ -101,13 +105,12 @@ end
 
 function BM_info(hf::HartreeFock)
     hf.H0 = zeros(ComplexF64,size(hf.H))
-    hbm = zeros(ComplexF64,hf.nη*hf.nb,hf.latt.nk)
-    tmp_H = reshape(hf.H0,hf.ns,hf.nη*hf.nb,hf.ns,hf.nη*hf.nb,hf.latt.nk)
-    
+    hbm = zeros(ComplexF64,hf.nt,hf.latt.nk)
+
     jldopen(hf.fname,"r") do file
-        hbm .= reshape(file["E"],hf.nη*hf.nb,hf.latt.nk)
-        for ifl in 1:hf.nη*hf.nb, is in 1:hf.ns
-            tmp_H[is,ifl,is,ifl,:] = hbm[ifl,:]
+        hbm .= file["E"]
+        for ifl in 1:hf.nt
+            hf.H0[ifl,ifl,:] = hbm[ifl,:] 
         end
     end
     return nothing
@@ -120,14 +123,11 @@ function add_Hartree(hf::HartreeFock;β::Float64=1.0)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
 
     tmp_Λ = reshape(hf.Λ,hf.nt,hf.latt.nk,hf.nt,hf.latt.nk)
-    tmp_Λ1 = reshape(hf.Λ,hf.ns,hf.nη*hf.nb*hf.latt.nk,hf.ns,hf.nη*hf.nb*hf.latt.nk)
     
     for ig in 1:lG^2
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
         jldopen(hf.fname,"r") do file 
-            for is in 1:hf.ns 
-                tmp_Λ1[is,:,is,:] = file["$(m)_$(n)"]
-            end
+            hf.Λ .= file["$(m)_$(n)"]
         end
         trPG = 0.0+0.0im
         for ik in 1:hf.latt.nk 
@@ -147,7 +147,6 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
 
     tmp_Λ = reshape(hf.Λ,hf.nt,hf.latt.nk,hf.nt,hf.latt.nk)
-    tmp_Λ1 = reshape(hf.Λ,hf.ns,hf.nη*hf.nb*hf.latt.nk,hf.ns,hf.nη*hf.nb*hf.latt.nk)
 
     kvec = reshape(hf.latt.kvec,:) 
     tmp_Fock = zeros(ComplexF64,hf.nt,hf.nt)
@@ -155,9 +154,7 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     for ig in 1:lG^2 
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
         jldopen(hf.fname,"r") do file 
-            for is in 1:hf.ns 
-                tmp_Λ1[is,:,is,:] = file["$(m)_$(n)"]
-            end
+            hf.Λ .= file["$(m)_$(n)"]
         end
         for ik in 1:hf.latt.nk
             tmp_Fock .= 0.0 + 0.0im
@@ -177,7 +174,6 @@ function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0)
     Glabels = (-(lG-1)÷2):((lG-1)÷2)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
 
-    tmp_Λ = reshape(hf.Λ,hf.ns,hf.nη*hf.nb*hf.latt.nk,hf.ns,hf.nη*hf.nb*hf.latt.nk)
     kvec = reshape(hf.latt.kvec,:) 
 
     Λ_perm = zeros(ComplexF64,hf.nt*hf.latt.nk,hf.nt*hf.latt.nk)
@@ -192,9 +188,7 @@ function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0)
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
         
         jldopen(hf.fname,"r") do file 
-            for is in 1:hf.ns 
-                tmp_Λ[is,:,is,:] = file["$(m)_$(n)"]
-            end
+            hf.Λ .= file["$(m)_$(n)"]
         end
         Λ_perm .= transpose(hf.Λ)
         Vvals .= (β*hf.V0/hf.latt.nk) * V.(reshape(kvec,:,1) .- reshape(kvec,1,:) .+ Gs[ig],Lm)

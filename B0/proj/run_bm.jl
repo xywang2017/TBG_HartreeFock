@@ -1,7 +1,7 @@
 using PyPlot
 using JLD2
 fpath = joinpath(pwd(),"B0")
-include(joinpath(fpath,"libs/BM_modv1.jl"))
+include(joinpath(fpath,"libs/BM_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
@@ -11,7 +11,7 @@ initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"data/bm_strain.jld2")
+bm_path = joinpath(fpath,"data/bm.jld2")
 
 # ------------------ non-interacting part ------------------ #
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
@@ -27,7 +27,7 @@ bm = compute_bm(latt,params,fname=bm_path);
 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(load(bm_path,"E"),bm.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[2,:,:],points=[params.Kt/abs(params.g1)])
+plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[:,:,iΓ],:,length(kcut))
