@@ -251,12 +251,4 @@ function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::
     return real(Etot)/(size(H0,3))
 end
 
-function check_Hermitian(H::Matrix{ComplexF64})
-    err = norm(H - H')
-    if err > 1e-6
-        println("Error with Hermitian Hamiltonian: ",err)
-    end
-    return nothing
-end
-
 include("initP_helpers.jl")
