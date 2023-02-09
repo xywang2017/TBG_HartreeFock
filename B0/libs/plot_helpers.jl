@@ -21,6 +21,7 @@ function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2})
     end
     xlabel("k")
     ylabel("E (meV)")
+    ylim([-30,30])
     legend()
     tight_layout()
     display(fig)

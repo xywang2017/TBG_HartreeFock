@@ -70,7 +70,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     iter_energy = Float64[]
     while norm_convergence > hf.precision
         println("Iter: ",iter)
-        hf.H .= hf.H0 * 0.0
+        hf.H .= hf.H0 * 1.0
         add_Hartree(hf;β=1.0)
         add_Fock(hf;β=1.0)
         # @time add_Fock_vectorize(hf;β=1.0)
@@ -80,15 +80,19 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         if norm_convergence <1e-4
             Δ = 0.0 
         else 
-            Δ = 0.0
+            Δ = 0.1
         end
-        norm_convergence = update_P(hf;Δ=Δ,α=0.4)
+        norm_convergence = update_P(hf;Δ=Δ,α=0.9)
 
         println("Running HF energy: ",Etot)
         println("Running norm convergence: ",norm_convergence)
         push!(iter_energy,Etot)
         push!(iter_err,norm_convergence)
         iter +=1
+
+        if iter >200
+            break 
+        end
     end
 
     return nothing
