@@ -94,6 +94,12 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         push!(iter_err,norm_convergence)
         iter +=1
 
+        if mod(i,50) == 0 
+            jldopen(savename,"w") do file 
+                file["hf"] = hf
+            end
+        end
+
         if iter >200
             break 
         end
