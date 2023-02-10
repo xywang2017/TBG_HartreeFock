@@ -4,7 +4,7 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix = 3
+prefix = 4
 ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
@@ -22,7 +22,7 @@ hf_path = joinpath(fpath,"data/$(prefix)_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)])
+# plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
