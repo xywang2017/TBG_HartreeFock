@@ -98,7 +98,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         push!(iter_oda,λ)
         iter +=1
 
-        if mod(iter,50) == 0 
+        if (mod(iter,50) == 0 )|| norm_convergence < hf.precision
             jldopen(savename,"w") do file 
                 file["hf"] = hf
                 file["iter_energy"] = iter_energy

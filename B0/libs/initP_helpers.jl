@@ -15,7 +15,7 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     # valley x spin U(4) rotation --- otherwise above initializations do not access valley spin coherent states
     # init_P_valley_spin_rotation(hf;α=0.2)
     # init_P_valley_rotation(hf;α=0.2)
-    init_P_random_rotation(hf;α=0.1)
+    init_P_random_rotation(hf;α=0.2)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing

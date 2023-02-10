@@ -26,7 +26,7 @@ bm = compute_bm(latt,params,fname=bm_path);
 # ------------------ non-interacting analysis ------------------ #
 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
-ϵ0 = reshape(load(bm_path,"E"),bm.nt,lk,lk)
+ϵ0 = reshape(load(bm_path,"E"),:,lk,lk)
 plot_contour_maps(kvec,ϵ0[6,:,:],points=[params.Kt/abs(params.g1)])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
