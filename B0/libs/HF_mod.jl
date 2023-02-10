@@ -72,29 +72,33 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     iter = 1
     iter_err = Float64[]
     iter_energy = Float64[]
+    iter_oda = Float64[]
     while norm_convergence > hf.precision
         println("Iter: ",iter)
         hf.H .= hf.H0 * 1.0
-        add_Hartree(hf;β=1.0)
-        add_Fock(hf;β=1.0)
+        add_HartreeFock(hf;β=1.0)
+        # add_Hartree(hf;β=1.0)
+        # add_Fock(hf;β=1.0)
         # @time add_Fock_vectorize(hf;β=1.0)
         Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P)
 
-        #Δ is a projector to make it closed shell
+        #Δ is a projector to make it closed shell -- incompatible with ODA
         if norm_convergence <1e-4
             Δ = 0.0 
         else 
-            Δ = 0.1
+            Δ = 0.0
         end
-        norm_convergence = update_P(hf;Δ=Δ,α=0.9)
+        norm_convergence,λ = update_P(hf;Δ=Δ)
 
         println("Running HF energy: ",Etot)
         println("Running norm convergence: ",norm_convergence)
+        println("ODA parameter λ: ",λ)
         push!(iter_energy,Etot)
         push!(iter_err,norm_convergence)
+        push!(iter_oda,λ)
         iter +=1
 
-        if mod(i,50) == 0 
+        if mod(iter,50) == 0 
             jldopen(savename,"w") do file 
                 file["hf"] = hf
             end
@@ -174,14 +178,51 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     return nothing
 end
 
-function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0)
+function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     Gs = load(hf.fname,"Gs")
     lG = load(hf.fname,"lG")
     Glabels = (-(lG-1)÷2):((lG-1)÷2)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
 
-    kvec = reshape(hf.latt.kvec,:) 
+    tmp_Λ = reshape(hf.Λ,hf.nt,hf.latt.nk,hf.nt,hf.latt.nk)
 
+    kvec = reshape(hf.latt.kvec,:) 
+    tmp_Fock = zeros(ComplexF64,hf.nt,hf.nt)
+
+    for ig in 1:lG^2 
+        m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        jldopen(hf.fname,"r") do file 
+            hf.Λ .= file["$(m)_$(n)"]
+        end
+
+        ## Hartree
+        trPG = 0.0+0.0im
+        for ik in 1:hf.latt.nk 
+            trPG += tr(view(hf.P,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
+        end
+        for ik in 1:size(hf.H,3) 
+            hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
+        end
+
+        ## Fock
+        for ik in 1:hf.latt.nk
+            tmp_Fock .= 0.0 + 0.0im
+            for ip in 1:hf.latt.nk
+                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
+                            ( view(tmp_Λ,:,ik,:,ip)*transpose(view(hf.P,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+            end
+            hf.H[:,:,ik] .-= tmp_Fock
+        end
+    end
+    return nothing
+end
+
+function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0)
+    Gs = load(hf.fname,"Gs")
+    lG = load(hf.fname,"lG")
+    Glabels = (-(lG-1)÷2):((lG-1)÷2)
+    Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
+    kvec = reshape(hf.latt.kvec,:) 
     Λ_perm = zeros(ComplexF64,hf.nt*hf.latt.nk,hf.nt*hf.latt.nk)
 
     Vvals = zeros(Float64,hf.latt.nk,hf.latt.nk)
@@ -213,7 +254,7 @@ function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0)
     return nothing
 end
 
-function update_P(hf::HartreeFock;Δ::Float64=0.0,α::Float64=0.3)
+function update_P(hf::HartreeFock;Δ::Float64=0.0)
     """
         Diagonalize Hamiltonian for every k; use ν to keep the lowest N particle states;
         update P 
@@ -238,9 +279,11 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,α::Float64=0.3)
     end
 
     norm_convergence = norm(P_new .- hf.P) ./ norm(P_new)
-    hf.P .= α*P_new + (1-α)*hf.P
+
+    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    hf.P .= λ*P_new + (1-λ)*hf.P
     
-    return norm_convergence
+    return norm_convergence,λ
 end
 
 function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::Array{ComplexF64,3})
@@ -249,6 +292,76 @@ function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::
         Etot += tr(view(H_HF,:,:,ik)*transpose(view(P,:,:,ik)))/2 + tr(view(H0,:,:,ik)*transpose(view(P,:,:,ik)))
     end
     return real(Etot)/(size(H0,3))
+end
+
+function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0)
+    # compute coefficients b λ + a λ^2/2
+
+    Gs = load(hf.fname,"Gs")
+    lG = load(hf.fname,"lG")
+    Glabels = (-(lG-1)÷2):((lG-1)÷2)
+    Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
+
+    tmp_Λ = reshape(hf.Λ,hf.nt,hf.latt.nk,hf.nt,hf.latt.nk)
+    kvec = reshape(hf.latt.kvec,:) 
+    tmp_Fock = zeros(ComplexF64,hf.nt,hf.nt)
+
+    # change of Hartree-Fock due to a small δP
+    δH = zeros(ComplexF64,size(δP))
+    for ig in 1:lG^2
+        m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        jldopen(hf.fname,"r") do file 
+            hf.Λ .= file["$(m)_$(n)"]
+        end
+        trPG = 0.0+0.0im
+        for ik in 1:hf.latt.nk 
+            trPG += tr(view(δP,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
+        end
+        for ik in 1:size(δH,3) 
+            δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
+        end
+        for ik in 1:hf.latt.nk
+            tmp_Fock .= 0.0 + 0.0im
+            for ip in 1:hf.latt.nk
+                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
+                            ( view(tmp_Λ,:,ik,:,ip)*transpose(view(δP,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+            end
+            δH[:,:,ik] .-= tmp_Fock
+        end
+    end
+
+    # compute coefficients with δP 
+    a, b = 0.0+0.0im , 0.0 +0.0im
+    for ik in 1:hf.latt.nk 
+        b += tr(transpose(view(δP,:,:,ik))*view(hf.H0,:,:,ik)) + 
+             tr(transpose(view(δP,:,:,ik))*view(hf.H .- hf.H0,:,:,ik))/2 +
+             tr(transpose(view(hf.P,:,:,ik))*view(δH,:,:,ik))/2
+        a += tr(transpose(view(δP,:,:,ik))*view(δH,:,:,ik))
+    end
+    a = real(a)/size(δP,3)
+    b = real(b)/size(δP,3)
+
+    # if abs(imag(a))+abs(imag(b)) >1e-13 
+    #     println(imag(a)," ",imag(b))
+    # end
+    λ, λ0 = 0.0 , -b/a
+    # println("a= ",a," b= ",b," λ0=",λ0)
+    if a>0 # convex and increasing with large λ 
+        if λ0 <=0 
+            λ = 0.1  # give it some kick..
+        elseif λ0 <1 
+            λ = λ0 
+        else
+            λ = 1.0 
+        end
+    else
+        if λ0 <=0.5 
+            λ = 1.0 
+        else 
+            λ = 0.1 # give it some kick..
+        end
+    end
+    return λ
 end
 
 include("initP_helpers.jl")

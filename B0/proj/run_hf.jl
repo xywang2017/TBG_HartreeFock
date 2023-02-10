@@ -7,7 +7,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 prefix = ARGS[1]
 
 # ------------------ Specification ------------------ #
-lk = 19
+lk = 13
 params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
