@@ -104,7 +104,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             end
         end
 
-        if iter >200
+        if iter >500
             break 
         end
     end
