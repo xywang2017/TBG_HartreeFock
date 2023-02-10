@@ -287,8 +287,10 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
 
     norm_convergence = norm(P_new .- hf.P) ./ norm(P_new)
 
-    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    hf.P .= λ*P_new + (1-λ)*hf.P
+    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    # hf.P .= λ*P_new + (1-λ)*hf.P
+    λ = 1.0  # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    hf.P .= P_new
     
     return norm_convergence,λ
 end
