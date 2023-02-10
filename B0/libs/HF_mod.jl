@@ -101,6 +101,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         if mod(iter,50) == 0 
             jldopen(savename,"w") do file 
                 file["hf"] = hf
+                file["iter_energy"] = iter_energy
+                file["iter_err"] = iter_err 
+                file["iter_oda"] = iter_oda
             end
         end
 
