@@ -15,7 +15,8 @@ latt = Lattice()
 initLattice(latt,params;lk=lk)
 
 bm_path = joinpath(fpath,"data/strain_bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
+# hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
+hf_path = "typical_starting_point.jld2"
 
 # ----------------- Hartree-Fock analysis part ---------------- # 
 hf = load(hf_path,"hf");

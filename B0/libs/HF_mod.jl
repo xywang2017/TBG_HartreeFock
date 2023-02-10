@@ -96,8 +96,12 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         push!(iter_energy,Etot)
         push!(iter_err,norm_convergence)
         push!(iter_oda,λ)
+        # if iter == 1 
+        #     jldopen("typical_starting_point.jld2","w") do file 
+        #         file["hf"] = hf 
+        #     end
+        # end
         iter +=1
-
         if (mod(iter,50) == 0 )|| norm_convergence < hf.precision
             jldopen(savename,"w") do file 
                 file["hf"] = hf
