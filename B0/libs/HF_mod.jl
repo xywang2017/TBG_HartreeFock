@@ -285,7 +285,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
     end
 
-    norm_convergence = norm(P_new .- hf.P) ./ norm(P_new)
+    norm_convergence = calculate_norm_convergence(P_new,hf.P)
 
     # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
     # hf.P .= λ*P_new + (1-λ)*hf.P
@@ -293,6 +293,17 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     hf.P .= P_new
     
     return norm_convergence,λ
+end
+
+function calculate_norm_convergence(P2::Array{ComplexF64,3},P1::Array{ComplexF64,3})
+    vals1 = zeros(Float64,size(P1,1),size(P1,3))
+    vals2 = zeros(Float64,size(P1,1),size(P1,3))
+    for ik in 1:size(P1,3)
+        vals1[:,ik] .= eigvals(Hermitian(view(P1,:,:,ik)))
+        vals2[:,ik] .= eigvals(Hermitian(view(P2,:,:,ik))) 
+    end
+    return norm(vals2 .-vals1) / norm(vals2)
+    # return norm(P_new .- hf.P) ./ norm(P_new)
 end
 
 function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::Array{ComplexF64,3})
