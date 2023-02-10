@@ -9,6 +9,7 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     ylabel(L"k_y")
     axis("equal")
     tight_layout()
+    savefig("test.pdf")
     display(fig)
     close(fig)
     return nothing
@@ -28,6 +29,7 @@ function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vect
     # ylim([-30,30])
     legend()
     tight_layout()
+    savefig("test.pdf")
     display(fig)
     close(fig)
     return nothing
