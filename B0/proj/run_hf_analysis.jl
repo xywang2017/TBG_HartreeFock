@@ -4,18 +4,18 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix = 4
-ν = 1.0
+prefix = 8
+ν = 2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 19
-params = Params(ϵ=0.00,Da=00,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"data/_bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"data/$(prefix)_hf_$(νstr)_lk$(lk).jld2")
+bm_path = joinpath(fpath,"data/strain_bm_lk$(lk).jld2")
+hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 # hf_path = "typical_starting_point.jld2"
 
 # ----------------- Hartree-Fock analysis part ---------------- # 
@@ -34,6 +34,8 @@ plot_energy_cuts(kcut,Ecut,lines=[μ])
 iter_oda = load(hf_path,"iter_oda");
 iter_err = load(hf_path,"iter_err");
 iter_energy = load(hf_path,"iter_energy");
+println(iter_energy[end])
+println(iter_err[end])
 
 fig,ax = subplots(figsize=(4,3))
 ax.plot(eachindex(iter_err),iter_err,"b.",label="err",ms=2)

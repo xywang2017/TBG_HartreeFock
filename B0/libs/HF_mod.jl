@@ -278,7 +278,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     iband_occupied = (iϵ_occupied .-1) .% size(hf.ϵk,1) .+1
     ik_occupied = (iϵ_occupied .-1) .÷ size(hf.ϵk,1) .+1
 
-    P_new = similar(hf.P)
+    P_new = zeros(ComplexF64,size(hf.P))
 
     for ik in 1:size(hf.P,3)
         occupied_vecs = vecs[:,iband_occupied[ik_occupied.==ik],ik]
@@ -287,10 +287,11 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
 
     norm_convergence = calculate_norm_convergence(P_new,hf.P)
 
-    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    # hf.P .= λ*P_new + (1-λ)*hf.P
-    λ = 1.0  # often times oda_parameterization returns λ = 1.0, therefore not necessary
-    hf.P .= P_new
+    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
+    hf.P .= λ*P_new + (1-λ)*hf.P
+    # λ = 1.0  # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    # hf.P .= P_new
     
     return norm_convergence,λ
 end
