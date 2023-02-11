@@ -76,7 +76,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     while norm_convergence > hf.precision
         println("Iter: ",iter)
         hf.H .= hf.H0 * 1.0
-        add_HartreeFock(hf;β=1.0)
+        @time add_HartreeFock(hf;β=1.0)
         # add_Hartree(hf;β=1.0)
         # add_Fock(hf;β=1.0)
         # @time add_Fock_vectorize(hf;β=1.0)
