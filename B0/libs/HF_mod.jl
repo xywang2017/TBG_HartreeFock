@@ -287,24 +287,22 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
 
     norm_convergence = calculate_norm_convergence(P_new,hf.P)
 
-    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     hf.P .= λ*P_new + (1-λ)*hf.P
-    # λ = 1.0  # often times oda_parameterization returns λ = 1.0, therefore not necessary
-    # hf.P .= P_new
-    
     return norm_convergence,λ
 end
 
 function calculate_norm_convergence(P2::Array{ComplexF64,3},P1::Array{ComplexF64,3})
-    vals1 = zeros(Float64,size(P1,1),size(P1,3))
-    vals2 = zeros(Float64,size(P1,1),size(P1,3))
-    for ik in 1:size(P1,3)
-        vals1[:,ik] .= eigvals(Hermitian(view(P1,:,:,ik)))
-        vals2[:,ik] .= eigvals(Hermitian(view(P2,:,:,ik))) 
-    end
-    return norm(vals2 .-vals1) / norm(vals2)
-    # return norm(P_new .- hf.P) ./ norm(P_new)
+    # vals1 = zeros(Float64,size(P1,1),size(P1,3))
+    # vals2 = zeros(Float64,size(P1,1),size(P1,3))
+    # for ik in 1:size(P1,3)
+    #     vals1[:,ik] .= eigvals(Hermitian(view(P1,:,:,ik)))
+    #     vals2[:,ik] .= eigvals(Hermitian(view(P2,:,:,ik))) 
+    # end
+    # return norm(vals2 .-vals1) / norm(vals2)
+    return norm(P1 .- P2) ./ norm(P2)
 end
 
 function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::Array{ComplexF64,3})
