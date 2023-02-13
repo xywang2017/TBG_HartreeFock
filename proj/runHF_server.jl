@@ -10,7 +10,7 @@ q = parse(Int,ARGS[2])
 νstr = round(Int,1000*ν)
 flag = ARGS[4]
 w0 = ARGS[5]
-savename = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+savename = joinpath(fpath,"feldman/data_w$(w0)/1_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 ϕ = p//q 
 if isequal(flag,"flavor")
     _Init = "Flavor U(4)"

@@ -1,6 +1,6 @@
 using PyPlot,JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 ## Hartree Fock related 
