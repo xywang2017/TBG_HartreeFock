@@ -1,7 +1,6 @@
 using JLD2
 fpath = pwd()
-# include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
-include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
