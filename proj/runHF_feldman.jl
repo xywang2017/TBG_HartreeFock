@@ -14,11 +14,12 @@ w0s = ["07"]
 w0snum = [0.7]
 σz = []
 p,q = 1, 4
-νF = 0 + (0)*p/q
+νF = 1 + (1)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    metadata = "typical_starting_point.jld2"
+    println(metadata)
+    # metadata = "typical_starting_point.jld2"
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)

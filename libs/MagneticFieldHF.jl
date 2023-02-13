@@ -135,7 +135,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
                     hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
         end
 
-        if mod(iter,25) ==0 
+        if mod(iter,25) ==0 || norm_convergence < hf.precision
             save(hf.savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",
                     hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
         end

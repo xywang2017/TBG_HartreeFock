@@ -16,20 +16,18 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # ϵsorted = ϵsorted[chern .>0] #./Vcoulomb
     # chern = chern[chern .>0]
 
-    pl=scatter(ones(length(ϵsorted))*0.25,ϵsorted,c=chern,cmap="Spectral_r",s=6,vmin=-1,vmax=1)
+    pl=scatter(ones(length(ϵsorted))*0.25,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
     colorbar(pl)
     ϵF = minimum(ϵsorted)
     δν = 1/length(ϵsorted) * 8
-    Δ = 0.0 
-    for i in 2:length(ϵsorted)
-        ν = (i / length(ϵsorted) -0.5) * 8 
-        if ν>=νF+δν/2 
-            ϵF = (ν==νF) ? (ϵsorted[i] + ϵsorted[i+1])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
-            Δ = (ν==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
-            println("Gap size: ", Δ)
-            break 
-        end
+    ν = 8*eachindex(ϵsorted) ./ length(ϵsorted) .- 4
+    i = 1
+    while νF > ν[i]
+        i += 1
     end
+    ϵF = (ν[i]==νF) ? (ϵsorted[i+1] + ϵsorted[i])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
+    Δ = (ν[i]==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
+    println("Gap size: ", Δ)
     axhline(ϵF,ls=":",c="gray")
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
