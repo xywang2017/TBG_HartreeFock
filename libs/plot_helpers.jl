@@ -25,6 +25,7 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     while νF > ν[i]
         i += 1
     end
+    i-=1
     ϵF = (ν[i]==νF) ? (ϵsorted[i+1] + ϵsorted[i])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
     Δ = (ν[i]==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
     println("Gap size: ", Δ)
