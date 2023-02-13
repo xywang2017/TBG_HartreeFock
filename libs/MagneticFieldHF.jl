@@ -106,28 +106,30 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     iter_energy = Float64[]
     iter_oda = Float64[]
     while norm_convergence > hf.precision
-        println("Iter: ",iter)
-        α = 1.0
-        hf.H .= hf.H0 * α
-        add_Hartree(hf;β=1.0,V0=hf.V0)
-        # add_Fock(hf;β=1.0,V0=hf.V0)
-        add_Fock_vectorize(hf;β=1.0,V0=hf.V0)
-        Etot = compute_HF_energy(hf.H .- α*hf.H0,α*hf.H0,hf.P,hf.ν)
-        #Δ is a projector to make it closed shell
-        if norm_convergence <1e-4
-            Δ = 0.0
-        else 
-            Δ = 0.0
-        end
-        norm_convergence,λ = update_P(hf;Δ=Δ)
-        
-        println("Running HF energy (per moire u.c.): ",Etot)
-        println("Running norm convergence: ",norm_convergence)
-        println("Running ODA paramter λ: ",λ)
+        @time begin 
+            println("Iter: ",iter)
+            α = 1.0
+            hf.H .= hf.H0 * α
+            add_Hartree(hf;β=1.0,V0=hf.V0)
+            # add_Fock(hf;β=1.0,V0=hf.V0)
+            add_Fock_vectorize(hf;β=1.0,V0=hf.V0)
+            Etot = compute_HF_energy(hf.H .- α*hf.H0,α*hf.H0,hf.P,hf.ν)
+            #Δ is a projector to make it closed shell
+            if norm_convergence <1e-4
+                Δ = 0.0
+            else 
+                Δ = 0.0
+            end
+            norm_convergence,λ = update_P(hf;Δ=Δ)
+            
+            println("Running HF energy (per moire u.c.): ",Etot)
+            println("Running norm convergence: ",norm_convergence)
+            println("Running ODA paramter λ: ",λ)
 
-        push!(iter_energy,Etot)
-        push!(iter_err,norm_convergence)
-        push!(iter_oda,λ)
+            push!(iter_energy,Etot)
+            push!(iter_err,norm_convergence)
+            push!(iter_oda,λ)
+        end
         if iter ==1 
             save("typical_starting_point.jld2","spectrum",hf.ϵk,"chern",
                     hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
@@ -336,10 +338,8 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
     end
 
-    norm_convergence = calculate_norm_convergence(P_new,hf.P)
-
-    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    # λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     hf.P .= λ*P_new + (1-λ)*hf.P
     return norm_convergence,λ
