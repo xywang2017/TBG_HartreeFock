@@ -37,6 +37,8 @@ mutable struct HartreeFock
     H::Array{ComplexF64,3} # running Hamiltonian for any given k; nfl*q x nfl*q x nk
     precision::Float64  # iteration stopping point
 
+    savename::String
+
     HartreeFock() = new()
 end
 
@@ -58,7 +60,7 @@ function CoulombUnit(params::Params)
 end
 
 function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
-        ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",
+        ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",savename::String="placeholder.txt",
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     p, q = numerator(ϕ), denominator(ϕ)
     hf.p = p
@@ -95,12 +97,14 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     # --------- Initialization ---------- #
     
     init_P(hf,_Init=_Init,P0=P0,H0=H0)
+    hf.savename = savename
     
     # --------- Hartree Fock Iterations ---------- #
     norm_convergence = 10.0 
     iter = 1
     iter_err = Float64[]
     iter_energy = Float64[]
+    iter_oda = Float64[]
     while norm_convergence > hf.precision
         println("Iter: ",iter)
         α = 1.0
@@ -115,18 +119,30 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         else 
             Δ = 0.0
         end
-        norm_convergence = update_P(hf;Δ=Δ,α=0.3)
+        norm_convergence,λ = update_P(hf;Δ=Δ)
         
         println("Running HF energy (per moire u.c.): ",Etot)
         println("Running norm convergence: ",norm_convergence)
+        println("Running ODA paramter λ: ",λ)
+
         push!(iter_energy,Etot)
         push!(iter_err,norm_convergence)
+        push!(iter_oda,λ)
+        if iter ==1 
+            save("typical_starting_point.jld2","spectrum",hf.ϵk,"chern",
+                    hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
+        end
+
+        if mod(iter,25) ==0 
+            save(hf.savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",
+                    hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
+        end
+
         iter +=1
         
-        if iter > 200
+        if iter > 500
             break 
         end
-        
     end
 
     return iter_err, iter_energy
@@ -290,7 +306,7 @@ function add_Fock_vectorize(hf::HartreeFock;β::Float64=1.0,V0::Float64=1.0)
     return nothing
 end
 
-function update_P(hf::HartreeFock;Δ::Float64=0.0,α::Float64=0.2)
+function update_P(hf::HartreeFock;Δ::Float64=0.0)
     """
         Diagonalize Hamiltonian for every k; use ν to keep the lowest N particle states;
         update P 
@@ -320,13 +336,27 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,α::Float64=0.2)
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
     end
 
-    # α = compute_optimal_λ(hf.H-hf.H0,hf.H0,hf.P,P_new,hf.ν)
-    norm_convergence = norm(P_new .- hf.P) ./ norm(P_new)
-    hf.P .= α*P_new .+(1-α)*hf.P
-    println("ODA value α is: ",α)
-    # println("Trace of P is: ", sum([tr(P_new[:,:,ik]) for ik in 1:size(P,3)]) )
-    return norm_convergence
+    norm_convergence = calculate_norm_convergence(P_new,hf.P)
+
+    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    # λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
+    hf.P .= λ*P_new + (1-λ)*hf.P
+    return norm_convergence,λ
 end
+
+
+function calculate_norm_convergence(P2::Array{ComplexF64,3},P1::Array{ComplexF64,3})
+    # vals1 = zeros(Float64,size(P1,1),size(P1,3))
+    # vals2 = zeros(Float64,size(P1,1),size(P1,3))
+    # for ik in 1:size(P1,3)
+    #     vals1[:,ik] .= eigvals(Hermitian(view(P1,:,:,ik)))
+    #     vals2[:,ik] .= eigvals(Hermitian(view(P2,:,:,ik))) 
+    # end
+    # return norm(vals2 .-vals1) / norm(vals2)
+    return norm(P1 .- P2) ./ norm(P2)
+end
+
 
 function compute_optimal_λ(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P1::Array{ComplexF64,3},P2::Array{ComplexF64,3},ν::Float64)
     # assuming a simple parabolic dependence on λ
@@ -353,23 +383,97 @@ function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::
     return real(Etot)/(size(H0,3)*size(H0,1))*8 # per moire unit cell
 end
 
-function check_Hermitian(H::Matrix{ComplexF64})
-    err = norm(H - H')
-    if err > 1e-6
-        println("Error with Hermitian Hamiltonian")
+function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0)
+    # change of Hartree-Fock due to a small δP
+    δH = zeros(ComplexF64,size(δP))
+    Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
+    nk = length(hf.latt.kvec)
+    kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
+                    reshape(hf.latt.k1[1:hf.nq]*hf.params.g1,1,:,1) .+ 
+                    reshape(hf.latt.k2[1:hf.nq]*hf.params.g2,1,1,:), : )
+
+    # --------------------------------------------------------- # 
+    tmpδP = reshape(δP,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,hf.nq^2*hf.q)
+    tmpδH = reshape(δH,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,hf.nq^2*hf.q)
+    tmpΛ = reshape(hf.Λ,2hf.q,hf.nq^2*hf.q,2hf.q,hf.nq^2*hf.q,hf.nη)
+    tmpΛ1= reshape(hf.Λ,2hf.q,hf.nq^2*hf.q,2hf.q,hf.nq^2*hf.q,hf.nη,1)
+    P_perm = permutedims(tmpδP,(4,1,7,5,6,2,3))
+    Λ_perm = zeros(ComplexF64,hf.nb*hf.q,hf.q*hf.nq^2,hf.nb*hf.q,hf.nη,1,hf.q*hf.nq^2)
+    Vnum = zeros(Float64,hf.q*hf.nq^2,hf.q*hf.nq^2)
+
+    term1 = zeros(ComplexF64,1,1,hf.q*hf.nq^2,1,1,1,1,1,1,hf.q*hf.nq^2)
+    term2 = zeros(ComplexF64,hf.nb*hf.q,1,hf.q*hf.nq^2,hf.nb*hf.q,hf.nη,1,1,1,1,hf.nq^2*hf.q)
+    term3 = zeros(ComplexF64,hf.nb*hf.q,hf.nb*hf.q,hf.q*hf.nq^2,1,hf.nη,hf.ns,1,hf.nη,hf.ns,1)
+    term4 = zeros(ComplexF64,1,hf.nb*hf.q,hf.q*hf.nq^2,1,1,1,hf.nb*hf.q,hf.nη,1,hf.nq^2*hf.q)
+    
+    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
+        for iη in 1:2
+            jldopen(hf.metadata[iη]) do file 
+                hf.Λ[:,:,iη] .= file["$(m)_$(n)"]
+            end
+        end
+        # --------------------------------- Hartree ------------------------------- #
+        trΛ = 0.0 + 0.0im
+        if n%hf.q ==0
+            for ik in 1:size(tmpΛ,2),is in 1:hf.ns,iη in 1:hf.nη
+                trΛ += tr( conj(view(tmpΛ,:,ik,:,ik,iη))*view(tmpδP,:,iη,is,:,iη,is,ik) )
+            end
+        else
+            for ik in 1:size(tmpΛ,2),is in 1:hf.ns,iη in 1:hf.nη
+                trΛ += tr( conj(view(tmpΛ,:,ik,:,ik,iη))*( view(tmpδP,:,iη,is,:,iη,is,ik) + 0.5I) )
+            end
+        end
+        for ik in 1:size(tmpΛ,2),is in 1:hf.ns,iη in 1:hf.nη
+            tmpδH[:,iη,is,:,iη,is,ik] .+= (β*hf.V0/nk*V(m*hf.params.g1+n/hf.q*hf.params.g2,Lm)*trΛ) * view(tmpΛ,:,ik,:,ik,iη) 
+        end
+        # --------------------------------- Fock ------------------------------- #
+        Vnum .= (β/nk*hf.V0) .* V.(kvec .-transpose(kvec) .+m*hf.params.g1.+n/hf.q*hf.params.g2,Lm)
+        Λ_perm .= permutedims(tmpΛ1,(3,4,1,5,6,2))
+        term1 .= reshape(Vnum,(1,1,hf.q*hf.nq^2,1,1,1,1,1,1,hf.q*hf.nq^2)) 
+        term2 .= reshape(Λ_perm,(hf.nb*hf.q,1,hf.q*hf.nq^2,hf.nb*hf.q,hf.nη,1,1,1,1,hf.nq^2*hf.q))
+        term3 .= reshape(P_perm,(hf.nb*hf.q,hf.nb*hf.q,hf.q*hf.nq^2,1,hf.nη,hf.ns,1,hf.nη,hf.ns,1))
+        term4 .= reshape(conj(Λ_perm),(1,hf.nb*hf.q,hf.q*hf.nq^2,1,1,1,hf.nb*hf.q,hf.nη,1,hf.nq^2*hf.q))
+        @inbounds @fastmath for i3 in 1:hf.q*hf.nq^2, i2 in 1:hf.nb*hf.q, i1 in 1:hf.nb*hf.q 
+            tmpδH .-= view(term1,1,1,i3,:,:,:,:,:,:,:) .* 
+                    view(term2,i1,1,i3,:,:,:,:,:,:,:) .*  
+                    view(term3,i1,i2,i3,:,:,:,:,:,:,:) .* 
+                    view(term4,1,i2,i3,:,:,:,:,:,:,:)
+        end
     end
-    return nothing
-end
 
-
-function check_Unitary(A::Matrix{ComplexF64})
-    err = norm(A'*A -I)
-    if err > 1e-6
-        println("Error with Unitarity of Matrix")
+    # compute coefficients with δP 
+    a, b = 0.0+0.0im , 0.0 +0.0im
+    for ik in 1:size(δP,3)
+        b += tr(transpose(view(δP,:,:,ik))*view(hf.H0,:,:,ik)) + 
+             tr(transpose(view(δP,:,:,ik))*view(hf.H .- hf.H0,:,:,ik))/2 +
+             tr(transpose(view(hf.P,:,:,ik))*view(δH,:,:,ik))/2
+        a += tr(transpose(view(δP,:,:,ik))*view(δH,:,:,ik))
     end
-    return nothing
-end
+    a = real(a)/size(δP,3)
+    b = real(b)/size(δP,3)
 
+    if abs(imag(a))+abs(imag(b)) >1e-13 
+        println(imag(a)," ",imag(b))
+    end
+    λ, λ0 = 0.0 , -b/a
+    # println("a= ",a," b= ",b," λ0=",λ0)
+    if a>0 # convex and increasing with large λ 
+        if λ0 <=0 
+            λ = 0.1  # give it some kick..
+        elseif λ0 <1 
+            λ = λ0 
+        else
+            λ = 1.0 
+        end
+    else
+        if λ0 <=0.5 
+            λ = 1.0 
+        else 
+            λ = 0.1 # give it some kick..
+        end
+    end
+    return λ
+end
 
 include("initP_helpers.jl")
 # include("plot_helpers.jl")

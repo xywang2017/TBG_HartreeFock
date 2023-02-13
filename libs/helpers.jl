@@ -277,3 +277,21 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
     # oLL *= exp(1im * real(q) * imag(q) * lB^2 / 2)
     return oLL
 end
+
+
+function check_Hermitian(H::Matrix{ComplexF64})
+    err = norm(H - H')
+    if err > 1e-6
+        println("Error with Hermitian Hamiltonian")
+    end
+    return nothing
+end
+
+
+function check_Unitary(A::Matrix{ComplexF64})
+    err = norm(A'*A -I)
+    if err > 1e-6
+        println("Error with Unitarity of Matrix")
+    end
+    return nothing
+end

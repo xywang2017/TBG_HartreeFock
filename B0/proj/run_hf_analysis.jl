@@ -5,10 +5,10 @@ include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
-ν = 0.0
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 25
+lk = 19
 params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()

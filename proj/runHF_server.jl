@@ -1,6 +1,7 @@
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+# include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -25,10 +26,10 @@ println(savename)
 params = Params()
 initParamsWithStrain(params)
 hf = HartreeFock()
-iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="feldman/data_w$(w0)/_$(p)_$(q)/",_Init=_Init)
+iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="feldman/data_w$(w0)/_$(p)_$(q)/",_Init=_Init,savename=savename)
 
 # P0 = load(savename,"P")
 # iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="feldman/data_w$(w0)/_$(p)_$(q)/",_Init=" ",P0=P0)
 
-save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
+# save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
 #
