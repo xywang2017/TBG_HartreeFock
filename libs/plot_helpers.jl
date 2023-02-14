@@ -18,14 +18,11 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
 
     pl=scatter(ones(length(ϵsorted))*0.25,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
     colorbar(pl)
-    ϵF = minimum(ϵsorted)
-    δν = 1/length(ϵsorted) * 8
     ν = 8*eachindex(ϵsorted) ./ length(ϵsorted) .- 4
     i = 1
     while νF > ν[i]
         i += 1
     end
-    i-=1
     ϵF = (ν[i]==νF) ? (ϵsorted[i+1] + ϵsorted[i])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
     Δ = (ν[i]==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
     println("Gap size: ", Δ)
@@ -35,7 +32,7 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # legend()
     # ylim([-0.4,0.8])
     tight_layout()
-    # savefig(savename,dpi=500)
+    savefig(savename,transparent=true)
     display(fig)
     close(fig)
     println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)

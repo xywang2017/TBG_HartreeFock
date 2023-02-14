@@ -29,7 +29,9 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = joinpath(fpath,"feldman/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     # fname = joinpath(fpath,"feldman/nonint/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
-    constructbmLL(bm;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
+    params = Params(w1=110.0,w0=110.0*w0)
+    initParamsWithStrain(params)
+    constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
     return bm
 end

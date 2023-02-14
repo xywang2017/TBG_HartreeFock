@@ -49,7 +49,7 @@ mutable struct bmLL
     bmLL() = new()
 end
 
-function constructbmLL(A::bmLL;
+function constructbmLL(A::bmLL,params::Params;
                         ϕ::Rational{Int}=1//10,nLL::Int=10,nq::Int=2,fname::String="placeholder.txt", α::Float64=0.3,
                         _σrotation::Bool = false, _hBN::Bool = false, _strain::Bool= true, _valley::String="K", _calculate_overlap::Bool = true)
     
@@ -64,10 +64,7 @@ function constructbmLL(A::bmLL;
     A.nH = A.nLL * A.nγ - 1
     A.nq = nq
     
-    A.params = Params(w1=110,w0=110*α)
-    if (A._strain==true)
-        initParamsWithStrain(A.params)
-    end
+    A.params = params
 
     A.qϕ = 2π/abs2(A.params.a2) * A.params.a2 * A.p/A.q
     

@@ -9,7 +9,7 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 1
+seed = 4
 w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
@@ -19,14 +19,13 @@ p,q = 1, 4
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    println(metadata)
     # metadata = "typical_starting_point.jld2"
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)
     ϵk = load(metadata,"spectrum")
     σzτz = load(metadata,"chern")
-    push!(σz, plot_spectra(ϵk,σzτz,νF,params;savename=joinpath(fpath,"feldman/figures/$(flag)_spectrum_$(p)_$(q)_$(w0).png")))
+    push!(σz, plot_spectra(ϵk,σzτz,νF,params;savename="test.pdf"))
 end 
 
 ## BM basis 
