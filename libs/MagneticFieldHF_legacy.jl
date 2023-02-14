@@ -69,7 +69,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.precision = precision
     hf.nb, hf.nη, hf.ns, hf.nfl = 2, 2, 2, 8
     hf.ng = 3
-    hf.nq = (q>4) ? 2 : 2
+    hf.nq = (q>4) ? 1 : 2
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     

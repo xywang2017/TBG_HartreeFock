@@ -69,7 +69,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.precision = precision
     hf.nb, hf.nη, hf.ns, hf.nt = 2, 2, 2, 8*hf.q # data stored as 2q x nη x ns x nk
     hf.ng = 3
-    hf.nq = (q>4) ? 2 : 2
+    hf.nq = (q>4) ? 1 : 2
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     hf.lk = hf.q*hf.nq^2
@@ -94,8 +94,8 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     
     hf.P = zeros(ComplexF64,size(hf.H0))
     hf.H = zeros(ComplexF64,size(hf.H0))
-    hf.ϵk = zeros(Float64,size(hf.H0,1),size(hf.H0,2))
-    hf.σzτz = zeros(Float64,size(hf.H0,1),size(hf.H0,2))
+    hf.ϵk = zeros(Float64,size(hf.H0,1),size(hf.H0,3))
+    hf.σzτz = zeros(Float64,size(hf.H0,1),size(hf.H0,3))
     
     # --------- Initialization ---------- #
     
@@ -111,9 +111,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         # @time begin 
             println("Iter: ",iter)
             hf.H .= hf.H0 * 1.0
-            # add_Hartree(hf;β=1.0)
-            # add_Fock(hf;β=1.0)
-            add_HartreeFock(hf;β=1.0)
+            add_Hartree(hf;β=1.0)
+            add_Fock(hf;β=1.0)
+            # add_HartreeFock(hf;β=1.0)
             Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P,hf.ν)
             #Δ is a projector to make it closed shell
             if norm_convergence <1e-4
@@ -283,57 +283,6 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     return nothing
 end
 
-
-function add_HartreeFockv1(hf::HartreeFock;β::Float64=1.0)
-    ## not good, too big of a file to load
-    Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
-    Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk,length(hf.gvec))
-    tmpΛ = reshape(Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk,length(hf.gvec))
-    kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
-                    reshape(hf.latt.k1[1:hf.nq]*hf.params.g1,1,:,1) .+ 
-                    reshape(hf.latt.k2[1:hf.nq]*hf.params.g2,1,1,:), : )
-    tmp_Fock = zeros(ComplexF64,hf.nt,hf.nt)
-    
-    metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
-    tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
-
-    for iη in 1:2
-        jldopen(hf.metadata[iη]) do file 
-            for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-                ig = m + hf.ng + 1 + (n+hf.ng*hf.q)*(2hf.ng+1)
-                
-                metadata .= file["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:,ig] .= tmp_metadata 
-                end
-            end
-        end
-    end
-    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-        G = m*hf.params.g1+n/hf.q*hf.params.g2
-        ig = m + hf.ng + 1 + (n+hf.ng*hf.q)*(2hf.ng+1)
-        # --------------------------------------- Hartree ------------------------------- #
-        trPG = 0.0+0.0im
-        for ik in 1:size(hf.P,3)
-            trPG += tr(view(hf.P,:,:,ik)*conj(view(Λ,:,ik,:,ik,ig)))
-        end
-        for ik in 1:size(hf.P,3) 
-            hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG) * view(Λ,:,ik,:,ik,ig)
-        end
-        # --------------------------------------- Fock ------------------------------- #
-        for ik in 1:size(hf.P,3)
-            tmp_Fock .= 0.0 + 0.0im
-            for ip in 1:size(hf.P,3)
-                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+G,Lm) /hf.latt.nk) * 
-                            ( view(Λ,:,ik,:,ip,ig)*transpose(view(hf.P,:,:,ip))*view(Λ,:,ik,:,ip,ig)' )
-            end
-            hf.H[:,:,ik] .-= tmp_Fock
-        end
-    end
-    return nothing
-end
-
-
 function update_P(hf::HartreeFock;Δ::Float64=0.0)
     """
         Diagonalize Hamiltonian for every k; use ν to keep the lowest N particle states;
@@ -343,7 +292,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     vecs = zeros(ComplexF64,size(hf.H,1),size(hf.H,2),size(hf.H,3))
     vals = zeros(Float64,size(hf.H,1),size(hf.H,3))
     for ik in 1:size(hf.H,3)
-        check_Hermitian(hf.H[:,:,ik])
+        # check_Hermitian(hf.H[:,:,ik])
         hf.ϵk[:,ik] = eigvals(Hermitian(view(hf.H,:,:,ik)))
         vals[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)-Δ*(conj.(view(hf.P,:,:,ik))+0.5*I)) )
         for iq in 1:size(hf.H,1)
