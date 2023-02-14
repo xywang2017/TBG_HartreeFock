@@ -9,7 +9,7 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 4
+seed = 1
 w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
