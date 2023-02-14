@@ -9,13 +9,13 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 4
+seed = 1
 w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
 σz = []
 p,q = 1, 4
-νF = 0 + (0)*p/q
+νF = 0 + (1)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
