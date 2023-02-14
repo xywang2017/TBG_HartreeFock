@@ -1,6 +1,6 @@
 @with_kw mutable struct Params
-    vf::Float64 =  2482 #2135.4  #2445.38  #2135.4 # 2422.76   # Weizmann
-    dθ::Float64 = 1.06π/180
+    vf::Float64 = 2482 #2135.4  #2445.38  #2135.4 # 2422.76   # Weizmann
+    dθ::Float64 = 1.05π/180
     μ::Float64 = 0.0
     w0::Float64 = 77 # 110*0.8 ## AA tunneling chiral limit
     w1::Float64 = 110 ## AB tunneling #96.056
@@ -33,7 +33,7 @@ end
 
 @with_kw mutable struct Strain
     # this contains info about strain based on Bi Zhen and Fu Liang 
-    ϵ::Float64 = 0.002
+    ϵ::Float64 = 0.00
     φ::Float64 = 0.0*π/180
     ν::Float64 =  0.16
     ϵxx::Float64 = -ϵ * cos(φ)^2 + ν * ϵ * sin(φ)^2
@@ -43,7 +43,7 @@ end
     A::Vector{Float64} = (sqrt(3)*βg/2)*[ϵxx-ϵyy;-2ϵxy]
     Rφ::Matrix{Float64} = [cos(φ) -sin(φ);sin(φ) cos(φ)]
     S::Matrix{Float64} = Rφ' * [-ϵ 0; 0 ν*ϵ] * Rφ
-    Da::Float64 = -4100.0
+    Da::Float64 = 0.0
 end
 
 
