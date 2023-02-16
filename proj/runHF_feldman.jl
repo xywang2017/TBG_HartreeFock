@@ -14,8 +14,8 @@ w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
 σz = []
-p,q = 1, 4
-νF = 1+ (3)*p/q
+p,q = 1, 8
+νF = 2+ (2)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
