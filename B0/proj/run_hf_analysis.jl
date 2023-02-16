@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.6
+ν = 0.8
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -48,6 +48,7 @@ s3 = ComplexF64[1 0;0 -1]
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
     Δ[:,ik] = real(diag(F.vectors'*kron(s1,kron(s3,s0))*F.vectors))
+    # Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s0))*F.vectors))
 end
 
 plot_energy_cuts_with_order_parameters(kcut,Ecut,
