@@ -74,7 +74,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     ηs = ["η0","η1","η2","η3"]
     σs = ["s0","s1","s2","s3"]
     ns = ["n0","n1","n2","n3"]
-    hf.Δstr = [σs[i]*ηs[j]*ns[k] for i in 1:4 for j in 1:4 for k in 1:4]
+    hf.Δstr = [ns[i]*ηs[j]*σs[k] for i in 1:4 for j in 1:4 for k in 1:4]
     hf.Δ = zeros(Float64,size(hf.Δstr))
 
     # Hartree-Fock iterations
@@ -84,21 +84,23 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     iter_energy = Float64[]
     iter_oda = Float64[]
     while norm_convergence > hf.precision
-        println("Iter: ",iter)
-        hf.H .= hf.H0 * 1.0
-        @time add_HartreeFock(hf;β=1.0)
-        # add_Hartree(hf;β=1.0)
-        # add_Fock(hf;β=1.0)
-        # @time add_Fock_vectorize(hf;β=1.0)
-        Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P)
+        @time begin 
+            println("Iter: ",iter)
+            hf.H .= hf.H0 * 1.0
+            add_HartreeFock(hf;β=1.0)
+            # add_Hartree(hf;β=1.0)
+            # add_Fock(hf;β=1.0)
+            # @time add_Fock_vectorize(hf;β=1.0)
+            Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P)
 
-        #Δ is a projector to make it closed shell -- incompatible with ODA
-        if norm_convergence <1e-4
-            Δ = 0.0 
-        else 
-            Δ = 0.0
+            #Δ is a projector to make it closed shell -- incompatible with ODA
+            if norm_convergence <1e-4
+                Δ = 0.0 
+            else 
+                Δ = 0.0
+            end
+            norm_convergence,λ = update_P(hf;Δ=Δ)
         end
-        norm_convergence,λ = update_P(hf;Δ=Δ)
 
         println("Running HF energy: ",Etot)
         println("Running norm convergence: ",norm_convergence)
@@ -300,8 +302,8 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
 
     norm_convergence = calculate_norm_convergence(P_new,hf.P)
 
-    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    # λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     hf.P .= λ*P_new + (1-λ)*hf.P
     return norm_convergence,λ
@@ -411,7 +413,7 @@ function calculate_valley_spin_band_order_parameters(hf::HartreeFock)
                     F = eigen(Hermitian(view(hf.H,:,:,ik)))
                     Δ[:,ik] = real(diag(F.vectors'*kron(pauli_matrices[i],kron(pauli_matrices[j],pauli_matrices[k]))*F.vectors))
                 end
-                push!(order_parameters,sum(Δ[:][hf.ϵk[:].<= μ])/length(hf.ϵk)*8)
+                push!(order_parameters,sum(Δ[:][hf.ϵk[:].<= hf.μ])/length(hf.ϵk)*8)
             end
         end
     end

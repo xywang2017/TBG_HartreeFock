@@ -41,9 +41,11 @@ function plot_energy_cuts_with_order_parameters(kvec::Vector{Float64},ϵ::Array{
     for i in 1:size(ϵ,1)
         plot(kvec,ϵ[i,:],"-",c="gray",lw=1)
     end
+    pl = 0.0
     for i in 1:size(ϵ,1)
-        scatter(kvec,ϵ[i,:],s=6,c=σz[i,:],cmap="bwr",vmin=0,vmax=1)
+        pl = scatter(kvec,ϵ[i,:],s=6,c=σz[i,:],cmap="coolwarm",vmin=-1,vmax=1)
     end
+    colorbar(pl)
     for line in lines 
         axhline(line,ls=":",c="gray")
     end

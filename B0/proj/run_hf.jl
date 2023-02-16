@@ -8,7 +8,7 @@ prefix = ARGS[1]
 ν = parse(Float64,ARGS[2])
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 19
+lk = 15
 params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
