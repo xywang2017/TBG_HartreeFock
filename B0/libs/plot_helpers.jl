@@ -35,3 +35,26 @@ function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vect
     close(fig)
     return nothing
 end
+
+function plot_energy_cuts_with_order_parameters(kvec::Vector{Float64},ϵ::Array{Float64,2},σz::Array{Float64,2};lines::Vector{Float64}=[])
+    fig = figure(figsize=(4,3))
+    for i in 1:size(ϵ,1)
+        plot(kvec,ϵ[i,:],"-",c="gray",lw=1)
+    end
+    for i in 1:size(ϵ,1)
+        scatter(kvec,ϵ[i,:],s=6,c=σz[i,:],cmap="bwr",vmin=0,vmax=1)
+    end
+    for line in lines 
+        axhline(line,ls=":",c="gray")
+    end
+    xlim([minimum(kvec)-0.1,2.5*maximum(kvec)])
+    xlabel("k")
+    ylabel("E (meV)")
+    # ylim([-30,30])
+    # legend()
+    tight_layout()
+    savefig("test.pdf")
+    display(fig)
+    close(fig)
+    return nothing
+end

@@ -15,6 +15,9 @@ mutable struct HartreeFock
     ν::Float64 # filling fraction -4 to 4 
     P::Array{ComplexF64,3}  # one particle density matrix
     ϵk::Matrix{Float64} # eigenvalues of HF renormalized band dispersions nfl x ns x nk
+    μ::Float64 # running Hartree-Fock chemical potential 
+    Δ::Vector{Float64} # spin-valley-band mixing order parameter s_iη_jn_k
+    Δstr::Vector{String} # string
 
     Λ::Array{ComplexF64,2}
     H0::Array{ComplexF64,3}
@@ -66,6 +69,13 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     hf.Λ = zeros(ComplexF64,hf.nt*latt.nk,hf.nt*latt.nk)
     
     BM_info(hf)
+
+    # order parameters 
+    ηs = ["η0","η1","η2","η3"]
+    σs = ["s0","s1","s2","s3"]
+    ns = ["n0","n1","n2","n3"]
+    hf.Δstr = [σs[i]*ηs[j]*ns[k] for i in 1:4 for j in 1:4 for k in 1:4]
+    hf.Δ = zeros(Float64,size(hf.Δstr))
 
     # Hartree-Fock iterations
     norm_convergence = 10.0 
@@ -278,6 +288,9 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     iband_occupied = (iϵ_occupied .-1) .% size(hf.ϵk,1) .+1
     ik_occupied = (iϵ_occupied .-1) .÷ size(hf.ϵk,1) .+1
 
+    hf.μ = find_chemicalpotential(hf.ϵk[:],(hf.ν+4)/8)
+    hf.Δ .= calculate_valley_spin_band_order_parameters(hf)
+
     P_new = zeros(ComplexF64,size(hf.P))
 
     for ik in 1:size(hf.P,3)
@@ -383,4 +396,28 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
     return λ
 end
 
+function calculate_valley_spin_band_order_parameters(hf::HartreeFock)
+    s0 = ComplexF64[1 0;0 1]
+    s1 = ComplexF64[0 1;1 0]
+    s2 = ComplexF64[0 -1im;1im 0]
+    s3 = ComplexF64[1 0;0 -1]
+    pauli_matrices = [s0,s1,s2,s3]
+    order_parameters = Float64[]
+    Δ = zeros(Float64,size(hf.ϵk))
+    for i in 1:4
+        for j in 1:4 
+            for k in 1:4
+                for ik in 1:size(hf.ϵk,2)
+                    F = eigen(Hermitian(view(hf.H,:,:,ik)))
+                    Δ[:,ik] = real(diag(F.vectors'*kron(pauli_matrices[i],kron(pauli_matrices[j],pauli_matrices[k]))*F.vectors))
+                end
+                push!(order_parameters,sum(Δ[:][hf.ϵk[:].<= μ])/length(hf.ϵk)*8)
+            end
+        end
+    end
+    return order_parameters
+end
+
+
 include("initP_helpers.jl")
+include("helpers.jl")
