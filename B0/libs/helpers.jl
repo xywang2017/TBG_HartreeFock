@@ -21,6 +21,10 @@ function find_chemicalpotential(energies::Vector{Float64},ν::Float64)
     while ν > νs[i]
         i = i+1 
     end   
-    μ = (E[i+1]+E[i])/2
+    if i < length(E)
+        μ = (E[i+1]+E[i])/2
+    else
+        μ = E[i]
+    end
     return μ
 end

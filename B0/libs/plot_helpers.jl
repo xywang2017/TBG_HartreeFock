@@ -38,9 +38,9 @@ end
 
 function plot_energy_cuts_with_order_parameters(kvec::Vector{Float64},ϵ::Array{Float64,2},σz::Array{Float64,2};lines::Vector{Float64}=[])
     fig = figure(figsize=(4,3))
-    for i in 1:size(ϵ,1)
-        plot(kvec,ϵ[i,:],"-",c="gray",lw=1)
-    end
+    # for i in 1:size(ϵ,1)
+    #     plot(kvec,ϵ[i,:],"-",c="gray",lw=1)
+    # end
     pl = 0.0
     for i in 1:size(ϵ,1)
         pl = scatter(kvec,ϵ[i,:],s=6,c=σz[i,:],cmap="coolwarm",vmin=-1,vmax=1)
