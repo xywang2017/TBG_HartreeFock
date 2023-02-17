@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.6
+ν = 0.8
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -32,8 +32,8 @@ plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 # ----------------- valley-spin-bamd polarization info ----------------- # 
 fig = figure(figsize=(2,10))
-plot(hf.Δ,eachindex(hf.Δ),"b^")
-yticks(collect(eachindex(hf.Δ)),hf.Δstr)
+plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
+yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
 axvline(0,c="gray")
 xlim(-0.4,0.4)
 tight_layout()
@@ -47,7 +47,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s1,kron(s3,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s3,kron(s3,s0))*F.vectors))
 end
 
 plot_energy_cuts_with_order_parameters(kcut,Ecut,
