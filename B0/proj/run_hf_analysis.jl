@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.6
+ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -23,12 +23,11 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+plot_contour_maps(kvec,ϵ0[5,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
 plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
-
 
 # ----------------- valley-spin-bamd polarization info ----------------- # 
 fig = figure(figsize=(2,10))
@@ -47,7 +46,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s1,kron(s3,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s3,kron(s3,s0))*F.vectors))
 end
 
 plot_energy_cuts_with_order_parameters(kcut,Ecut,
@@ -74,3 +73,24 @@ savefig("test.pdf")
 display(fig)
 close(fig)
 
+### all the chemical potentials 
+νs = collect(0.0:0.1:4.0)
+μs = Float64[]
+actual_νs = Float64[]
+for ν in νs 
+    νstr = round(Int,1000*ν)
+    hf_path = joinpath(fpath,"data/1_strain_hf_$(νstr)_lk15.jld2")
+    if ispath(hf_path)
+        hf = load(hf_path,"hf");
+        push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
+        push!(μs,hf.μ)
+    end
+end
+fig = figure(figsize=(4,3))
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-^")
+xlabel("ν")
+ylabel("μ")
+tight_layout()
+savefig("cascade_strain_gapless.pdf")
+display(fig)
+close(fig)
