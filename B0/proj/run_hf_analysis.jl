@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.8
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -35,7 +35,7 @@ fig = figure(figsize=(2,10))
 plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
 yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
 axvline(0,c="gray")
-xlim(-0.4,0.4)
+# xlim(-0.4,0.4)
 tight_layout()
 display(fig)
 close(fig)
