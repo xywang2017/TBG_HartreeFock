@@ -33,7 +33,7 @@ end
 
 @with_kw mutable struct Strain
     # this contains info about strain based on Bi Zhen and Fu Liang 
-    ϵ::Float64 = 0.002
+    ϵ::Float64 = 0.003
     φ::Float64 = 0.0*π/180
     ν::Float64 =  0.16
     ϵxx::Float64 = -ϵ * cos(φ)^2 + ν * ϵ * sin(φ)^2

@@ -33,6 +33,10 @@ mutable struct HartreeFock
     ϵk::Matrix{Float64} # eigenvalues of HF renormalized band dispersions nt x ns x nk
     σzτz::Matrix{Float64} # eigenvalues of σzτz for all HF states;
 
+    μ::Float64 # running Hartree-Fock chemical potential 
+    Δ::Vector{Float64} # spin-valley-band mixing order parameter s_iη_jn_k
+    Δstr::Vector{String} # string
+
     Σz0::Array{ComplexF64,3} # projected Σz operator in the BM basis
     H0::Array{ComplexF64,3}  # non-interacting part of the Hamiltonian (BM)
     H::Array{ComplexF64,3} # running Hamiltonian for any given k; nt*q x nt*q x nk
@@ -46,7 +50,7 @@ end
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
     ϵr = 15.0
-    return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*Lm/2)
+    return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4Lm/2)
 end
 
 function CoulombUnit(params::Params)
@@ -90,6 +94,11 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.Σz0 = zeros(ComplexF64,size(hf.H0))
     BM_info(hf)
 
+    # order parameters 
+    ηs = ["η0","η1","η2","η3"]
+    σs = ["s0","s1","s2","s3"]
+    hf.Δstr = [σs[k]*ηs[j] for k in 1:4 for j in 1:4]
+    hf.Δ = zeros(Float64,size(hf.Δstr))
     # ------------------------------------------------- Begin Hartree Fock Procedure -------------------------------- #
     
     hf.P = zeros(ComplexF64,size(hf.H0))
@@ -131,18 +140,18 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         push!(iter_err,norm_convergence)
         push!(iter_oda,λ)
         if iter ==1 
-            save("typical_starting_point.jld2","spectrum",hf.ϵk,"chern",
-                    hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
+            save("typical_starting_point.jld2","hf",hf,
+                    "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
         end
 
         if mod(iter,25) ==0 || norm_convergence < hf.precision
-            save(hf.savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",
-                    hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
+            save(hf.savename,"hf",hf,
+                    "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
         end
 
         iter +=1
         
-        if iter > 500
+        if iter > 300 || λ < 1e-3
             break 
         end
     end
@@ -302,6 +311,9 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     end
     # plot_spectra(hf)
 
+    hf.μ = find_chemicalpotential(hf.ϵk[:],νnorm/(size(hf.H,1)*size(hf.H,3)))
+    hf.Δ .= calculate_valley_spin_band_order_parameters(hf)
+
     iϵ_sorted = sortperm(vals[:])
     iϵ_occupied = iϵ_sorted[1:νnorm]
     iband_occupied = (iϵ_occupied .-1) .% size(vals,1) .+1
@@ -414,6 +426,43 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
         end
     end
     return λ
+end
+
+
+function calculate_valley_spin_band_order_parameters(hf::HartreeFock)
+    s0 = ComplexF64[1 0;0 1]
+    s1 = ComplexF64[0 1;1 0]
+    s2 = ComplexF64[0 -1im;1im 0]
+    s3 = ComplexF64[1 0;0 -1]
+    pauli_matrices = [s0,s1,s2,s3]
+    I_band = Array{Float64,2}(I,hf.nb*hf.q,hf.nb*hf.q)
+    order_parameters = Float64[]
+    Δ = zeros(Float64,size(hf.ϵk))
+    for k in 1:4
+        for j in 1:4 
+            for ik in 1:size(hf.ϵk,2)
+                F = eigen(Hermitian(view(hf.H,:,:,ik)))
+                Δ[:,ik] = real(diag(F.vectors'*kron(pauli_matrices[k],kron(pauli_matrices[j],I_band))*F.vectors))
+            end
+            push!(order_parameters,sum(Δ[:][hf.ϵk[:].<= hf.μ])/length(hf.ϵk)*8)
+        end
+    end
+    return order_parameters
+end
+
+function find_chemicalpotential(energies::Vector{Float64},ν::Float64)
+    E = sort(energies)
+    νs = collect(eachindex(E)) ./ length(E)
+    i = 1
+    while ν > νs[i]
+        i = i+1 
+    end   
+    if i < length(E)
+        μ = (E[i+1]+E[i])/2
+    else
+        μ = E[i]
+    end
+    return μ
 end
 
 include("initP_helpers.jl")
