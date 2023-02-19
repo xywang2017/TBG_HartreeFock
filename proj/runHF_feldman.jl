@@ -15,16 +15,19 @@ w0s = ["07"]
 w0snum = [0.7]
 σz = []
 p,q = 1, 4
-νF = 1+ (3)*p/q
+νF = 0+ (0)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    hf = load(metadata,"hf")
     # metadata = "typical_starting_point.jld2"
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)
-    ϵk = load(metadata,"spectrum")
-    σzτz = load(metadata,"chern")
+    # ϵk = load(metadata,"spectrum")
+    # σzτz = load(metadata,"chern")
+    ϵk = hf.ϵk 
+    σzτz = hf.σzτz
     push!(σz, plot_spectra(ϵk,σzτz,νF,params;savename="test.pdf"))
 end 
 
