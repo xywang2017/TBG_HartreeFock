@@ -9,7 +9,7 @@ prefix = ARGS[1]
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
-params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)

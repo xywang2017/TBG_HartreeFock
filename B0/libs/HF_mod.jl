@@ -39,7 +39,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 10.0
+    ϵr = 15.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 
@@ -123,7 +123,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             end
         end
 
-        if iter >500
+        if iter >300 || λ < 1e-3
             break 
         end
     end
@@ -382,7 +382,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
     # println("a= ",a," b= ",b," λ0=",λ0)
     if a>0 # convex and increasing with large λ 
         if λ0 <=0 
-            λ = 0.1  # give it some kick..
+            λ = 0.0  # give it some kick..
         elseif λ0 <1 
             λ = λ0 
         else
@@ -392,7 +392,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
         if λ0 <=0.5 
             λ = 1.0 
         else 
-            λ = 0.1 # give it some kick..
+            λ = 0. # give it some kick..
         end
     end
     return λ

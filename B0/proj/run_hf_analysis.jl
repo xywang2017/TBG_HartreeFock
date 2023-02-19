@@ -4,13 +4,13 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix =1
+prefix =2
 # νs = collect(0.0:0.2:4.0)
-ν = 0.0
+ν = 2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
-params = Params(ϵ=0.002,Da=-4100,dθ=1.08π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
@@ -23,7 +23,7 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[5,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+plot_contour_maps(kvec,ϵ0[5,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ+4])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
@@ -34,7 +34,7 @@ fig = figure(figsize=(2,10))
 plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
 yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
 axvline(0,c="gray")
-# xlim(-0.4,0.4)
+xlim(-0.4,0.4)
 tight_layout()
 display(fig)
 close(fig)
@@ -74,7 +74,7 @@ display(fig)
 close(fig)
 
 ### all the chemical potentials 
-νs = collect(0.0:0.1:4.0)
+νs = collect(-4.0:0.1:4.0)
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
@@ -86,11 +86,15 @@ for ν in νs
         push!(μs,hf.μ)
     end
 end
-fig = figure(figsize=(4,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-^")
+fig = figure(figsize=(5,3))
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
 xlabel("ν")
 ylabel("μ")
+axhline(0,ls="--",c="gray")
+# ylim([0,30])
+xlim([-4.3,4.3])
 tight_layout()
 savefig("cascade_strain_gapless.pdf")
 display(fig)
 close(fig)
+
