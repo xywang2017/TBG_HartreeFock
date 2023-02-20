@@ -62,3 +62,89 @@ function plot_hf_iterations(fname::String)
     close(fig)
     return nothing 
 end
+
+### density matrix analysis 
+function plot_density_matrix_bm(fname::String)
+    # plot at a given k point, 2qx4 x 2qx4 matrix 
+    hf = load(fname,"hf");
+    ik = 1
+    fig = figure(figsize=(6,6))
+    P0 = view(hf.P,:,:,ik) + 0.5I
+    pl = imshow(abs.(P0),vmin=0,vmax=1)
+    colorbar(pl)
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+### density matrix analysis 
+function plot_density_matrix_bm_valley_spin(fname::String)
+    # plot at a given k point, 2qx4 x 2qx4 matrix 
+    hf = load(fname,"hf");
+    ik = 1
+    fig = figure(figsize=(6,6))
+    P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
+    fig,ax = subplots(2,2,figsize=(8,8))
+    states = ["K↑","K'↑","K↓","K'↓"]
+    for r in 1:2, c in 1:2 
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),vmin=0,vmax=1)
+        colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
+        ax[r,c].set_title(states[r+2(c-1)])
+    end
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+### strong coupling basis 
+function plot_density_matrix_strong_coupling(fname::String,fname0::String)
+    ik = 1
+    hf = load(fname,"hf");
+    hf0 = load(fname0,"hf");
+    H0 = hf0.H
+    P = hf.P 
+    tmpH0 = view(H0,:,:,ik)
+    P0 = view(P,:,:,ik)+0.5I
+    F = eigen(Hermitian(tmpH0))
+    Pstrong = transpose(F.vectors) * P0 * conj.(F.vectors )
+
+    fig = figure(figsize=(6,6))
+    pl=imshow(abs.(Pstrong),vmin=0,vmax=1)
+    colorbar(pl,fraction=0.046, pad=0.04)
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing 
+end
+
+
+### strong coupling basis  valley spin
+function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::String)
+    ik = 1
+    hf = load(fname,"hf");
+    hf0 = load(fname0,"hf");
+    H0 = hf0.H
+    P = hf.P 
+    tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
+    Pstrong = zeros(ComplexF64,2hf.q,2hf.q,4)
+    for iηs in 1:4
+        F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
+        vec = F.vectors
+        Pstrong[:,:,iηs] = transpose(vec) * P0[:,iηs,:,iηs] * conj.(vec) 
+    end 
+    fig,ax = subplots(2,2,figsize=(8,8))
+    states = ["K↑","K'↑","K↓","K'↓"]
+    for r in 1:2, c in 1:2 
+        pl=ax[r,c].imshow(abs.(Pstrong[:,:,r+2(c-1)]),vmin=0,vmax=1)
+        colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
+        ax[r,c].set_title(states[r+2(c-1)])
+    end
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing 
+end
