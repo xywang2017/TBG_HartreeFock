@@ -18,13 +18,14 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
 
     pl=scatter(ones(length(ϵsorted))*0.25,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
     colorbar(pl)
-    ν = 8*eachindex(ϵsorted) ./ length(ϵsorted) .- 4
+    ν = eachindex(ϵsorted) ./ length(ϵsorted)
     i = 1
-    while νF > ν[i]
+    while (νF+4)/8 > ν[i]
         i += 1
     end
-    ϵF = (ν[i]==νF) ? (ϵsorted[i+1] + ϵsorted[i])/2 : (ϵsorted[i] + ϵsorted[i-1])/2
-    Δ = (ν[i]==νF) ? (ϵsorted[i+1] - ϵsorted[i]) : (ϵsorted[i] - ϵsorted[i-1])
+    ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
+    Δ = (ϵsorted[i+1] - ϵsorted[i]) 
+    
     println("Gap size: ", Δ)
     axhline(ϵF,ls=":",c="gray")
     ylabel("E (meV)")

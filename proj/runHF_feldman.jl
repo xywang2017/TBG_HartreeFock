@@ -9,13 +9,13 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 1
+seed =1
 w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
 σz = []
 p,q = 1, 4
-νF = 2 + (0)*p/q
+νF = 3 + (0)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -33,7 +33,7 @@ end
 
 ## BM basis 
 seed = 2
-νF = 2+ (2)*p/q
+νF = 3+ (1)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"feldman/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
@@ -41,7 +41,7 @@ metadata = joinpath(fpath,"feldman/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$
 
 ## strong coupling basis at reference point defined by metadata0
 
-νF0 = 2+ (0)*p/q
+νF0 = 3+ (0)*p/q
 νstr0 = round(Int,1000*νF0)
 metadata0 = joinpath(fpath,"feldman/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr0).jld2")
 plot_density_matrix_strong_coupling(metadata,metadata0)

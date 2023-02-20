@@ -1,6 +1,6 @@
 #!/bin/bash -l 
 
-for nu in {0.0,0.8,0.6,2.4,3.2}
+for nu in {0.0,0.8,1.6,2.4,3.2}
 do 
 	julia proj/runHF_server.jl 1 5 $nu random 07 $1
 done
