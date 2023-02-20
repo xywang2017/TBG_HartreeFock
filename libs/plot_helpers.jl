@@ -149,3 +149,15 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
     close(fig)
     return nothing 
 end
+
+function plot_order_parameters(fname::String)
+    hf = load(fname,"hf");
+    fig = figure(figsize=(2,6))
+    println(hf.Δ)
+    plot(hf.Δ,eachindex(hf.Δ),"b^")
+    yticks(eachindex(hf.Δ),hf.Δstr)
+    axvline(0)
+    xlim([-0.4,0.5])
+    display(fig)
+    close(fig)
+end
