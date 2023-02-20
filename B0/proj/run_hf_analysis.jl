@@ -6,11 +6,12 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.0
+ν = 2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
-params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=0,dθ=1.38π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
@@ -23,7 +24,7 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[7,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+plot_contour_maps(kvec,ϵ0[8,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
@@ -36,6 +37,7 @@ yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
 axvline(0,c="gray")
 xlim(-0.4,0.4)
 tight_layout()
+savefig("test.pdf")
 display(fig)
 close(fig)
 
@@ -46,7 +48,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s1,kron(s0,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s3))*F.vectors))
 end
 
 plot_energy_cuts_with_order_parameters(kcut,Ecut,

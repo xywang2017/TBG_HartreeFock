@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 1.0
+ν = 3.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -32,13 +32,29 @@ plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 # ----------------- valley-spin polarization info ----------------- # 
 fig = figure(figsize=(2,10))
 plot(hf.Δ,eachindex(hf.Δ),"b^")
-yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
+yticks(collect(eachindex(hf.Δ)),hf.Δstr)
 # yticks(collect(1:length(hf.Δ)))
 axvline(0,c="gray")
-xlim(-0.4,0.4)
+xlim(-0.6,0.6)
 tight_layout()
+savefig("test.pdf")
 display(fig)
 close(fig)
+
+# ----------------------------------------------- #
+s0 = ComplexF64[1 0;0 1]
+s1 = ComplexF64[0 1;1 0]
+s2 = ComplexF64[0 -1im;1im 0]
+s3 = ComplexF64[1 0;0 -1]
+Δ = zeros(size(hf.ϵk))
+for ik in 1:size(hf.ϵk,2)
+    F = eigen(Hermitian(view(hf.H,:,:,ik)))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s1))*F.vectors))
+end
+
+plot_energy_cuts_with_order_parameters(kcut,Ecut,
+                reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
+
 
 ##### ------ 
 ρ = hf.Δ[1]
