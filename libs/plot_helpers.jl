@@ -80,7 +80,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     xticks([1/4,1/5,1/6,1/8],[L"$\frac{1}{4}$",L"$\frac{1}{5}$",L"$\frac{1}{6}$",L"$\frac{1}{8}$"])
-    title("(s,t)=(1,3)")
+    # title("(s,t)=(1,3)")
     tight_layout()
     savefig(savename,transparent=true)
     display(fig)
