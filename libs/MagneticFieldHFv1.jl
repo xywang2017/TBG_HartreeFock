@@ -24,6 +24,7 @@ mutable struct HartreeFock
     # gvec and overlap matrix for a given gvec
     gvec::Matrix{ComplexF64}
     Λ::Array{ComplexF64,4}
+    Λs::Array{ComplexF64,4} # prestore all the data of overlap
 
     # Coulomb unit 
     V0::Float64
@@ -92,6 +93,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     # BM band structure and projected sublattice info
     hf.H0 = zeros(ComplexF64,hf.nt,hf.nt,hf.lk)
     hf.Σz0 = zeros(ComplexF64,size(hf.H0))
+    hf.Λs = zeros(ComplexF64,hf.nb*hf.lk,hf.nb*hf.lk,hf.nη,length(hf.gvec))
     BM_info(hf)
 
     # order parameters 
@@ -167,7 +169,7 @@ function BM_info(hf::HartreeFock)
     tmp_Σz0 = reshape(hf.Σz0,hf.nb*hf.q,hf.nη,hf.ns,hf.nb*hf.q,hf.nη,hf.ns,hf.q,hf.nq,hf.nq)
     hbm = zeros(Float64,hf.nb*hf.q,hf.nq,hf.nq)
     σz = zeros(ComplexF64,hf.nb*hf.q,hf.nb*hf.q,hf.nq,hf.nq)
-    
+    tmp_Λs = reshape(hf.Λs,hf.nb*hf.q*hf.lk,hf.nb*hf.q*hf.lk,hf.nη,2hf.ng,:)
     for iη in 1:2 
         jldopen(hf.metadata[iη]) do file 
             hbm .= file["E"]
@@ -178,6 +180,15 @@ function BM_info(hf::HartreeFock)
             σz .= file["PΣz"]
             for rk1 in 1:hf.q, is in 1:2
                 tmp_Σz0[:,iη,is,:,iη,is,rk1,:,:] .=  σz * (3-2iη) 
+            end
+
+            for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):hf.ng*hf.q
+                for iη in 1:2
+                    jldopen(hf.metadata[iη]) do file 
+                        metadata .= file["$(m)_$(n)"]
+                        tmpΛs[:,:,iη,m+hf.ng+1,n+hf.ng*hf.q+1] = file["$(m)_$(n)"]
+                    end
+                end
             end
         end
     end
@@ -193,14 +204,12 @@ function add_Hartree(hf::HartreeFock;β::Float64=1.0)
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
-    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-        G = m*hf.params.g1+n/hf.q*hf.params.g2
+    for ig in eachindex(hf.gvec)
+        G = hf.gvec[ig]
         for iη in 1:2
-            jldopen(hf.metadata[iη]) do file 
-                metadata .= file["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
-                end
+            metadata .= view(hf.Λs,:,:,iη,ig)
+            for is in 1:2
+                tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
             end
         end
         trPG = 0.0+0.0im
@@ -228,14 +237,12 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
 
-    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-        G = m*hf.params.g1+n/hf.q*hf.params.g2
+    for ig in eachindex(hf.gvec)
+        G = hf.gvec[ig]
         for iη in 1:2
-            jldopen(hf.metadata[iη]) do file 
-                metadata .= file["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
-                end
+            metadata .= view(hf.Λs,:,:,iη,ig)
+            for is in 1:2
+                tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
             end
         end
         for ik in 1:size(hf.P,3)
@@ -261,14 +268,12 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
 
-    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-        G = m*hf.params.g1+n/hf.q*hf.params.g2
+    for ig in eachindex(hf.gvec)
+        G = hf.gvec[ig]
         for iη in 1:2
-            jldopen(hf.metadata[iη]) do file 
-                metadata .= file["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
-                end
+            metadata .= view(hf.Λs,:,:,iη,ig)
+            for is in 1:2
+                tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
             end
         end
         # --------------------------------------- Hartree ------------------------------- #
@@ -367,14 +372,12 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
 
     # change of Hartree-Fock due to a small δP
     δH = zeros(ComplexF64,size(δP))
-    for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
-        G = m*hf.params.g1+n/hf.q*hf.params.g2
+    for ig in eachindex(hf.gvec)
+        G = hf.gvec[ig]
         for iη in 1:2
-            jldopen(hf.metadata[iη]) do file 
-                metadata .= file["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
-                end
+            metadata .= view(hf.Λs,:,:,iη,ig)
+            for is in 1:2
+                tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
             end
         end
         trPG = 0.0+0.0im
