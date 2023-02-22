@@ -10,27 +10,31 @@ initParamsWithStrain(params)
 ##
 flag = "random"
 seed = 2
-w0cs = Float64[]
 w0s = ["07"]
 w0snum = [0.7]
-σz = []
-p,q = 1, 8
+p,q = 1,8
 νF = 1+ (3)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    hf = load(metadata,"hf")
-    # metadata = "typical_starting_point.jld2"
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)
-    # ϵk = load(metadata,"spectrum")
-    # σzτz = load(metadata,"chern")
-    actual_ν = 8*round(Int,(νF+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
-    ϵk = hf.ϵk 
-    σzτz = hf.σzτz
-    push!(σz, plot_spectra(ϵk,σzτz,actual_ν,params;savename="test.pdf"))
+    plot_spectra(metadata;savename="test.pdf")
 end 
+
+# ------------------ plot_spectra_collectively_at_different_flux --------------- # 
+ϕs = 1 .// [4;6;8]
+w0 = "07"
+metadatas = String[]
+for ϕ in ϕs 
+    flag, seed = "random", 2
+    p,q = numerator(ϕ), denominator(ϕ)
+    νstr = round(Int,1000*(1+3*p/q))
+    metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    push!(metadatas,metadata)
+end
+plot_spectra_collective(metadatas;savename="test.pdf")
 
 ## BM basis 
 seed = 2

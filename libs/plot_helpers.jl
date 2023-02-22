@@ -1,13 +1,19 @@
 using PyPlot 
 
 ## plot Hartree Fock spectra
-function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,params::Params;savename::String="tmp.pdf")
+function plot_spectra(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    ν = 8*round(Int,(νF+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+    ϵk = hf.ϵk 
+    σzτz = hf.σzτz
+    params = hf.params 
+
     ee = 1.6e-19
     ϵϵ = 8.8541878128e−12	
     aa = 2.46e-10
     ϵr = 5.0
     Vcoulomb = ee/(4π*ϵϵ*ϵr* abs(params.a1)*aa) * 1e3
-    
+
     fig = figure(figsize=(3,3))
     idx = sortperm(ϵk[:])
     ϵsorted = ϵk[idx] #./Vcoulomb
@@ -16,7 +22,7 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # ϵsorted = ϵsorted[chern .>0] #./Vcoulomb
     # chern = chern[chern .>0]
 
-    pl=scatter(ones(length(ϵsorted))*0.25,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
+    pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
     colorbar(pl)
     ν = eachindex(ϵsorted) ./ length(ϵsorted)
     i = 1
@@ -41,6 +47,49 @@ function plot_spectra(ϵk::Matrix{Float64},σzτz::Matrix{Float64},νF::Float64,
     # return sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8
     return Δ /Vcoulomb
 end
+
+
+## plot Hartree Fock spectra collectively
+function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf")
+    fig = figure(figsize=(4,4))
+    ϵFs = Float64[]
+    Δs = Float64[]
+    for j in eachindex(metadatas) 
+        metadata = metadatas[j]
+        hf = load(metadata,"hf");
+        νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+        ϵk = hf.ϵk 
+        σzτz = hf.σzτz
+        idx = sortperm(ϵk[:])
+        ϵsorted = ϵk[idx] 
+        chern = σzτz[idx]
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
+        if j == length(metadatas)
+            colorbar(pl)
+        end
+        ν = eachindex(ϵsorted) ./ length(ϵsorted)
+        i = 1
+        while (νF+4)/8 > ν[i]
+            i += 1
+        end
+        push!(ϵFs,(ϵsorted[i+1] + ϵsorted[i])/2) 
+        push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
+        # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
+    end 
+    xlim([0,0.3])
+    ylabel("E (meV)")
+    xlabel(L"ϕ/ϕ_0")
+    xticks([1/4,1/5,1/6,1/8],[L"$\frac{1}{4}$",L"$\frac{1}{5}$",L"$\frac{1}{6}$",L"$\frac{1}{8}$"])
+    title("(s,t)=(1,3)")
+    tight_layout()
+    savefig(savename,transparent=true)
+    display(fig)
+    close(fig)
+
+    # println("Gap sizes: ", Δs)
+    return nothing
+end
+
 
 ## plot error and energies under Hartree Fock iterations 
 function plot_hf_iterations(fname::String)
