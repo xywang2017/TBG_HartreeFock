@@ -23,4 +23,4 @@
 #	julia proj/runHF_server.jl 1 8 $nu random 07 $1
 #done
 
-julia proj/runHF_server.jl 1 8 1.375 random 07 $1
+julia proj/runHF_server.jl 1 10 1.3 random 07 $1
