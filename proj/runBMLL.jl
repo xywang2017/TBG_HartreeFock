@@ -35,9 +35,9 @@ end
 #
 bm = compute_bmLL(ϕ,str,w0,w0str);
 
-##
+# #
 
-# jldopen(joinpath(fpath,"feldman/data_w07/_1_4/_1_4_K_metadata.jld2")) do file 
+# jldopen(joinpath(fpath,"feldman/data_w07/_1_10/_1_10_Kprime_metadata.jld2")) do file 
 #     # for m in -3:3, n in -12:12 
 #     #     Λ = file["$(m)_$(n)"]
 #     #     if n%4 !=0
