@@ -32,8 +32,8 @@ using Parameters
     T2::Matrix{ComplexF64} = [[w0 w1*ω];[w1*conj(ω) w0]]  # t -> b along +g1
 
     # heterostrain
-    ϵ::Float64 = 0.0
-    φ::Float64 = 10.0*π/180
+    ϵ::Float64 = 0.003
+    φ::Float64 = 0.0*π/180
     ν::Float64 =  0.16
     ϵxx::Float64 = -ϵ * cos(φ)^2 + ν * ϵ * sin(φ)^2
     ϵyy::Float64 = ν * ϵ * cos(φ)^2 - ϵ * sin(φ)^2
