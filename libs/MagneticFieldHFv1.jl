@@ -93,7 +93,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     # BM band structure and projected sublattice info
     hf.H0 = zeros(ComplexF64,hf.nt,hf.nt,hf.lk)
     hf.Σz0 = zeros(ComplexF64,size(hf.H0))
-    hf.Λs = zeros(ComplexF64,hf.nb*hf.lk,hf.nb*hf.lk,hf.nη,length(hf.gvec))
+    hf.Λs = zeros(ComplexF64,hf.nb*hf.q*hf.lk,hf.nb*hf.q*hf.lk,hf.nη,length(hf.gvec))
     BM_info(hf)
 
     # order parameters 
@@ -169,7 +169,7 @@ function BM_info(hf::HartreeFock)
     tmp_Σz0 = reshape(hf.Σz0,hf.nb*hf.q,hf.nη,hf.ns,hf.nb*hf.q,hf.nη,hf.ns,hf.q,hf.nq,hf.nq)
     hbm = zeros(Float64,hf.nb*hf.q,hf.nq,hf.nq)
     σz = zeros(ComplexF64,hf.nb*hf.q,hf.nb*hf.q,hf.nq,hf.nq)
-    tmp_Λs = reshape(hf.Λs,hf.nb*hf.q*hf.lk,hf.nb*hf.q*hf.lk,hf.nη,2hf.ng,:)
+    tmpΛs = reshape(hf.Λs,hf.nb*hf.q*hf.lk,hf.nb*hf.q*hf.lk,hf.nη,2hf.ng+1,:)
     for iη in 1:2 
         jldopen(hf.metadata[iη]) do file 
             hbm .= file["E"]
@@ -183,12 +183,7 @@ function BM_info(hf::HartreeFock)
             end
 
             for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):hf.ng*hf.q
-                for iη in 1:2
-                    jldopen(hf.metadata[iη]) do file 
-                        metadata .= file["$(m)_$(n)"]
-                        tmpΛs[:,:,iη,m+hf.ng+1,n+hf.ng*hf.q+1] = file["$(m)_$(n)"]
-                    end
-                end
+                tmpΛs[:,:,iη,m+hf.ng+1,n+hf.ng*hf.q+1] = file["$(m)_$(n)"]
             end
         end
     end
