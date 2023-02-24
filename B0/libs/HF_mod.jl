@@ -39,7 +39,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 15.0
+    ϵr = 25.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 
@@ -114,7 +114,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
         #     end
         # end
         iter +=1
-        if (mod(iter,25) == 0 )|| norm_convergence < hf.precision
+        if (mod(iter,10) == 0 )|| norm_convergence < hf.precision
             jldopen(savename,"w") do file 
                 file["hf"] = hf
                 file["iter_energy"] = iter_energy
@@ -123,7 +123,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             end
         end
 
-        if iter >300 || λ < 1e-3
+        if iter >150 || λ < 1e-3
             break 
         end
     end

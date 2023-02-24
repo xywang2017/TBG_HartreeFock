@@ -9,7 +9,7 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 11
+seed = 2
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,8
@@ -24,18 +24,27 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = 1 .// [4;6;8]
+ϕs = 1 .// [4;5;6;8;10]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
     flag, seed = "random", 2
     p,q = numerator(ϕ), denominator(ϕ)
+    if q == 10 
+        seed = 1
+    end
     νstr = round(Int,1000*(1+3*p/q))
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
 end
-plot_spectra_collective(metadatas;savename="test.pdf")
+Δs= plot_spectra_collective(metadatas;savename="test.pdf")
 
+fig = figure()
+plot(ϕs,Δs,"b^")
+xlim([0,0.3])
+ylim([0,7])
+display(fig)
+close(fig)
 ## BM basis 
 seed = 2
 flag = "random"

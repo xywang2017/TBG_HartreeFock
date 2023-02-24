@@ -5,7 +5,6 @@
 #	julia proj/runHF_server.jl 1 5 $nu random 07 $1
 #done
 
-# julia proj/runHF_server.jl 1 5 1.6 random 07 $1
 
 #for nu in {0.0,0.667,1.5,2.333,3.167}
 #do 
@@ -22,5 +21,14 @@
 #do 
 #	julia proj/runHF_server.jl 1 8 $nu random 07 $1
 #done
+
+
+# julia proj/runHF_server.jl 1 4 1.75 random 07 $1
+
+# julia proj/runHF_server.jl 1 5 1.6 random 07 $1
+
+# julia proj/runHF_server.jl 1 6 1.5 random 07 $1
+
+# julia proj/runHF_server.jl 1 8 1.375 random 07 $1
 
 julia proj/runHF_server.jl 1 10 1.3 random 07 $1

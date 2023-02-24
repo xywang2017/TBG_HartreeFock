@@ -4,9 +4,9 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix =1
+prefix =4
 # νs = collect(0.0:0.2:4.0)
-ν = 2.0
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 15
@@ -23,7 +23,7 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[8,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+# plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
@@ -75,12 +75,12 @@ display(fig)
 close(fig)
 
 ### all the chemical potentials 
-νs = collect(-4.0:0.1:4.0)
+νs = collect(-4.0:0.25:4.0)
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
     νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/1_strain_hf_$(νstr)_lk15.jld2")
+    hf_path = joinpath(fpath,"data/4_strain_hf_$(νstr)_lk15.jld2")
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
@@ -93,9 +93,10 @@ xlabel("ν")
 ylabel("μ")
 axhline(0,ls="--",c="gray")
 # ylim([0,30])
-xlim([-4.3,4.3])
+# ylim([0,14])
+xlim([-0.1,4.1])
 tight_layout()
-savefig("cascade_strain_gapless.pdf")
+# savefig("cascade_strain_gapless.pdf")
 display(fig)
 close(fig)
 

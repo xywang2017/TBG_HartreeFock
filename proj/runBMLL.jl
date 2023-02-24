@@ -18,7 +18,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
         mkpath(joinpath(fpath,"feldman/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
-    nq = (denominator(ϕ)>4) ? 1 : 2
+    nq = (denominator(ϕ)>5) ? 1 : 2
     # nq = 16÷q
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"feldman/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")

@@ -46,7 +46,7 @@ using Parameters
     # alpha=0.5 means heterostrain, alpha=1/0 means strain on single layer
     α::Float64 = 0.5  
     # deformation potential strength 
-    Da::Float64 = 0.0 # meV
+    Da::Float64 = -4100.0 # meV
 end
 
 function initParamsWithStrain(params::Params)

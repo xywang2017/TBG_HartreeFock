@@ -65,8 +65,10 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         chern = σzτz[idx]
         pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
         if j == length(metadatas)
+            axhline(hf.μ,ls=":",c="gray")
             colorbar(pl)
         end
+        
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
         i = 1
         while (νF+4)/8 > ν[i]
@@ -86,8 +88,8 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     display(fig)
     close(fig)
 
-    # println("Gap sizes: ", Δs)
-    return nothing
+    println("Gap sizes: ", Δs)
+    return Δs
 end
 
 
