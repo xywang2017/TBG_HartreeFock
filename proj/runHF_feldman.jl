@@ -9,10 +9,10 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed =1
+seed =6
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,8
+p,q = 1,5
 νF = 1+ (3)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
@@ -30,6 +30,9 @@ metadatas = String[]
 for ϕ in ϕs 
     flag, seed = "random", 5
     p,q = numerator(ϕ), denominator(ϕ)
+    if q==5 
+        seed = 6 
+    end
     νstr = round(Int,1000*(1+3*p/q))
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
@@ -37,7 +40,7 @@ end
 Δs= plot_spectra_collective(metadatas;savename="test.pdf")
 
 fig = figure()
-plot(ϕs,Δs,"b^")
+plot(ϕs,Δs,"b-^")
 xlim([0,0.3])
 ylim([0,15])
 display(fig)

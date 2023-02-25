@@ -74,7 +74,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.precision = precision
     hf.nb, hf.nη, hf.ns, hf.nt = 2, 2, 2, 8*hf.q # data stored as 2q x nη x ns x nk
     hf.ng = 3
-    hf.nq = (q>4) ? 1 : 2
+    hf.nq = (q>5) ? 1 : 2
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     hf.lk = hf.q*hf.nq^2
