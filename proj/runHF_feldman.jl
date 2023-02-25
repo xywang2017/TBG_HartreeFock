@@ -24,15 +24,12 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = 1 .// [4;5;6;8]
+ϕs = 1 .// [4;5;6;8;10]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
-    flag, seed = "random", 1
+    flag, seed = "random", 5
     p,q = numerator(ϕ), denominator(ϕ)
-    if q == 10 
-        seed = 1
-    end
     νstr = round(Int,1000*(1+3*p/q))
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)

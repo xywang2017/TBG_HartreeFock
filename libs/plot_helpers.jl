@@ -65,9 +65,9 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         chern = σzτz[idx]
         pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
         if j == length(metadatas)
-            axhline(hf.μ,ls=":",c="gray")
             colorbar(pl)
         end
+        plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="gray")
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
         i = 1
@@ -81,7 +81,8 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     xlim([0,0.3])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
-    xticks([1/4,1/5,1/6,1/8],[L"$\frac{1}{4}$",L"$\frac{1}{5}$",L"$\frac{1}{6}$",L"$\frac{1}{8}$"])
+    xticks([1/4,1/5,1/6,1/8,1/10],
+            [L"$\frac{1}{4}$",L"$\frac{1}{5}$",L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$"])
     # title("(s,t)=(1,3)")
     tight_layout()
     savefig(savename,transparent=true)

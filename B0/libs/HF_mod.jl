@@ -15,12 +15,14 @@ mutable struct HartreeFock
     ν::Float64 # filling fraction -4 to 4 
     P::Array{ComplexF64,3}  # one particle density matrix
     ϵk::Matrix{Float64} # eigenvalues of HF renormalized band dispersions nfl x ns x nk
+    σzτz::Matrix{Float64} # eigenvalues of σzτz in every HF state
     μ::Float64 # running Hartree-Fock chemical potential 
     Δ::Vector{Float64} # spin-valley-band mixing order parameter s_iη_jn_k
     Δstr::Vector{String} # string
 
     Λ::Array{ComplexF64,2}
     H0::Array{ComplexF64,3}
+    Σz::Array{ComplexF64,3} # σzτz operator in the BM basis
     H::Array{ComplexF64,3} # running Hamiltonian for any given k; nfl*ns x nfl*ns x nk
     precision::Float64  # iteration stopping point
 
@@ -60,7 +62,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
 
     hf.P = zeros(ComplexF64,hf.nt,hf.nt,hf.latt.nk)
     hf.H = zeros(ComplexF64,size(hf.P))
+    hf.Σz = zeros(ComplexF64,size(hf.P))
     hf.ϵk = zeros(Float64,hf.nt,latt.nk)
+    hf.σzτz = zeros(Float64,hf.nt,latt.nk)
 
     # Coulomb scale in meV units 
     hf.V0 = CoulombUnit(hf.params)
@@ -141,6 +145,7 @@ function BM_info(hf::HartreeFock)
         for ifl in 1:hf.nt
             hf.H0[ifl,ifl,:] = hbm[ifl,:] 
         end
+        hf.Σz .= file["Σz"]
     end
     return nothing
 end
@@ -281,8 +286,10 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
     νnorm = round(Int,(hf.ν+4)/8 * size(hf.H,1)*size(hf.H,3))  # total number of occupied states 
     vecs = similar(hf.H)
     for ik in 1:size(hf.H,3)
-        check_Hermitian(hf.H[:,:,ik])
-        hf.ϵk[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)-Δ*(conj.(view(hf.P,:,:,ik))+0.5*I)) )
+        # check_Hermitian(hf.H[:,:,ik])
+        # hf.ϵk[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)-Δ*(conj.(view(hf.P,:,:,ik))+0.5*I)) )
+        hf.ϵk[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)))
+        hf.σzτz[:,ik] = real( diag( view(vecs,:,:,ik)' * view(hf.Σz,:,:,ik) * view(vecs,:,:,ik) ) )
     end
 
     iϵ_sorted = sortperm(hf.ϵk[:])

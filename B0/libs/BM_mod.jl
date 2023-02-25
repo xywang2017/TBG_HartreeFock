@@ -15,6 +15,7 @@ mutable struct HBM
     nt::Int # total number of flavors
 
     H::Array{ComplexF64,4}
+    Σz::Array{ComplexF64,3}  #sublattice operator, will save in data file as σzτz
     Uk::Array{ComplexF64,4}
     spectrum::Array{Float64,3} # Hbm energies nb x nη x nk
     lg::Int 
@@ -45,6 +46,7 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
     constructHBM(A)
     computeSpectrum(A)
     enforceSymmetry(A)
+    calculateChern(A)
 
     jldopen(A.fname, "w") do file
         hbm = zeros(Float64,A.nt,A.latt.nk)
@@ -56,6 +58,7 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
         file["nη"] = A.nη
         file["nb"] = A.nb
         file["ns"] = A.ns
+        file["Σz"] = A.Σz
     end
 
     if _calculate_overlap 
@@ -97,12 +100,13 @@ end
 function computeSpectrum(A::HBM)
     A.spectrum = zeros(Float64,A.nb,A.nη,A.latt.nk)
     A.Uk = zeros(ComplexF64,A.nlocal*A.lg^2,A.nb,A.nη,A.latt.nk)
-
+    
     for ik in 1:A.latt.nk, iη in 1:A.nη
         # check_Hermitian(A.H[:,:,iη,ik])
         H0 = view(A.H,:,:,iη,ik)
         idx_mid = size(H0,1)÷2
         A.spectrum[:,iη,ik], A.Uk[:,:,iη,ik] = eigen(Hermitian(H0),idx_mid:(idx_mid+A.nb-1))
+        
     end
 
     return nothing
@@ -125,6 +129,24 @@ function enforceSymmetry(A::HBM)
         A.Uk[:,:,iη,ik] = (view(A.Uk,:,:,iη,ik) .+ C2T*conj.(view(A.Uk,:,:,iη,ik)))
         for j in 1:size(A.Uk,2)
             normalize!(view(A.Uk,:,j,iη,ik))
+        end
+    end
+    return nothing
+end
+
+function calculateChern(A::HBM)
+    A.Σz = zeros(ComplexF64,A.ns*A.nη*A.nb,A.ns*A.nη*A.nb,A.latt.nk)
+    tmpΣz = reshape(A.Σz,A.ns,A.nη,A.nb,A.ns,A.nη,A.nb,A.latt.nk)
+
+    s0 = ComplexF64[1 0; 0 1]
+    sz = ComplexF64[1 0; 0 -1]
+    σz = kron(Array{ComplexF64,2}(I,A.lg^2,A.lg^2),kron(s0,sz))
+
+    mat2x2 = zeros(ComplexF64,A.nb,A.nb)
+    for ik in 1:A.latt.nk, iη in 1:A.nη
+        mat2x2 .= view(A.Uk,:,:,iη,ik)' * σz * view(A.Uk,:,:,iη,ik) * (3-2iη) 
+        for is in 1:A.ns
+            tmpΣz[is,iη,:,is,iη,:,ik] = mat2x2
         end
     end
     return nothing
