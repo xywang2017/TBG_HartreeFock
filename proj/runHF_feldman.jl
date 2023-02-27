@@ -28,21 +28,24 @@ end
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
-    flag, seed = "random", 5
+    flag, seed = "random", 6
     p,q = numerator(ϕ), denominator(ϕ)
-    if q==5 
-        seed = 6 
-    end
     νstr = round(Int,1000*(1+3*p/q))
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
 end
-Δs= plot_spectra_collective(metadatas;savename="test.pdf")
+Δs1= plot_spectra_collective(metadatas;savename="test.pdf")
 
-fig = figure()
-plot(ϕs,Δs,"b-^")
+fig = figure(figsize=(4,3))
+plot(ϕs,Δs,"b-^",label="seed 5")
+plot(ϕs,Δs1,"r->",label="seed 6")
 xlim([0,0.3])
 ylim([0,15])
+ylabel("Δ (meV)")
+xlabel(L"ϕ/ϕ_0")
+legend()
+tight_layout()
+savefig("gap_vs_flux.pdf")
 display(fig)
 close(fig)
 ## BM basis 
