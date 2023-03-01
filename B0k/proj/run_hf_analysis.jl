@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 0.0
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 8
