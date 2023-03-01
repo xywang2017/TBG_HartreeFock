@@ -156,22 +156,59 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     lG = load(hf.fname,"lG")
     Glabels = (-(lG-1)÷2):((lG-1)÷2)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
+    
+    Λ1 = zeros(ComplexF64,hf.nt*hf.latt.nk,hf.nt*hf.latt.nk)
+    Λ2 = zeros(ComplexF64,size(Λ1))
+    tmpΛ1 = reshape(Λ1,hf.nt,hf.latt.lk,hf.latt.lk,hf.nt,hf.latt.lk,hf.latt.lk)
+    tmpΛ2 = reshape(Λ2,size(tmpΛ1))
+    δgs = [i+j*1im for i in -1:1 for j in -1:1]
 
-    kvec = reshape(hf.latt.kvec,:) 
+    tmpH = reshape(hf.H,hf.nt,hf.latt.lk,hf.latt.lk,hf.nt,hf.latt.lk,hf.latt.lk)
+    tmpP = reshape(hf.P,size(tmpH))
 
-    for ig in 1:lG^2 
+    fock = zeros(ComplexF64,hf.nt,hf.nt)
+    λ1 = zeros(ComplexF64,hf.nt,hf.nt)
+    λ2 = zeros(ComplexF64,size(λ1))
+    p = zeros(ComplexF64,size(λ1))
+
+    for ig in 1:lG^2 ,δg in δgs
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        m1,n1 = (m-Glabels[1]+real(δg))%lG + Glabels[1],(n-Glabels[1]+imag(δg))%lG + Glabels[1]
         jldopen(hf.fname,"r") do file 
-            hf.Λ .= file["$(m)_$(n)"]
+            Λ1 .= file["$(m)_$(n)"]
+            Λ2 .= file["$(m1)_$(n1)"]
         end
+        for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
+            δp1,δp2 = δk1 - real(δg), δk2 - imag(δg)
+            _δk = δk1*hf.params.g1 + δk2*hf.params.g2
 
-        ## Hartree
-        trPG = tr(hf.P*conj(hf.Λ))
-        hf.H .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * hf.Λ
+            hartree = 0.0 + 0.0im 
+            for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                    hartree += tr(conj(view(tmpΛ1,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
+                end
+            end
 
-        ## Fock
-        Vnum = (β*hf.V0/hf.latt.nk)*V.(kvec' .- kvec .+Gs[ig],Lm)
-        hf.H .-= (kron(Vnum,Array{ComplexF64,2}(I,hf.nt,hf.nt)).*hf.Λ)*transpose(hf.P)*hf.Λ'
+            for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                    vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
+                    λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                    fock .= 0.0 + 0.0im
+                    for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                        ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                        if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                            λ2 .= view(tmpΛ2,:,ip1,ip2,:,ip1r,ip2r)
+                            p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
+                            fock .+= vnum * (λ1*transpose(p)*λ2')
+                        end
+                    end
+                    tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= hartree*λ1 - fock
+                end
+            end
+
+        end 
     end
     return nothing
 end
@@ -215,27 +252,65 @@ end
 
 function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,2};β::Float64=1.0)
     # compute coefficients b λ + a λ^2/2
-
     Gs = load(hf.fname,"Gs")
     lG = load(hf.fname,"lG")
     Glabels = (-(lG-1)÷2):((lG-1)÷2)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
-
-    kvec = reshape(hf.latt.kvec,:) 
-
+    
+    Λ1 = zeros(ComplexF64,hf.nt*hf.latt.nk,hf.nt*hf.latt.nk)
+    Λ2 = zeros(ComplexF64,size(Λ1))
+    tmpΛ1 = reshape(Λ1,hf.nt,hf.latt.lk,hf.latt.lk,hf.nt,hf.latt.lk,hf.latt.lk)
+    tmpΛ2 = reshape(Λ2,size(tmpΛ1))
+    δgs = [i+j*1im for i in -1:1 for j in -1:1]
+    
+    tmpP = reshape(δP,size(tmpH))
     # change of Hartree-Fock due to a small δP
     δH = zeros(ComplexF64,size(δP))
-    for ig in 1:lG^2
-        m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
-        jldopen(hf.fname,"r") do file 
-            hf.Λ .= file["$(m)_$(n)"]
-        end
-        trPG = tr(δP*conj(hf.Λ))
-        δH .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * hf.Λ
+    tmpH = reshape(δH,hf.nt,hf.latt.lk,hf.latt.lk,hf.nt,hf.latt.lk,hf.latt.lk)
 
-        ## Fock
-        Vnum = (β*hf.V0/hf.latt.nk)*V.(kvec' .- kvec .+Gs[ig],Lm)
-        δH .-= (kron(Vnum,Array{ComplexF64,2}(I,hf.nt,hf.nt)).*hf.Λ)*transpose(δP)*hf.Λ'
+    fock = zeros(ComplexF64,hf.nt,hf.nt)
+    λ1 = zeros(ComplexF64,hf.nt,hf.nt)
+    λ2 = zeros(ComplexF64,size(λ1))
+    p = zeros(ComplexF64,size(λ1))
+    
+    for ig in 1:lG^2 ,δg in δgs
+        m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        m1,n1 = (m-Glabels[1]+real(δg))%lG + Glabels[1],(n-Glabels[1]+imag(δg))%lG + Glabels[1]
+        jldopen(hf.fname,"r") do file 
+            Λ1 .= file["$(m)_$(n)"]
+            Λ2 .= file["$(m1)_$(n1)"]
+        end
+        for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
+            δp1,δp2 = δk1 - real(δg), δk2 - imag(δg)
+            _δk = δk1*hf.params.g1 + δk2*hf.params.g2
+
+            hartree = 0.0 + 0.0im 
+            for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                    hartree += tr(conj(view(tmpΛ1,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
+                end
+            end
+
+            for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                    vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
+                    λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                    fock .= 0.0 + 0.0im
+                    for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                        ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                        if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                            λ2 .= view(tmpΛ2,:,ip1,ip2,:,ip1r,ip2r)
+                            p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
+                            fock .+= vnum * (λ1*transpose(p)*λ2')
+                        end
+                    end
+                    tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= hartree*λ1 - fock
+                end
+            end
+
+        end 
     end
 
     # compute coefficients with δP 

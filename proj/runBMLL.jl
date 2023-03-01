@@ -1,7 +1,7 @@
 using PyPlot
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
 
 str = ARGS[1]
 w0 = parse(Float64,ARGS[2])*0.1
@@ -37,30 +37,30 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 # #
 
-# jldopen(joinpath(fpath,"feldman/data_w07/_1_10/_1_10_Kprime_metadata.jld2")) do file 
-#     # for m in -3:3, n in -12:12 
-#     #     Λ = file["$(m)_$(n)"]
-#     #     if n%4 !=0
-#     #         println(norm(tr(Λ)))
-#     #     end
-#     # end
-#     Λ = file["0_0"]
-#     fig = figure(figsize=(5,4))
-#     pl=imshow(abs.(Λ),origin="lower")
-#     colorbar(pl)
-#     axis("equal")
-#     display(fig)
-#     close(fig)
-#     println(norm(Λ))
+jldopen(joinpath(fpath,"feldman/data_w07/_1_12/_1_12_K_metadata.jld2")) do file 
+    for m in -3:3, n in -36:36 
+        Λ = file["$(m)_$(n)"]
+        println(m," ",n," ",norm(Λ))
+    end
+    # Λ = file["0_0"]
+    # fig = figure(figsize=(5,4))
+    # pl=imshow(abs.(Λ),origin="lower")
+    # colorbar(pl)
+    # axis("equal")
+    # display(fig)
+    # close(fig)
+    # println(norm(Λ))
 
-#     energies = file["E"]
-#     fig = figure(figsize=(5,4))
-#     plot(ones(length(energies)),energies[:],"b_")
-#     colorbar(pl)
-#     axis("equal")
-#     display(fig)
-#     close(fig)
-# end
+    energies = file["E"]
+    fig = figure(figsize=(5,4))
+    plot(ones(length(energies)),energies[:],"b_")
+    axis("equal")
+    savefig("test.png",dpi=400)
+    display(fig)
+    close(fig)
+end
+
+3
 
 # # # plot spectrum 
 # function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)

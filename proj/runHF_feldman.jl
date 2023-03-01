@@ -1,6 +1,6 @@
 using PyPlot,JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 ## Hartree Fock related 
@@ -24,17 +24,20 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = 1 .// [4;5;6;8;10]
+ϕs = 1 .// [4;5;6;8;10;12]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
-    flag, seed = "random", 6
+    flag, seed = "random", 5
     p,q = numerator(ϕ), denominator(ϕ)
     νstr = round(Int,1000*(1+3*p/q))
+    if q==12 
+        seed = 1
+    end
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
 end
-Δs1= plot_spectra_collective(metadatas;savename="test.pdf")
+Δs= plot_spectra_collective(metadatas;savename="test.pdf")
 
 fig = figure(figsize=(4,3))
 plot(ϕs,Δs,"b-^",label="seed 5")

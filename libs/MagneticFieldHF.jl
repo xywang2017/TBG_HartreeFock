@@ -24,6 +24,7 @@ mutable struct HartreeFock
     # gvec and overlap matrix for a given gvec
     gvec::Matrix{ComplexF64}
     Λ::Array{ComplexF64,4}
+    Λs::Array{ComplexF64,4} # prestore all the data of overlap
 
     # Coulomb unit 
     V0::Float64
