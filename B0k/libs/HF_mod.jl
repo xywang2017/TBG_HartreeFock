@@ -173,41 +173,50 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
 
     for ig in 1:lG^2 ,δg in δgs
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
-        m1,n1 = mod(m-Glabels[1]+real(δg),lG) + Glabels[1],mod(n-Glabels[1]+imag(δg),lG)  + Glabels[1]
-        jldopen(hf.fname,"r") do file 
-            Λ1 .= file["$(m)_$(n)"]
-            Λ2 .= file["$(m1)_$(n1)"]
-        end
-        for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
-            δp1,δp2 = δk1 - real(δg), δk2 - imag(δg)
-            _δk = δk1*hf.params.g1 + δk2*hf.params.g2
-
-            hartree = 0.0 + 0.0im 
-            for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
-                ip1r, ip2r = ip1 -δp1, ip2 - δp2 
-                if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
-                    hartree += tr(conj(view(tmpΛ1,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
-                end
+        m1,n1 = m+real(δg),n+imag(δg)
+        if (m1 in Glabels && n1 in Glabels)
+            jldopen(hf.fname,"r") do file 
+                Λ1 .= file["$(m)_$(n)"]
+                Λ2 .= file["$(m1)_$(n1)"]
             end
+            for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
+                δp1,δp2 = δk1 - real(δg)*hf.latt.lk, δk2 - imag(δg)*hf.latt.lk
+                _δk = (δk1*hf.params.g1 + δk2*hf.params.g2)/hf.latt.lk
+                vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
 
-            for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
-                ik1r, ik2r = ik1 +δk1, ik2 + δk2 
-                if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
-                    vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
-                    λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
-                    fock .= 0.0 + 0.0im
-                    for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
-                        ip1r, ip2r = ip1 -δp1, ip2 - δp2 
-                        if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
-                            λ2 .= view(tmpΛ2,:,ip1,ip2,:,ip1r,ip2r)
-                            p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
-                            fock .+= vnum * (λ1*transpose(p)*λ2')
-                        end
+                hartree = 0.0 + 0.0im 
+                for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                    ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                    if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                        hartree += tr(conj(view(tmpΛ2,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
                     end
-                    tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= hartree*λ1 - fock
+                end
+
+                for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                    ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                    if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                        λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                        tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= (hartree*vnum)  * λ1
+                    end
+                end
+
+                for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                    ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                    if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                        λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                        fock .= 0.0 + 0.0im
+                        for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                            ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                            if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                                λ2 .= view(tmpΛ2,:,ip1r,ip2r,:,ip1,ip2)
+                                p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
+                                fock .= vnum * (λ1*transpose(p)*λ2')
+                                tmpH[:,ik1,ik2,:,ip1r,ip2r] .-= fock
+                            end
+                        end 
+                    end
                 end
             end
-
         end 
     end
     return nothing
@@ -234,8 +243,8 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
 
     norm_convergence = calculate_norm_convergence(P_new,hf.P)
 
-    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    # λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    # λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     hf.P .= λ*P_new + (1-λ)*hf.P
     return norm_convergence,λ
@@ -263,10 +272,11 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,2};β::Float6
     tmpΛ2 = reshape(Λ2,size(tmpΛ1))
     δgs = [i+j*1im for i in -1:1 for j in -1:1]
     
-    tmpP = reshape(δP,size(tmpH))
+    
     # change of Hartree-Fock due to a small δP
     δH = zeros(ComplexF64,size(δP))
     tmpH = reshape(δH,hf.nt,hf.latt.lk,hf.latt.lk,hf.nt,hf.latt.lk,hf.latt.lk)
+    tmpP = reshape(δP,size(tmpH))
 
     fock = zeros(ComplexF64,hf.nt,hf.nt)
     λ1 = zeros(ComplexF64,hf.nt,hf.nt)
@@ -275,41 +285,49 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,2};β::Float6
     
     for ig in 1:lG^2 ,δg in δgs
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
-        m1,n1 = mod(m-Glabels[1]+real(δg),lG) + Glabels[1],mod(n-Glabels[1]+imag(δg),lG)  + Glabels[1]
-        jldopen(hf.fname,"r") do file 
-            Λ1 .= file["$(m)_$(n)"]
-            Λ2 .= file["$(m1)_$(n1)"]
-        end
-        for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
-            δp1,δp2 = δk1 - real(δg), δk2 - imag(δg)
-            _δk = δk1*hf.params.g1 + δk2*hf.params.g2
-
-            hartree = 0.0 + 0.0im 
-            for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
-                ip1r, ip2r = ip1 -δp1, ip2 - δp2 
-                if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
-                    hartree += tr(conj(view(tmpΛ1,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
-                end
+        m1,n1 = m+real(δg),n+imag(δg)
+        if (m1 in Glabels && n1 in Glabels)
+            jldopen(hf.fname,"r") do file 
+                Λ1 .= file["$(m)_$(n)"]
+                Λ2 .= file["$(m1)_$(n1)"]
             end
+            for δk1 in (-(hf.latt.lk-1)):(hf.latt.lk-1),δk2 in (-(hf.latt.lk-1)):(hf.latt.lk-1)
+                δp1,δp2 = δk1 - real(δg)*hf.latt.lk, δk2 - imag(δg)*hf.latt.lk
+                _δk = (δk1*hf.params.g1 + δk2*hf.params.g2)/hf.latt.lk
+                vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
 
-            for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
-                ik1r, ik2r = ik1 +δk1, ik2 + δk2 
-                if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
-                    vnum = (β*hf.V0/hf.latt.nk)*V(_δk+Gs[ig],Lm)
-                    λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
-                    fock .= 0.0 + 0.0im
-                    for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
-                        ip1r, ip2r = ip1 -δp1, ip2 - δp2 
-                        if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
-                            λ2 .= view(tmpΛ2,:,ip1,ip2,:,ip1r,ip2r)
-                            p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
-                            fock .+= vnum * (λ1*transpose(p)*λ2')
+                hartree = 0.0 + 0.0im 
+                for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                    ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                    if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                        hartree += tr(conj(view(tmpΛ2,:,ip1r,ip2r,:,ip1,ip2))*view(tmpP,:,ip1,ip2,:,ip1r,ip2r))
+                    end
+                end
+
+                for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                    ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                    if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                        λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                        tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= (hartree*vnum)  * λ1
+                    end
+                end
+
+                for ik2 in 1:hf.latt.lk, ik1 in 1:hf.latt.lk
+                    ik1r, ik2r = ik1 +δk1, ik2 + δk2 
+                    if (ik1r in 1:hf.latt.lk && ik2r in 1:hf.latt.lk)
+                        λ1 .= view(tmpΛ1,:,ik1,ik2,:,ik1r,ik2r)
+                        for ip2 in 1:hf.latt.lk, ip1 in 1:hf.latt.lk 
+                            ip1r, ip2r = ip1 -δp1, ip2 - δp2 
+                            if (ip1r in 1:hf.latt.lk && ip2r in 1:hf.latt.lk)
+                                λ2 .= view(tmpΛ2,:,ip1r,ip2r,:,ip1,ip2)
+                                p .= view(tmpP,:,ip1,ip2,:,ik1r,ik2r)
+                                fock .= vnum * (λ1*transpose(p)*λ2')
+                                tmpH[:,ik1,ik2,:,ip1r,ip2r] .-= fock
+                            end
                         end
                     end
-                    tmpH[:,ik1,ik2,:,ik1r,ik2r] .+= hartree*λ1 - fock
                 end
             end
-
         end 
     end
 
