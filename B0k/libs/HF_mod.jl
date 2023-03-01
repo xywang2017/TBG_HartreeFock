@@ -173,7 +173,7 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
 
     for ig in 1:lG^2 ,δg in δgs
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
-        m1,n1 = (m-Glabels[1]+real(δg))%lG + Glabels[1],(n-Glabels[1]+imag(δg))%lG + Glabels[1]
+        m1,n1 = mod(m-Glabels[1]+real(δg),lG) + Glabels[1],mod(n-Glabels[1]+imag(δg),lG)  + Glabels[1]
         jldopen(hf.fname,"r") do file 
             Λ1 .= file["$(m)_$(n)"]
             Λ2 .= file["$(m1)_$(n1)"]
@@ -275,7 +275,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,2};β::Float6
     
     for ig in 1:lG^2 ,δg in δgs
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
-        m1,n1 = (m-Glabels[1]+real(δg))%lG + Glabels[1],(n-Glabels[1]+imag(δg))%lG + Glabels[1]
+        m1,n1 = mod(m-Glabels[1]+real(δg),lG) + Glabels[1],mod(n-Glabels[1]+imag(δg),lG)  + Glabels[1]
         jldopen(hf.fname,"r") do file 
             Λ1 .= file["$(m)_$(n)"]
             Λ2 .= file["$(m1)_$(n1)"]
