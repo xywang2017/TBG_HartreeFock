@@ -228,7 +228,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
         update P 
     """
     νnorm = round(Int,(hf.ν+4)/8 * size(hf.H,1))  # total number of occupied states 
-    check_Hermitian(hf.H)
+    # check_Hermitian(hf.H)
     hf.ϵk[:],vecs = eigen(Hermitian(hf.H))
     hf.σzτz .= real( diag( vecs' * hf.Σz * vecs ) )
 

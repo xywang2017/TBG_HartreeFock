@@ -1,15 +1,15 @@
 using PyPlot
 using JLD2
-fpath = joinpath(pwd(),"B0")
+fpath = joinpath(pwd(),"B0k")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix =2
+prefix =1
 # νs = collect(0.0:0.2:4.0)
-ν = 2.0
+ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 15
+lk = 8
 params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -21,13 +21,7 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 
 # ----------------- Hartree-Fock analysis part ---------------- # 
 hf = load(hf_path,"hf");
-kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
-ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
-iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
-kcut = real(kvec[:,iΓ])
-Ecut = ϵ0[:,:,iΓ]
-plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+plot_energies(hf.ϵk,hf.σzτz,lines=[hf.μ])
 
 # ----------------- valley-spin-bamd polarization info ----------------- # 
 fig = figure(figsize=(2,10))
