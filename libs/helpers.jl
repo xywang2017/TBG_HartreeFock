@@ -44,7 +44,7 @@ function _associatedlaguerre_v1(nLL::Int, cplus::ComplexF64, cminus::ComplexF64)
     # first construct the matrix <n|c_-a + c_+ a^dagger |m>, diagonalize, then exponentiate
     # 0,1,.. nscale*nLL-1
     # x = -real(cplus*cminus)
-    nscale = 2
+    nscale = 1
     mat = zeros(ComplexF64, nscale*nLL, nscale*nLL)
     for i in 1:(size(mat,2)-1)
         mat[i+1, i] = sqrt(i) * cplus * (1im)
@@ -54,7 +54,8 @@ function _associatedlaguerre_v1(nLL::Int, cplus::ComplexF64, cminus::ComplexF64)
     #     println("error with hermitian")
     # end
     F = eigen(Hermitian(mat))
-    return view(F.vectors,1:nLL,:) * Diagonal(exp.(-1im * F.values)) * view(F.vectors,1:nLL,:)'
+    # return view(F.vectors,1:nLL,:) * Diagonal(exp.(-1im * F.values)) * view(F.vectors,1:nLL,:)'
+    return F.vectors * Diagonal(exp.(-1im * F.values)) * F.vectors'
 end
 
 
@@ -76,8 +77,8 @@ function _tLL_v1(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
 
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
-    # _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
-    _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
+    _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
+    # _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
     oLL = zeros(ComplexF64, nH, nH)
     for iH1 in 1:nH, iH2 in 1:nH
         n1, γ1 = inγ(iH1)
@@ -232,8 +233,8 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
     # T is 2x2 Hamiltonian in the sublattice basis 
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
-    # _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
-    _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
+    _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
+    # _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
     oLL = zeros(ComplexF64, nH, nH)
     for iH1 in 1:nH, iH2 in 1:nH
         n1, γ1 = inγ(iH1)

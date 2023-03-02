@@ -37,30 +37,28 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 # #
 
-jldopen(joinpath(fpath,"feldman/data_w07/_1_12/_1_12_K_metadata.jld2")) do file 
-    for m in -3:3, n in -36:36 
-        Λ = file["$(m)_$(n)"]
-        println(m," ",n," ",norm(Λ))
-    end
-    # Λ = file["0_0"]
-    # fig = figure(figsize=(5,4))
-    # pl=imshow(abs.(Λ),origin="lower")
-    # colorbar(pl)
-    # axis("equal")
-    # display(fig)
-    # close(fig)
-    # println(norm(Λ))
+# jldopen(joinpath(fpath,"feldman/data_w07/_1_12/_1_12_K_metadata.jld2")) do file 
+#     for m in -3:3, n in -36:36 
+#         Λ = file["$(m)_$(n)"]
+#         println(m," ",n," ",norm(Λ))
+#     end
+#     # Λ = file["0_0"]
+#     # fig = figure(figsize=(5,4))
+#     # pl=imshow(abs.(Λ),origin="lower")
+#     # colorbar(pl)
+#     # axis("equal")
+#     # display(fig)
+#     # close(fig)
+#     # println(norm(Λ))
 
-    energies = file["E"]
-    fig = figure(figsize=(5,4))
-    plot(ones(length(energies)),energies[:],"b_")
-    axis("equal")
-    savefig("test.png",dpi=400)
-    display(fig)
-    close(fig)
-end
-
-3
+#     energies = file["E"]
+#     fig = figure(figsize=(5,4))
+#     plot(ones(length(energies)),energies[:],"b_")
+#     axis("equal")
+#     savefig("test.png",dpi=400)
+#     display(fig)
+#     close(fig)
+# end
 
 # # # plot spectrum 
 # function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
