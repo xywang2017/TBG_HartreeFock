@@ -23,75 +23,12 @@ hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 plot_energies(hf.ϵk,hf.σzτz,lines=[hf.μ])
 
-# ----------------- valley-spin-bamd polarization info ----------------- # 
-fig = figure(figsize=(2,10))
-plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
-yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
-axvline(0,c="gray")
-xlim(-0.4,0.4)
-tight_layout()
-savefig("test.pdf")
-display(fig)
-close(fig)
-
-s0 = ComplexF64[1 0;0 1]
-s1 = ComplexF64[0 1;1 0]
-s2 = ComplexF64[0 -1im;1im 0]
-s3 = ComplexF64[1 0;0 -1]
-Δ = zeros(size(hf.ϵk))
-for ik in 1:size(hf.ϵk,2)
-    F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s3))*F.vectors))
-end
-Δ .= hf.σzτz
-
-plot_energy_cuts_with_order_parameters(kcut,Ecut,
-                reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
-
 
 # ----------------- Hartree-Fock statistics ---------------- # 
-iter_oda = load(hf_path,"iter_oda");
-iter_err = load(hf_path,"iter_err");
-iter_energy = load(hf_path,"iter_energy");
-println(iter_energy[end])
-println(iter_err[end])
-
-fig,ax = subplots(figsize=(4,3))
-ax.plot(eachindex(iter_err),iter_err,"b-",label="err",ms=2)
-ax1 = ax.twinx()
-ax1.plot(eachindex(iter_energy),iter_energy,"r-",label="oda",ms=3)
-ax.set_ylabel("Iter Err")
-ax.set_yscale("log")
-ax1.set_ylabel("Iter Energy")
-# ax1.set_yscale("log")
+fig = figure(figsize=(5,4)) 
+pl = imshow(abs.(hf.P-Diagonal(hf.P)),cmap="Blues",origin="lower")
+colorbar(pl)
+axis("equal")
 tight_layout()
-savefig("test.pdf")
 display(fig)
 close(fig)
-
-### all the chemical potentials 
-νs = collect(-4.0:0.25:4.0)
-μs = Float64[]
-actual_νs = Float64[]
-for ν in νs 
-    νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/4_strain_hf_$(νstr)_lk15.jld2")
-    if ispath(hf_path)
-        hf = load(hf_path,"hf");
-        push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
-        push!(μs,hf.μ)
-    end
-end
-fig = figure(figsize=(5,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
-xlabel("ν")
-ylabel("μ")
-axhline(0,ls="--",c="gray")
-# ylim([0,30])
-# ylim([0,14])
-xlim([-0.1,4.1])
-tight_layout()
-# savefig("cascade_strain_gapless.pdf")
-display(fig)
-close(fig)
-

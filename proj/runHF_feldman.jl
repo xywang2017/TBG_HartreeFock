@@ -41,7 +41,6 @@ end
 
 fig = figure(figsize=(4,3))
 plot(ϕs,Δs,"b-^",label="seed 5")
-plot(ϕs,Δs1,"r->",label="seed 6")
 xlim([0,0.3])
 ylim([0,15])
 ylabel("Δ (meV)")
