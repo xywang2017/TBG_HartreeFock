@@ -78,7 +78,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
-    xlim([0,0.3])
+    xlim([0,0.55])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     xticks([1/4,1/5,1/6,1/8,1/10],

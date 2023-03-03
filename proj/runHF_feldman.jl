@@ -24,7 +24,7 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = 1 .// [4;5;6;8;10;12]
+ϕs = [1//2;1//3;2//7;1//4;1//5;1//6;1//8;1//10;1//12]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
@@ -41,8 +41,8 @@ end
 
 fig = figure(figsize=(4,3))
 plot(ϕs,Δs,"b-^",label="seed 5")
-xlim([0,0.3])
-ylim([0,15])
+xlim([0,0.55])
+ylim([0,10])
 ylabel("Δ (meV)")
 xlabel(L"ϕ/ϕ_0")
 legend()
@@ -51,7 +51,8 @@ savefig("gap_vs_flux.pdf")
 display(fig)
 close(fig)
 ## BM basis 
-seed = 2
+seed = 5
+p, q = 1 ,5
 flag = "random"
 νF = 1+ (3)*p/q
 νstr = round(Int,1000*νF)
