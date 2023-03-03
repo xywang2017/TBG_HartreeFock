@@ -18,7 +18,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
         mkpath(joinpath(fpath,"feldman/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
-    nq = (denominator(ϕ)>5) ? 1 : 2
+    nq = (denominator(ϕ)>6) ? 1 : 2
     if q == 3 
         nq = 4 
     elseif q ==2 

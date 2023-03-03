@@ -34,6 +34,9 @@ for ϕ in ϕs
     if q==12 
         seed = 1
     end
+    if q == 7 
+        seed = 6
+    end
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
 end
