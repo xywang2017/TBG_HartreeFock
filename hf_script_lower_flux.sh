@@ -24,13 +24,13 @@
 
 # julia proj/runHF_server.jl 1 2 2.5 random 07 $1
 # julia proj/runHF_server.jl 1 3 2.0 random 07 $1
-julia proj/runHF_server.jl 2 7 1.857 random 07 $1
+# julia proj/runHF_server.jl 2 7 1.857 random 07 $1
 
 # julia proj/runHF_server.jl 1 4 1.75 random 07 $1
 
 # julia proj/runHF_server.jl 1 5 1.6 random 07 $1
 
-# julia proj/runHF_server.jl 1 6 1.5 random 07 $1
+julia proj/runHF_server.jl 1 6 1.5 random 07 $1
 
 # julia proj/runHF_server.jl 1 8 1.375 random 07 $1
 
