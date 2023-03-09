@@ -18,7 +18,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
         mkpath(joinpath(fpath,"feldman/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
-    nq = (denominator(ϕ)>6) ? 1 : 2
+    nq = (denominator(ϕ)>7) ? 1 : 2
     if q == 3 
         nq = 4 
     elseif q ==2 
@@ -40,31 +40,40 @@ end
 #
 bm = compute_bmLL(ϕ,str,w0,w0str);
 
-# #
+#
 
-# jldopen(joinpath(fpath,"feldman/data_w07/_1_12/_1_12_K_metadata.jld2")) do file 
-#     for m in -3:3, n in -36:36 
-#         Λ = file["$(m)_$(n)"]
-#         println(m," ",n," ",norm(Λ))
-#     end
-#     # Λ = file["0_0"]
-#     # fig = figure(figsize=(5,4))
-#     # pl=imshow(abs.(Λ),origin="lower")
-#     # colorbar(pl)
-#     # axis("equal")
-#     # display(fig)
-#     # close(fig)
-#     # println(norm(Λ))
+jldopen(joinpath(fpath,"feldman/data_w07/_1_14/_1_14_K_metadata.jld2")) do file 
+    # @time begin 
+    #     for m in -3:3, n in -36:36 
+    #     Λ = file["$(m)_$(n)"]
+    #     F = qr(Λ)
+    #     # println(m," ",n," ",norm(Λ))
+    #     end
+    # end
+    Λ = file["-3_32"]
+    # fig = figure(figsize=(5,4))
+    # pl=imshow(abs.(Λ),origin="lower")
+    # colorbar(pl)
+    # axis("equal")
+    # display(fig)
+    # close(fig)
+    # println(norm(Λ))
 
-#     energies = file["E"]
-#     fig = figure(figsize=(5,4))
-#     plot(ones(length(energies)),energies[:],"b_")
-#     axis("equal")
-#     savefig("test.png",dpi=400)
-#     display(fig)
-#     close(fig)
-# end
-
+    F = svd(Λ)
+    fig = figure()
+    plot(F.S,"r.")
+    yscale("log")
+    display(fig)
+    close(fig)
+    # energies = file["E"]
+    # fig = figure(figsize=(5,4))
+    # plot(ones(length(energies)),energies[:],"b_")
+    # axis("equal")
+    # savefig("test.png",dpi=400)
+    # display(fig)
+    # close(fig)
+end
+3
 # # # plot spectrum 
 # function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
 #     fig = figure(figsize=(6,4))
