@@ -24,7 +24,7 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = [1//2;1//3;2//7;1//4;1//5;1//6;1//8;1//10;1//12;1//14]
+ϕs = [1//2;2//5;1//3;2//7;1//4;1//5;1//6;1//8;1//10;1//12;1//14]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
@@ -35,20 +35,19 @@ for ϕ in ϕs
         seed = 1
     end
     if q == 7 
-        seed = 6
+        seed = 5
     end
     metadata = joinpath(fpath,"feldman/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     push!(metadatas,metadata)
 end
-Δs= plot_spectra_collective(metadatas;savename="test.pdf")
+Δs= plot_spectra_collective(metadatas;savename="strain_s_1_t_3_spectrum.png")
 
-fig = figure(figsize=(4,3))
-plot(ϕs,Δs,"b-^",label="seed 5")
+fig = figure(figsize=(3.2,3))
+plot(ϕs,Δs,"b-^")
 xlim([0,0.55])
 ylim([0,10])
 ylabel("Δ (meV)")
 xlabel(L"ϕ/ϕ_0")
-legend()
 tight_layout()
 savefig("gap_vs_flux.pdf")
 display(fig)

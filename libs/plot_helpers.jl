@@ -51,7 +51,7 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf")
-    fig = figure(figsize=(4,4))
+    fig = figure(figsize=(4,3))
     ϵFs = Float64[]
     Δs = Float64[]
     for j in eachindex(metadatas) 
@@ -81,11 +81,14 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     xlim([0,0.55])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
-    xticks([1/4,1/5,1/6,1/8,1/10],
-            [L"$\frac{1}{4}$",L"$\frac{1}{5}$",L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$"])
+    # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
+    # ticklistLabels= [L"$\frac{1}{2}$",L"$\frac{1}{3}$",
+    #             L"$\frac{2}{7}$",L"$\frac{1}{4}$",L"$\frac{1}{5}$",
+    #             L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$",L"$\frac{1}{14}$"]
+    # xticks(ticklist,ticklistLabels)
     # title("(s,t)=(1,3)")
     tight_layout()
-    savefig(savename,transparent=true)
+    savefig(savename,dpi=600)
     display(fig)
     close(fig)
 

@@ -42,7 +42,7 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 #
 
-jldopen(joinpath(fpath,"feldman/data_w07/_1_14/_1_14_K_metadata.jld2")) do file 
+jldopen(joinpath(fpath,"feldman/data_w07/_2_7/_2_7_K_metadata.jld2")) do file 
     # @time begin 
     #     for m in -3:3, n in -36:36 
     #     Λ = file["$(m)_$(n)"]
@@ -50,7 +50,7 @@ jldopen(joinpath(fpath,"feldman/data_w07/_1_14/_1_14_K_metadata.jld2")) do file
     #     # println(m," ",n," ",norm(Λ))
     #     end
     # end
-    Λ = file["-3_32"]
+    Λ = file["-2_4"]
     # fig = figure(figsize=(5,4))
     # pl=imshow(abs.(Λ),origin="lower")
     # colorbar(pl)
