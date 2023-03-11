@@ -5,9 +5,9 @@ include(joinpath(fpath,"libs/BM_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
-lk = 15
+lk = 19
 params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
-# params = Params(ϵ=0.00,Da=0,dθ=1.38π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
@@ -28,7 +28,7 @@ bm = compute_bm(latt,params,fname=bm_path);
 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(load(bm_path,"E"),:,lk,lk)
-plot_contour_maps(kvec,ϵ0[5,:,:];points=[params.Kt/abs(params.g1)],contourlines=[0.])
+plot_contour_maps(kvec,ϵ0[5,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[:,:,iΓ],:,length(kcut))

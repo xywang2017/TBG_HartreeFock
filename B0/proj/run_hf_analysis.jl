@@ -4,12 +4,12 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix =2
+prefix = 2
 # νs = collect(0.0:0.2:4.0)
-ν = 2.0
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 15
+lk = 19
 params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -76,12 +76,12 @@ display(fig)
 close(fig)
 
 ### all the chemical potentials 
-νs = collect(-4.0:0.25:4.0)
+νs = collect(0:0.2:4.0)
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
     νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/4_strain_hf_$(νstr)_lk15.jld2")
+    hf_path = joinpath(fpath,"data/1_strain_hf_$(νstr)_lk19.jld2")
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)

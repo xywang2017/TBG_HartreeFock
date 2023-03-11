@@ -195,7 +195,7 @@ function constructDiagonals(H::Matrix{ComplexF64},k::ComplexF64,ζ::Int,A::HBM)
     H .= 0.0 + 0.0im
     σz = ComplexF64[1 0 ; 0 -1]
     σ0 = ComplexF64[1 0; 0 1]
-    R = A.params.dθ/2 * Float64[0 -1;1 0]
+    R = -A.params.dθ/2 * Float64[0 -1;1 0]
     ∇u = (A.params.S[1,1] + A.params.S[2,2])/2
     # dispersive part
     for ig in 1:A.lg^2
