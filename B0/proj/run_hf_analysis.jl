@@ -81,7 +81,7 @@ close(fig)
 actual_νs = Float64[]
 for ν in νs 
     νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/1_strain_hf_$(νstr)_lk19.jld2")
+    hf_path = joinpath(fpath,"data/2_strain_hf_$(νstr)_lk19.jld2")
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
