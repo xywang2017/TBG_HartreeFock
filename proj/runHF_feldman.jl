@@ -24,14 +24,14 @@ for w0 in w0s
 end 
 
 # ------------------ plot_spectra_collectively_at_different_flux --------------- # 
-ϕs = [1//2;2//5;1//3;2//7;1//4;1//5;1//6;1//8;1//10;1//12;1//14]
+ϕs = [1//2;5//12;2//5;1//3;2//7;1//4;1//5;1//6;1//8;1//10;1//12;1//14]
 w0 = "07"
 metadatas = String[]
 for ϕ in ϕs 
     flag, seed = "random", 5
     p,q = numerator(ϕ), denominator(ϕ)
     νstr = round(Int,1000*(1+3*p/q))
-    if q==12 
+    if q==12 && p == 1 
         seed = 1
     end
     if q == 7 
