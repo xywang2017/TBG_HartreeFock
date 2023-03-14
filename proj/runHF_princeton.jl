@@ -10,20 +10,35 @@ initParamsWithStrain(params)
 ##
 
 w0cs = Float64[]
-w0s = ["00","02","03","05","06","07"]
-w0snum = [0.0;0.2;0.3;0.5;0.6;0.7]
+w0s = ["07"]
+w0snum = [0.0]
 σz = []
-p,q = 1, 10
-νF = 2 + 2*p/q
+p,q = 1, 4
+νF = 0 + 4*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
-    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/_chern_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)
     ϵk = load(metadata,"spectrum")
     σzτz = load(metadata,"chern")
-    push!(σz, plot_spectra(ϵk,σzτz,νF,params;savename=joinpath(fpath,"princeton/figures/chern_spectrum_$(p)_$(q)_$(w0).png")))
+    fig = figure(figsize=(4,3)) 
+    scatter(ones(length(ϵk)),ϵk[:],c=σzτz[:],s=6,cmap="coolwarm",vmin=-1,vmax=1)
+    ϵsorted = sort(ϵk[:])
+    ν = eachindex(ϵsorted) ./ length(ϵsorted)
+    i = 1
+    while (νF+4)/8 > ν[i]
+        i += 1
+    end
+    ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
+    Δ = (ϵsorted[i+1] - ϵsorted[i]) 
+    println(i," ",length(ϵsorted))
+    println(Δ)
+    axhline(ϵF)
+    display(fig)
+    close(fig)
+    # push!(σz, plot_spectra(ϵk,σzτz,νF,params;savename=joinpath(fpath,"princeton/figures/chern_spectrum_$(p)_$(q)_$(w0).png")))
 end 
 
 for w0 in w0s
