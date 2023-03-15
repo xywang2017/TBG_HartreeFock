@@ -50,7 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 25.0
+    ϵr = 10.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4Lm/2)
 end
 
@@ -122,6 +122,8 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     iter_err = Float64[]
     iter_energy = Float64[]
     iter_oda = Float64[]
+    # strong coupling 
+    hf.H0 .= 0.0
     while norm_convergence > hf.precision
         @time begin 
             println("Iter: ",iter)

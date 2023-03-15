@@ -11,13 +11,13 @@ initParamsWithStrain(params)
 
 w0cs = Float64[]
 w0s = ["07"]
-w0snum = [0.0]
+w0snum = [0.7]
 σz = []
 p,q = 1, 4
-νF = 0 + 4*p/q
+νF = 2 + 2*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
-    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    metadata = joinpath(fpath,"princeton/old/data_w$(w0)/_$(p)_$(q)/_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     println(load(metadata,"iter_energy")[end])
     println(load(metadata,"iter_err")[end])
     # plot_hf_iterations(metadata)
