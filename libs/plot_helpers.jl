@@ -4,7 +4,7 @@ using PyPlot
 function plot_spectra(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");
     ν = 8*round(Int,(νF+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
-    ϵk = hf.ϵk 
+    ϵk = hf.ϵk
     σzτz = hf.σzτz
     params = hf.params 
 

@@ -22,7 +22,7 @@ end
 
 println("Running parameters: ","ϕ=",ϕ,", ν=",ν,", Init=",flag,", w0=",w0)
 println(savename)
-params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056,dθ=1.05π/180)
+params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056,vf=2135.4,dθ=1.05π/180)
 # params = Params(w1=110.0,w0=parse(Float64,ARGS[5])*0.1*110)
 # initParamsWithStrain(params)
 hf = HartreeFock()
