@@ -14,7 +14,7 @@ seed = 1
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
-νF = 2 + (1)*p/q
+νF = 2 + (2)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
