@@ -9,12 +9,12 @@ initParamsWithStrain(params)
 
 
 ##
-flag = "random"
+flag = "flavor"
 seed = 1
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
-νF = 1 + (0)*p/q
+νF = 2 + (1)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -56,8 +56,8 @@ close(fig)
 ## BM basis 
 seed = 1
 p, q = 1 ,4
-flag = "random"
-νF = 0+ (0)*p/q
+flag = "flavor"
+νF = 2+ (2)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 plot_density_matrix_bm_valley_spin(metadata)
@@ -66,8 +66,8 @@ plot_density_matrix_bm_valley_spin(metadata)
 ## strong coupling basis at reference point defined by metadata0
 
 seed = 1
-flag  = "random"
-νF0 = 0+ (0)*p/q
+flag  = "flavor"
+νF0 = 2+ (0)*p/q
 νstr0 = round(Int,1000*νF0)
 metadata0 = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr0).jld2")
 # plot_density_matrix_strong_coupling(metadata,metadata0)
