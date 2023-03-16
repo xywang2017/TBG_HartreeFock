@@ -16,7 +16,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
         init_P_sublattice(hf)
         # init_P_sublattice_no_momentum(hf)
     else
-        hf.P .= P0 
+        init_P_strong_coupling(hf,P0=P0,H0=H0)
     end
     # valley x spin U(4) rotation --- otherwise above initializations do not access valley spin coherent states
     # init_P_valley_spin_roation(hf;α=0.2)
@@ -225,7 +225,7 @@ function init_P_strong_coupling(hf::HartreeFock;
     # first need to recreate the density matrix based on CNP 
     hf.H .= H0
     hf.P .= P0
-    update_P(hf;α=1.0)
+    update_P(hf)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
 end

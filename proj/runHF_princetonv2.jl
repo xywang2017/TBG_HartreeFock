@@ -8,11 +8,11 @@ params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
 flag = "flavor"
-seed = 1
+seed =1
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,4
-νF = 0+ (2)*p/q
+p,q = 1,8
+νF = 0+ (4)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -25,9 +25,9 @@ end
 
 ## BM basis 
 seed = 1
-p, q = 1 ,4
-flag = "random"
-νF = 2+ (2)*p/q
+p, q = 1 ,8
+flag = "flavor"
+νF = 0+ (7)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
@@ -50,14 +50,34 @@ plot_order_parameters(metadata)
 ##
 x = [0,1,2,3,4,5,6,7]
 y = [13.23;5.05;7.36;8.26;5.92;4.72;16.44;1.92];
+y8 = [12;2.57;5.15;8.05;3.84;3.51;12.57;3.09]
 fig = figure(figsize=(4,3))
-plot(x,y,"b^")
-xticks(x,["(0,0)","(0,1)","(0,2)","(0,3)","(0,4)","(2,0)","(2,1)","(2,2)"])
+plot(x,y,"b^",label="1/4")
+plot(x,y8,"r<",label="1/8")
+xticks(x,["(0,0)","(0,1)","(0,2)","(1,-1)","(1,0)","(2,0)","(2,1)","(2,2)"])
 ylim([0,19])
 yticks(0:4:20)
+legend()
 xlabel("(s,t)")
 ylabel("Δ (meV)")
 tight_layout()
 savefig("gaps_strongcoupling.pdf")
 display(fig)
 close(fig)
+
+
+## 
+
+# ------------------ plot_spectra_collectively_at_different_flux --------------- # 
+ϕs = [1//4;1//8]
+w0 = "07"
+metadatas = String[]
+for ϕ in ϕs 
+    flag, seed = "flavor", 1
+    p,q = numerator(ϕ), denominator(ϕ)
+    s,t = 1,0
+    νstr = round(Int,1000*(s+t*p/q))
+    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    push!(metadatas,metadata)
+end
+Δs= plot_spectra_collective(metadatas;savename="tmp.pdf",titlestr="(s,t)=(2,0)")

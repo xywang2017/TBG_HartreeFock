@@ -50,8 +50,8 @@ end
 
 
 ## plot Hartree Fock spectra collectively
-function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf")
-    fig = figure(figsize=(4,3))
+function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
+    fig = figure(figsize=(3,3))
     ϵFs = Float64[]
     Δs = Float64[]
     for j in eachindex(metadatas) 
@@ -67,7 +67,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         if j == length(metadatas)
             colorbar(pl)
         end
-        plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="gray")
+        plot([hf.p/hf.q-0.02,hf.p/hf.q+0.02],[hf.μ,hf.μ],":",c="gray")
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
         i = 1
@@ -78,14 +78,17 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
-    xlim([0,0.55])
+    title(titlestr)
+    xlim([0,0.3])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
     # ticklistLabels= [L"$\frac{1}{2}$",L"$\frac{1}{3}$",
     #             L"$\frac{2}{7}$",L"$\frac{1}{4}$",L"$\frac{1}{5}$",
     #             L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$",L"$\frac{1}{14}$"]
-    # xticks(ticklist,ticklistLabels)
+    ticklist = [1/4,1/8]
+    ticklistLabels= [L"$\frac{1}{4}$",L"$\frac{1}{8}$"]
+    xticks(ticklist,ticklistLabels)
     # title("(s,t)=(1,3)")
     tight_layout()
     savefig(savename,dpi=600)
