@@ -269,11 +269,13 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
 
+    # files = [load(hf.metadata[1]),load(hf.metadata[2])]
     for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
         G = m*hf.params.g1+n/hf.q*hf.params.g2
         for iη in 1:2
             jldopen(hf.metadata[iη]) do file 
                 metadata .= file["$(m)_$(n)"]
+                # metadata .= files[iη]["$(m)_$(n)"]
                 for is in 1:2
                     tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
                 end
@@ -372,7 +374,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
 
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.lk,2hf.q,hf.lk)
-
+    # files = [load(hf.metadata[1]),load(hf.metadata[2])]
     # change of Hartree-Fock due to a small δP
     δH = zeros(ComplexF64,size(δP))
     for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
@@ -380,6 +382,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
         for iη in 1:2
             jldopen(hf.metadata[iη]) do file 
                 metadata .= file["$(m)_$(n)"]
+                # metadata .= files[iη]["$(m)_$(n)"]
                 for is in 1:2
                     tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
                 end
