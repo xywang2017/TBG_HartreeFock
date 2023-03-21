@@ -225,7 +225,7 @@ function init_P_strong_coupling(hf::HartreeFock;
     # first need to recreate the density matrix based on CNP 
     hf.H .= H0
     hf.P .= P0
-    update_P(hf)
+    update_P(hf;_oda=false)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
 end
