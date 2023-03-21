@@ -1,6 +1,8 @@
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
+
+BLAS.set_num_threads(1)
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -28,12 +30,15 @@ params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056,vf=2135.4,dθ=1.0
 # params = Params(w1=110.0,w0=parse(Float64,ARGS[5])*0.1*110)
 # initParamsWithStrain(params)
 hf = HartreeFock()
-iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=_Init,savename=savename)
 
-# savename0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_flavor_init_HF_$(p)_$(q)_nu_0.jld2")
-# hf0 = load(savename0,"hf")
-# P0,H0 = hf0.P,hf0.H0
-# iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=" ",H0=H0,P0=P0)
+if !isequal(flag,"strong")
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=_Init,savename=savename)
+else
+    savename0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_flavor_init_HF_$(p)_$(q)_nu_0.jld2")
+    hf0 = load(savename0,"hf")
+    P0,H0 = hf0.P,hf0.H
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=" ",H0=H0,P0=P0,savename=savename)
+end
 
 # save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
 #

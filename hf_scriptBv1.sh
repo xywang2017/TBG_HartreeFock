@@ -16,9 +16,9 @@
 #	julia proj/runHF_server.jl 1 6 $nu random 07 $1
 #done
 
-for nu in {0.5,0.625,0.875,1.0,2.0,2.125,2.25,2.375,2.5}
+for nu in {1.5,}
 do 
-	julia proj/runHF_server.jl 1 8 $nu flavor 07 $1
+	julia proj/runHF_server.jl 1 4 $nu flavor 07 $1
 done
 
 

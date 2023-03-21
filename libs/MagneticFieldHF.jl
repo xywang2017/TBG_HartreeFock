@@ -302,7 +302,7 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     return nothing
 end
 
-function update_P(hf::HartreeFock;Δ::Float64=0.0)
+function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     """
         Diagonalize Hamiltonian for every k; use ν to keep the lowest N particle states;
         update P 
@@ -335,8 +335,11 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0)
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
     end
 
-    λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
-    # λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    if _oda 
+        λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+    else
+        λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
+    end
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     hf.P .= λ*P_new + (1-λ)*hf.P
     return norm_convergence,λ
