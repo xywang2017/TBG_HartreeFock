@@ -1,8 +1,13 @@
 #!/bin/bash -l 
 
-for q in {2,3,4,5,6,8,10}
+# for q in {2,3,4,5,6,8,10}
+# do 
+# 	julia proj/runHF_server.jl 1 $q 0 flavor 07 $1
+# done
+
+for nu in {0.0,0.5,1.0,1.5,2.0,2.5,3.0}
 do 
-	julia proj/runHF_server.jl 1 $q 0 flavor 07 $1
+	julia proj/runHF_server.jl 1 2 $nu flavor 07 $1
 done
 
 # for nu in {0.0,0.25,0.5,0.75,1.0,2.0,2.25,2.5}
