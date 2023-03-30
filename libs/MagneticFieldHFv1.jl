@@ -100,7 +100,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.Σz0 = zeros(ComplexF64,size(hf.H0))
     hf.Λs = zeros(ComplexF64,hf.nb*hf.q*hf.lk,hf.nb*hf.q*hf.lk,hf.nη,length(hf.gvec))
     BM_info(hf)
-    hf.H0 .= 0.0+0.0im
+    # hf.H0 .= 0.0+0.0im
     # order parameters 
     ηs = ["η0","η1","η2","η3"]
     σs = ["s0","s1","s2","s3"]
