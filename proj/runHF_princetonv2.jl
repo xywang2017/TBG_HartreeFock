@@ -7,8 +7,8 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "flavor"
-seed = 1
+flag = "random"
+seed = 5
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
@@ -22,10 +22,9 @@ for w0 in w0s
     # plot_hf_iterations(metadata)
     plot_spectra(metadata;savename="test.pdf")
     hf = load(metadata,"hf")
-
 end 
 
-h
+
 ## BM basis 
 seed = 1
 p, q = 1 ,8

@@ -1,6 +1,6 @@
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHFv1.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
 #
