@@ -22,6 +22,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     # init_P_valley_spin_roation(hf;α=0.2)
     if isequal(_Init,"Random")
         init_P_random_rotation(hf;α=1.0)
+    elseif isequal(_Init,"Flavor U(4)")
+        init_P_valley_spin_rotation(hf;α=0.8)
     end
     # init_P_valley_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
@@ -240,8 +242,8 @@ function init_P_flavor_polarization(hf::HartreeFock)
     num_full_flavors_to_populate = νmax ÷ n_per_valley_spin 
     num_part_flavors_to_populate = (νmax % n_per_valley_spin ==0) ? 0 : 1
     
-    # flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
-    flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    # flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
 
     for iηs in flavors_to_populate[1:(end-num_part_flavors_to_populate)], iq in 1:size(tmpP,1)
         tmpP[iq,iηs,iq,iηs,:] .= 1.0 

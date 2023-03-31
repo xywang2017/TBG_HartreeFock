@@ -2,7 +2,7 @@
 
 for seed in {3..5}
 do
- 	julia proj/runHF_server.jl 1 4 1.0 random 07 $seed &
+ 	julia proj/runHF_server.jl 1 4 2.0 random 07 $seed &
 done
 # for q in {2,3,4,5,6,8,10}
 # do 

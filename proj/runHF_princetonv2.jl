@@ -7,12 +7,12 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "random"
-seed = 1
+flag = "flavor"
+seed = 2
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,3
-νF =0+ (9)*p/q
+p,q = 1,4
+νF =2+ (0)*p/q
 νstr = round(Int,1000*νF)
 for w0 in w0s
     metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
