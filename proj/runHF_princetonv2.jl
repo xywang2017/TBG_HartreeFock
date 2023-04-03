@@ -8,11 +8,13 @@ params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
 flag = "random"
-seed =4
+seed = 2
+# flag = "strong"
+# seed = 3
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,2
-νF =0+ (6)*p/q
+p,q = 1,5
+νF =1+ (3)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
