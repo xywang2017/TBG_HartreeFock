@@ -74,7 +74,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.precision = precision
     hf.nb, hf.nη, hf.ns, hf.nt = 2, 2, 2, 8*hf.q # data stored as 2q x nη x ns x nk
     hf.ng = 3
-    hf.nq = (q>7) ? 1 : 2
+    hf.nq = (q>6) ? 1 : 2
     if q == 3 
         hf.nq = 4 
     elseif q ==2 
