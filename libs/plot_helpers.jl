@@ -256,3 +256,31 @@ function plot_density_matrix_sublattice(fname::String)
     close(fig)
     return nothing 
 end
+
+
+
+
+### strong coupling basis  valley spin
+function plot_density_matrix_sublattice_full(fname::String)
+    ik = 1
+    hf = load(fname,"hf");
+    H0 = hf.Σz0
+    P = hf.P 
+    tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
+    Pstrong = zeros(ComplexF64,2hf.q,4,2hf.q,4)
+    for iηs in 1:4, iηs1 in 1:4
+        F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
+        vec = F.vectors
+        F1 = eigen(Hermitian(tmpH0[:,iηs1,:,iηs1]))
+        vec1 = F1.vectors
+        Pstrong[:,iηs,:,iηs1] = transpose(vec) * P0[:,iηs,:,iηs1] * conj.(vec1) 
+    end 
+    fig = figure(figsize=(6,6))
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1)
+    colorbar(pl,fraction=0.046, pad=0.04)
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing 
+end

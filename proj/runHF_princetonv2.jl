@@ -7,49 +7,55 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "random"
+flag = "flavor"
 seed = 1
-# flag = "strong"
-# seed = 3
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 2,5
-# νF = 0+ (4)*p/q
-νF = 0+ (3)*1/q
+p,q = 1,8
+νF = 2+ (0)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
     metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     println("HF energy: ",load(metadata,"iter_energy")[end])
     println("Convergence: ",load(metadata,"iter_err")[end])
+    # hf = load(metadata,"hf")
+    # iter_err = load(metadata,"iter_err")
+    # iter_energy = load(metadata,"iter_energy")
+    # iter_oda = load(metadata,"iter_oda")
+    # hf.Λs =  Array{ComplexF64,4}(undef,0,0,0,0)
+    # hf.Λ =  Array{ComplexF64,4}(undef,0,0,0,0)
+    # save(metadata,"hf",hf,
+    #                 "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
     # plot_hf_iterations(metadata)
-    plot_spectra(metadata;savename="test.pdf")
-    hf = load(metadata,"hf")
+    # plot_spectra(metadata;savename="test.pdf")
+    # hf = load(metadata,"hf")
 end 
 
-
 ## BM basis 
-seed = 1
-p, q = 1 ,8
-flag = "strong"
-νF = 0+ (6)*p/q
+seed = 3
+p, q = 1 ,5
+flag = "random"
+νF = 0+ (7)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
-# plot_density_matrix_bm(metadata)
+plot_density_matrix_bm(metadata)
 # plot_density_matrix_sublattice(metadata)
+# plot_density_matrix_sublattice_full(metadata)
+
 
 ## strong coupling basis at reference point defined by metadata0
 
 seed = 1
-flag  = "flavor"
-νF0 = 0+ (0)*p/q
+flag  = "random"
+νF0 = 0+ (2)*p/q
 νstr0 = round(Int,1000*νF0)
 metadata0 = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr0).jld2")
 # plot_density_matrix_strong_coupling(metadata,metadata0)
-plot_density_matrix_strong_coupling_valley_spin(metadata,metadata0)
+# plot_density_matrix_strong_coupling_valley_spin(metadata,metadata0)
 # 
-plot_order_parameters(metadata)
+# plot_order_parameters(metadata)
 
 
 ##
