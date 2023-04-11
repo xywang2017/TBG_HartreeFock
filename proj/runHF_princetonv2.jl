@@ -7,12 +7,12 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "flavor"
-seed = 1
+flag = "random"
+seed = 5
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,8
-νF = 2+ (0)*p/q
+p,q = 1,3
+νF = 1 + (1)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -28,7 +28,7 @@ for w0 in w0s
     # save(metadata,"hf",hf,
     #                 "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
     # plot_hf_iterations(metadata)
-    # plot_spectra(metadata;savename="test.pdf")
+    plot_spectra(metadata;savename="test.pdf")
     # hf = load(metadata,"hf")
 end 
 
