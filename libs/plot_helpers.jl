@@ -85,17 +85,17 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
     title(titlestr)
-    xlim([0,0.3])
+    xlim([0,0.6])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
     # ticklistLabels= [L"$\frac{1}{2}$",L"$\frac{1}{3}$",
     #             L"$\frac{2}{7}$",L"$\frac{1}{4}$",L"$\frac{1}{5}$",
     #             L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$",L"$\frac{1}{14}$"]
-    ticklist = [1/4,1/8]
-    ticklistLabels= [L"$\frac{1}{4}$",L"$\frac{1}{8}$"]
-    xticks(ticklist,ticklistLabels)
-    # title("(s,t)=(1,3)")
+    # ticklist = [1/4,1/8]
+    # ticklistLabels= [L"$\frac{1}{4}$",L"$\frac{1}{8}$"]
+    # xticks(ticklist,ticklistLabels)
+    title(titlestr)
     tight_layout()
     savefig(savename,dpi=600)
     display(fig)

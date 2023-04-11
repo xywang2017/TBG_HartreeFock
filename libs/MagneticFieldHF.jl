@@ -126,7 +126,6 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.H0 .= 0.0
     while norm_convergence > hf.precision
         @time begin 
-            println("Iter: ",iter)
             hf.H .= hf.H0 * 1.0
             # add_Hartree(hf;β=1.0)
             # add_Fock(hf;β=1.0)
@@ -140,6 +139,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
             end
             norm_convergence,λ = update_P(hf;Δ=Δ)
             
+            println("Iter: ",iter)
             println("Running HF energy (per moire u.c.): ",Etot)
             println("Running norm convergence: ",norm_convergence)
             println("Running ODA paramter λ: ",λ)
