@@ -4,16 +4,16 @@ using PyPlot
 function plot_spectra(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");
     νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
-    ϵk = hf.ϵk /1.5
+    ϵk = hf.ϵk
     σzτz = hf.σzτz
     params = hf.params 
 
     ee = 1.6e-19
     ϵϵ = 8.8541878128e−12	
     aa = 2.46e-10
-    ϵr = 10.0
+    ϵr = 15.0
     Vcoulomb = ee/(4π*ϵϵ*ϵr* abs(params.a1)*aa) * 1e3
-
+    println("Coulomb scale: ",Vcoulomb)
     fig = figure(figsize=(3,3))
     idx = sortperm(ϵk[:])
     ϵsorted = ϵk[idx] #./Vcoulomb
@@ -64,7 +64,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         metadata = metadatas[j]
         hf = load(metadata,"hf");
         νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
-        ϵk = hf.ϵk /1.5
+        ϵk = hf.ϵk
         σzτz = hf.σzτz
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 

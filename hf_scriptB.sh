@@ -1,14 +1,5 @@
 #!/bin/bash -l 
 
-for seed in {3..5}
-do
- 	julia proj/runHF_server.jl 1 4 2.0 random 07 $seed &
-done
-# for q in {2,3,4,5,6,8,10}
-# do 
-# 	julia proj/runHF_server.jl 1 $q 0 flavor 07 $1
-# done
-
 # for nu in {0.0,0.5,1.0,1.5,2.0,2.5,3.0}
 # do 
 # 	julia proj/runHF_server.jl 1 2 $nu random 07 $1
@@ -19,10 +10,10 @@ done
 # 	julia proj/runHF_server.jl 1 3 $nu random 07 $1
 # done
 
-# for nu in {0.0,0.25,0.5,0.75,1.0,2.0,2.25,2.5}
-# do 
-# 	julia proj/runHF_server.jl 1 4 $nu random 07 $1
-# done
+for nu in {0.0,0.25,0.5,0.75,1.0,1.25,1.5,1.75,2.0,2.25,2.5,2.75,3.0,3.25,3.5,3.75}
+do 
+	julia proj/runHF_server.jl 1 4 $nu flavor 07 $1
+done
 
 #for nu in {0.0,0.8,1.6,2.4,3.2}
 #do 

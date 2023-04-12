@@ -3,6 +3,8 @@ using JLD2
 fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
+BLAS.set_num_threads(1)
+
 str = ARGS[1]
 w0 = parse(Float64,ARGS[2])*0.1
 w0str = ARGS[2]
@@ -22,7 +24,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     if q == 3 
         nq = 4 
     elseif q ==2 
-        nq = 6 
+        nq = 6
     end
     # nq = 16÷q
     println("p= ",p,", q= ",q,", nq= ",nq)
@@ -41,7 +43,7 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 #
 
-# jldopen(joinpath(fpath,"princeton/data_w07/_1_4/_1_4_K_metadata.jld2")) do file 
+# jldopen(joinpath(fpath,"princeton/data_w07/_1_8/_1_8_K_metadata.jld2")) do file 
 #     # @time begin 
 #     #     for m in -3:3, n in -36:36 
 #     #     Λ = file["$(m)_$(n)"]
@@ -49,13 +51,13 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 #     #     # println(m," ",n," ",norm(Λ))
 #     #     end
 #     # end
-#     # Λ = file["-2_4"]
-#     # fig = figure(figsize=(5,4))
-#     # pl=imshow(abs.(Λ),origin="lower")
-#     # colorbar(pl)
-#     # axis("equal")
-#     # display(fig)
-#     # close(fig)
+#     Λ = file["-3_24"]
+#     fig = figure(figsize=(5,4))
+#     pl=imshow(abs.(Λ),origin="lower")
+#     colorbar(pl)
+#     axis("equal")
+#     display(fig)
+#     close(fig)
 #     # println(norm(Λ))
 
 #     # F = svd(Λ)
@@ -64,15 +66,15 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 #     # yscale("log")
 #     # display(fig)
 #     # close(fig)
-#     energies = file["E"]
-#     fig = figure(figsize=(5,4))
-#     plot(ones(length(energies)),energies[:],"b_")
-#     axis("equal")
-#     savefig("test.png",dpi=400)
-#     display(fig)
-#     close(fig)
+#     # energies = file["E"]
+#     # fig = figure(figsize=(5,4))
+#     # plot(ones(length(energies)),energies[:],"b_")
+#     # axis("equal")
+#     # savefig("test.png",dpi=400)
+#     # display(fig)
+#     # close(fig)
 # end
-
+# 3
 # # plot spectrum 
 # function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
 #     fig = figure(figsize=(4,3))

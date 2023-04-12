@@ -50,7 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 10.0
+    ϵr = 15.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 
@@ -281,22 +281,25 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
                 end
             end
         end
-        # --------------------------------------- Hartree ------------------------------- #
-        trPG = 0.0+0.0im
-        for ik in 1:size(hf.P,3)
-            trPG += tr(view(hf.P,:,:,ik)*conj(view(hf.Λ,:,ik,:,ik)))
-        end
-        for ik in 1:size(hf.P,3) 
-            hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG) * view(hf.Λ,:,ik,:,ik)
-        end
-        # --------------------------------------- Fock ------------------------------- #
-        for ik in 1:size(hf.P,3)
-            tmp_Fock .= 0.0 + 0.0im
-            for ip in 1:size(hf.P,3)
-                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+G,Lm) /hf.latt.nk) * 
-                            ( view(hf.Λ,:,ik,:,ip)*transpose(view(hf.P,:,:,ip))*view(hf.Λ,:,ik,:,ip)' )
+        G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
+        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6)) # this leads to a shell expansion up to 3g1+3g2
+            # --------------------------------------- Hartree ------------------------------- #
+            trPG = 0.0+0.0im
+            for ik in 1:size(hf.P,3)
+                trPG += tr(view(hf.P,:,:,ik)*conj(view(hf.Λ,:,ik,:,ik)))
             end
-            hf.H[:,:,ik] .-= tmp_Fock
+            for ik in 1:size(hf.P,3) 
+                hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG) * view(hf.Λ,:,ik,:,ik)
+            end
+            # --------------------------------------- Fock ------------------------------- #
+            for ik in 1:size(hf.P,3)
+                tmp_Fock .= 0.0 + 0.0im
+                for ip in 1:size(hf.P,3)
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+G,Lm) /hf.latt.nk) * 
+                                ( view(hf.Λ,:,ik,:,ip)*transpose(view(hf.P,:,:,ip))*view(hf.Λ,:,ik,:,ip)' )
+                end
+                hf.H[:,:,ik] .-= tmp_Fock
+            end
         end
     end
     return nothing
@@ -391,20 +394,23 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
                 end
             end
         end
-        trPG = 0.0+0.0im
-        for ik in 1:size(δH,3) 
-            trPG += tr(view(δP,:,:,ik)*conj(view(hf.Λ,:,ik,:,ik)))
-        end
-        for ik in 1:size(δH,3) 
-            δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG) * view(hf.Λ,:,ik,:,ik)
-        end
-        for ik in 1:size(δH,3) 
-            tmp_Fock .= 0.0 + 0.0im
-            for ip in 1:size(δH,3) 
-                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+G,Lm) /hf.latt.nk) * 
-                            ( view(hf.Λ,:,ik,:,ip)*transpose(view(δP,:,:,ip))*view(hf.Λ,:,ik,:,ip)' )
+        G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
+        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6))
+            trPG = 0.0+0.0im
+            for ik in 1:size(δH,3) 
+                trPG += tr(view(δP,:,:,ik)*conj(view(hf.Λ,:,ik,:,ik)))
             end
-            δH[:,:,ik] .-= tmp_Fock
+            for ik in 1:size(δH,3) 
+                δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG) * view(hf.Λ,:,ik,:,ik)
+            end
+            for ik in 1:size(δH,3) 
+                tmp_Fock .= 0.0 + 0.0im
+                for ip in 1:size(δH,3) 
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+G,Lm) /hf.latt.nk) * 
+                                ( view(hf.Λ,:,ik,:,ip)*transpose(view(δP,:,:,ip))*view(hf.Λ,:,ik,:,ip)' )
+                end
+                δH[:,:,ik] .-= tmp_Fock
+            end
         end
     end
 

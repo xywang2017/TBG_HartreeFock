@@ -9,7 +9,7 @@ w0 = "07"
 
 ϕs = [1//2;2//5;1//3;2//7;1//4;1//5;1//6;1//8]
 
-s,t = 2,1
+s,t = 2,2
 
 # ------------------------------------------ # 
 metadatas = String[]
@@ -17,14 +17,10 @@ for ϕ in ϕs
     flag, seed = "flavor", 1
     p,q = numerator(ϕ), denominator(ϕ)
     νstr = round(Int,1000*(s+t*p/q))
-    if q != 8
+    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    if !isfile(metadata)
+        flag = "random"
         metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        if !isfile(metadata)
-            flag = "random"
-            metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        end
-    else
-        metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)_server/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     end
     push!(metadatas,metadata)
 end
