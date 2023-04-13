@@ -13,8 +13,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Chern") # filling of Chern spectra of strong coupling Hamiltonian at CNP
         init_P_chern(hf,H0=H0)
     elseif isequal(_Init,"Sublattice")
-        init_P_sublattice(hf)
-        # init_P_sublattice_no_momentum(hf)
+        # init_P_sublattice(hf)
+        init_P_sublattice_no_momentum(hf)
     else
         init_P_strong_coupling(hf,P0=P0,H0=H0)
     end
@@ -189,7 +189,7 @@ function init_P_sublattice_no_momentum(hf::HartreeFock)
     end
 
     # println(sum(σzτz[idx_chern_minus,:])/size(σzτz,2))
-    println(length(idx_chern_minus)," ",length(idx_chern_plus))
+    # println(length(idx_chern_minus)," ",length(idx_chern_plus))
     # maximal population of the Chern states, and random sprinkling of the remaining states (k unresolved)
     νmax = round(Int,(hf.ν+4)/8 * size(H0,1))
     states_to_populate = zeros(Int,νmax)

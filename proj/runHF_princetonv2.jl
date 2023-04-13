@@ -8,11 +8,11 @@ params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
 flag = "random"
-seed = 1
+seed = 3
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
-νF = 3 +(2)*p/q
+νF = 1 +(3)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -36,13 +36,13 @@ end
 seed = 1
 p, q = 1 ,4
 flag = "flavor"
-νF = 3+ (1)*p/q
+νF = 1+ (3)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
 # plot_density_matrix_bm(metadata)
-# plot_density_matrix_sublattice(metadata)
-plot_density_matrix_sublattice_full(metadata)
+plot_density_matrix_sublattice(metadata)
+# plot_density_matrix_sublattice_full(metadata)
 
 
 ## strong coupling basis at reference point defined by metadata0
