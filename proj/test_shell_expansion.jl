@@ -1,6 +1,6 @@
 
-q = 8
-jldopen(joinpath(fpath,"princeton/data_w07/_1_$(q)/_1_$(q)_K_metadata.jld2")) do file 
+q = 4
+jldopen(joinpath(fpath,"princeton/data_w07/_1_$(q)/_1_$(q)_Kprime_metadata.jld2")) do file 
     m,n = 3,-3q
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
