@@ -38,7 +38,7 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
         Δ = 0 
     end
     # Δ = (ϵsorted[i] - ϵsorted[i-1]) 
-    println("Gap size: ", Δ)
+    # println("Gap size: ", Δ)
     axhline(ϵF,ls=":",c="gray")
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
@@ -46,15 +46,41 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     # ylim([-0.4,0.8])
     # ylim([-10,30])
     tight_layout()
-    savefig(savename,transparent=true)
+    # savefig(savename,transparent=true)
     display(fig)
     close(fig)
-    println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)
+    # println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)
     # println("Total energy: ",(0.25*sum(ϵsorted[ϵsorted.<ϵF])-0.25*sum(ϵsorted[ϵsorted.>=ϵF]))/size(hf.ϵk,2)/size(hf.ϵk,1)*8)
     # return sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8
-    return Δ /Vcoulomb
+    return Δ
 end
 
+
+## Compute spectral gap from HF 
+function computegap(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+    ϵk = hf.ϵk
+    σzτz = hf.σzτz
+    params = hf.params 
+    idx = sortperm(ϵk[:])
+    ϵsorted = ϵk[idx] #./Vcoulomb
+    chern = σzτz[idx]
+    ν = eachindex(ϵsorted) ./ length(ϵsorted)
+    i = 1
+    while (νF+4)/8 > ν[i]
+        i += 1
+    end
+    if i<length(chern)
+        # i = i-1
+        ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
+        Δ = (ϵsorted[i+1] - ϵsorted[i]) 
+    else
+        ϵF = ϵsorted[end]
+        Δ = 0 
+    end
+    return Δ
+end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
@@ -178,7 +204,7 @@ function plot_density_matrix_strong_coupling(fname::String,fname0::String)
     Pstrong = transpose(F.vectors) * P0 * conj.(F.vectors )
 
     fig = figure(figsize=(6,6))
-    pl=imshow(abs.(Pstrong),vmin=0,vmax=1)
+    pl=imshow(abs.(Pstrong),vmin=0,vmax=1,origin="lower")
     colorbar(pl,fraction=0.046, pad=0.04)
     tight_layout()
     display(fig)
@@ -278,7 +304,7 @@ function plot_density_matrix_sublattice_full(fname::String)
         Pstrong[:,iηs,:,iηs1] = transpose(vec) * P0[:,iηs,:,iηs1] * conj.(vec1) 
     end 
     fig = figure(figsize=(6,6))
-    pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1)
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1,origin="lower")
     colorbar(pl,fraction=0.046, pad=0.04)
     tight_layout()
     display(fig)
