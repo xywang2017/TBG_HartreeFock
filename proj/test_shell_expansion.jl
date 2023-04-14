@@ -1,3 +1,10 @@
+using PyPlot,JLD2
+fpath = pwd()
+include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/plot_helpers.jl"))
+#
+# Hartree Fock related 
+params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 q = 4
 jldopen(joinpath(fpath,"princeton/data_w07/_1_$(q)/_1_$(q)_Kprime_metadata.jld2")) do file 
