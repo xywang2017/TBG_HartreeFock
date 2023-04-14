@@ -6,8 +6,8 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
-q = 4
-jldopen(joinpath(fpath,"princeton/data_w07/_1_$(q)/_1_$(q)_Kprime_metadata.jld2")) do file 
+p, q = 2, 5 
+jldopen(joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")) do file 
     m,n = 3,-3q
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
