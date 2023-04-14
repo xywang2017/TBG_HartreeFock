@@ -7,12 +7,12 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "flavor"
-seed = 1
+flag = "random"
+seed = 3
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,3
-νF = 2 +(0)*p/q
+p,q = 2,5
+νF = 0 +(2)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -34,9 +34,9 @@ end
 
 ## BM basis 
 seed = 1
-p, q = 1,3
+p, q = 1,8
 flag = "flavor"
-νF = 1 + (0)*p/q
+νF = 3 + (1)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
