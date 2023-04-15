@@ -13,14 +13,14 @@ sts = [[0,0],[0,1],[0,2],[0,3],[1,-1],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2],[3,0],
 # ------------------------------------------ # 
 # for st in sts 
 #     s,t = st[1], st[2]
-    s,t = 0,2 
+    s,t = 1,1
     metadatas = String[]
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
         E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","random","chern"], seed in 1:4 
+        for flag in ["flavor","random","chern"], seed in 1:6 
             metadata0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if isfile(metadata0)
                 E0 = load(metadata0,"iter_energy")[end]
@@ -54,7 +54,7 @@ for ϕ in ϕs
         push!(fillings,s+t*p/q)
         metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
         E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","random","chern"], seed in 1:4 
+        for flag in ["flavor","random","chern"], seed in 1:6 
             metadata0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if isfile(metadata0)
                 E0 = load(metadata0,"iter_energy")[end]
@@ -81,9 +81,11 @@ for ϕ in ϕs
         cc = [cs[1:3];cs[10];cs[10];cs[9];cs[4:5];cs[end];cs[6];cs[11];cs[7];cs[8]]
     elseif ϕ == 1//4
         cc = [cs[1:3];cs[10];cs[9];cs[4:5];cs[12];cs[6];cs[11];cs[7];cs[8]]
-    elseif ϕ in [1//5;1//6] 
+    elseif ϕ == 1//5 
+        cc = [cs[1:3];cs[13];cs[10];cs[9];cs[4];cs[5];cs[12];cs[6];cs[11];cs[7];cs[8]]
+    elseif ϕ == 1//6
         cc = [cs[1:3];cs[13];cs[10];cs[9];cs[end];cs[5];cs[12];cs[6];cs[11];cs[7];cs[8]]
-    elseif ϕ == 1/8
+    elseif ϕ == 1//8
         cc = [cs[1:3];cs[13];cs[10];cs[9];cs[end];cs[5];cs[12];cs[6];cs[end];cs[7];cs[8]]
     end
     # println(p," ",q)
