@@ -7,8 +7,8 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 
 ##
-flag = "flavor"
-seed = 2
+flag = "random"
+seed = 4
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 2,5
