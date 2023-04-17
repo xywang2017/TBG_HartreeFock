@@ -15,7 +15,9 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     # valley x spin U(4) rotation --- otherwise above initializations do not access valley spin coherent states
     # init_P_valley_spin_rotation(hf;α=0.2)
     # init_P_valley_rotation(hf;α=1.0)
-    init_P_random_rotation(hf;α=1.0)
+    if isequal(_Init,"random")
+        init_P_random_rotation(hf;α=1.0)
+    end
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -76,8 +78,8 @@ function init_P_flavor_polarization(hf::HartreeFock)
     num_full_flavors_to_populate = νmax ÷ n_per_valley_spin 
     num_part_flavors_to_populate = (νmax % n_per_valley_spin ==0) ? 0 : 1
     
-    # flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
-    flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    # flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
     # flavors_to_populate = [1;3]
     # println(num_part_flavors_to_populate)
     for iηs in flavors_to_populate[1:(end-num_part_flavors_to_populate)], iq in 1:size(tmpP,2)

@@ -84,7 +84,7 @@ for ϕ in ϕs
     elseif ϕ == 1//5 
         cc = [cs[1:3];cs[13];cs[10];cs[9];cs[4];cs[5];cs[12];cs[6];cs[11];cs[7];cs[8]]
     elseif ϕ == 1//6
-        cc = [cs[1:3];cs[13];cs[10];cs[9];cs[end];cs[5];cs[12];cs[6];cs[11];cs[7];cs[8]]
+        cc = [cs[1:3];cs[13];cs[10];cs[9];cs[4];cs[5];cs[12];cs[6];cs[11];cs[7];cs[8]]
     elseif ϕ == 1//8
         cc = [cs[1:3];cs[13];cs[10];cs[9];cs[end];cs[5];cs[12];cs[6];cs[end];cs[7];cs[8]]
     end

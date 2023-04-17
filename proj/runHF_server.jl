@@ -34,7 +34,7 @@ hf = HartreeFock()
 if !isequal(flag,"strong")
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=_Init,savename=savename)
 else
-    savename0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_random_init_HF_$(p)_$(q)_nu_1000.jld2")
+    savename0 = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_random_init_HF_$(p)_$(q)_nu_1400.jld2")
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="princeton/data_w$(w0)/_$(p)_$(q)/",_Init=" ",H0=H0,P0=P0,savename=savename)

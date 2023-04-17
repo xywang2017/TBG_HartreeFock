@@ -89,7 +89,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     iter_oda = Float64[]
     while norm_convergence > hf.precision
         @time begin 
-            println("Iter: ",iter)
+            
             hf.H .= hf.H0 * 1.0
             add_HartreeFock(hf;β=1.0)
             # add_Hartree(hf;β=1.0)
@@ -105,7 +105,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             end
             norm_convergence,λ = update_P(hf;Δ=Δ)
         end
-
+        println("Iter: ",iter)
         println("Running HF energy: ",Etot)
         println("Running norm convergence: ",norm_convergence)
         println("ODA parameter λ: ",λ)
@@ -127,7 +127,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             end
         end
 
-        if iter >150 || λ < 1e-3
+        if iter >300 || λ < 1e-3
             break 
         end
     end
@@ -215,27 +215,31 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
 
     for ig in 1:lG^2 
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        G = Gs[ig]
         jldopen(hf.fname,"r") do file 
             hf.Λ .= file["$(m)_$(n)"]
         end
 
-        ## Hartree
-        trPG = 0.0+0.0im
-        for ik in 1:hf.latt.nk 
-            trPG += tr(view(hf.P,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
-        end
-        for ik in 1:size(hf.H,3) 
-            hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
-        end
-
-        ## Fock
-        for ik in 1:hf.latt.nk
-            tmp_Fock .= 0.0 + 0.0im
-            for ip in 1:hf.latt.nk
-                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
-                            ( view(tmp_Λ,:,ik,:,ip)*transpose(view(hf.P,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+        G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
+        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6)) # this leads to a shell expansion up to 3g1+3g2
+            ## Hartree
+            trPG = 0.0+0.0im
+            for ik in 1:hf.latt.nk 
+                trPG += tr(view(hf.P,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
             end
-            hf.H[:,:,ik] .-= tmp_Fock
+            for ik in 1:size(hf.H,3) 
+                hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
+            end
+
+            ## Fock
+            for ik in 1:hf.latt.nk
+                tmp_Fock .= 0.0 + 0.0im
+                for ip in 1:hf.latt.nk
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
+                                ( view(tmp_Λ,:,ik,:,ip)*transpose(view(hf.P,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+                end
+                hf.H[:,:,ik] .-= tmp_Fock
+            end
         end
     end
     return nothing
@@ -351,23 +355,27 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
     δH = zeros(ComplexF64,size(δP))
     for ig in 1:lG^2
         m,n = Glabels[(ig-1)%lG+1],Glabels[(ig-1)÷lG+1]
+        G = Gs[ig]
         jldopen(hf.fname,"r") do file 
             hf.Λ .= file["$(m)_$(n)"]
         end
-        trPG = 0.0+0.0im
-        for ik in 1:hf.latt.nk 
-            trPG += tr(view(δP,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
-        end
-        for ik in 1:size(δH,3) 
-            δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
-        end
-        for ik in 1:hf.latt.nk
-            tmp_Fock .= 0.0 + 0.0im
-            for ip in 1:hf.latt.nk
-                tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
-                            ( view(tmp_Λ,:,ik,:,ip)*transpose(view(δP,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+        G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
+        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6)) # this leads to a shell expansion up to 3g1+3g2
+            trPG = 0.0+0.0im
+            for ik in 1:hf.latt.nk 
+                trPG += tr(view(δP,:,:,ik)*conj(view(tmp_Λ,:,ik,:,ik)))
             end
-            δH[:,:,ik] .-= tmp_Fock
+            for ik in 1:size(δH,3) 
+                δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(Gs[ig],Lm) * trPG) * view(tmp_Λ,:,ik,:,ik)
+            end
+            for ik in 1:hf.latt.nk
+                tmp_Fock .= 0.0 + 0.0im
+                for ip in 1:hf.latt.nk
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[ip]-kvec[ik]+Gs[ig],Lm) /hf.latt.nk) * 
+                                ( view(tmp_Λ,:,ik,:,ip)*transpose(view(δP,:,:,ip))*view(tmp_Λ,:,ik,:,ip)' )
+                end
+                δH[:,:,ik] .-= tmp_Fock
+            end
         end
     end
 

@@ -4,26 +4,29 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix = 2
+prefix = 1
+flag = "random"
 # νs = collect(0.0:0.2:4.0)
-ν = 1.0
+ν = 3.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 19
-params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=0,w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"data/strain_bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"data/$(prefix)_strain_hf_$(νstr)_lk$(lk).jld2")
+bm_path = joinpath(fpath,"data/bm_lk$(lk).jld2")
+hf_path = joinpath(fpath,"data/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 # hf_path = "typical_starting_point.jld2"
 
 # ----------------- Hartree-Fock analysis part ---------------- # 
 hf = load(hf_path,"hf");
+println("")
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[3,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+plot_contour_maps(kvec,ϵ0[8,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
