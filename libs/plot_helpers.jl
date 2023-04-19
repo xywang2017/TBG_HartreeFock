@@ -307,6 +307,7 @@ function plot_density_matrix_sublattice_full(fname::String)
     pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1,origin="lower")
     colorbar(pl,fraction=0.046, pad=0.04)
     tight_layout()
+    savefig("test.pdf")
     display(fig)
     close(fig)
     return nothing 
