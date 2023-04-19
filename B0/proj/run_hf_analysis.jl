@@ -4,10 +4,10 @@ fpath = joinpath(pwd(),"B0")
 include(joinpath(fpath,"libs/HF_mod.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-prefix = 1
+prefix = 3
 flag = "random"
 # νs = collect(0.0:0.2:4.0)
-ν = 3.0
+ν = 1.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 19
@@ -23,35 +23,36 @@ hf_path = joinpath(fpath,"data/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 
 # ----------------- Hartree-Fock analysis part ---------------- # 
 hf = load(hf_path,"hf");
-println("")
+iter_energy = load(hf_path,"iter_energy");
+println(iter_energy[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[8,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+# plot_contour_maps(kvec,ϵ0[8,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
-plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+# plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 # ----------------- valley-spin-bamd polarization info ----------------- # 
-fig = figure(figsize=(2,10))
-plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
-yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
-axvline(0,c="gray")
-xlim(-0.4,0.4)
-tight_layout()
-savefig("test.pdf")
-display(fig)
-close(fig)
+# fig = figure(figsize=(2,10))
+# plot(hf.Δ[2:end],eachindex(hf.Δ)[2:end],"b^")
+# yticks(collect(eachindex(hf.Δ))[2:end],hf.Δstr[2:end])
+# axvline(0,c="gray")
+# xlim(-0.4,0.4)
+# tight_layout()
+# savefig("test.pdf")
+# display(fig)
+# close(fig)
 
-s0 = ComplexF64[1 0;0 1]
-s1 = ComplexF64[0 1;1 0]
-s2 = ComplexF64[0 -1im;1im 0]
-s3 = ComplexF64[1 0;0 -1]
+# s0 = ComplexF64[1 0;0 1]
+# s1 = ComplexF64[0 1;1 0]
+# s2 = ComplexF64[0 -1im;1im 0]
+# s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
-for ik in 1:size(hf.ϵk,2)
-    F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s3))*F.vectors))
-end
+# for ik in 1:size(hf.ϵk,2)
+#     F = eigen(Hermitian(view(hf.H,:,:,ik)))
+#     Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s0,s1))*F.vectors))
+# end
 Δ .= hf.σzτz
 
 plot_energy_cuts_with_order_parameters(kcut,Ecut,
