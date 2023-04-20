@@ -193,7 +193,7 @@ function init_P_sublattice_no_momentum(hf::HartreeFock)
     # maximal population of the Chern states, and random sprinkling of the remaining states (k unresolved)
     νmax = round(Int,(hf.ν+4)/8 * size(H0,1))
     states_to_populate = zeros(Int,νmax)
-    # println(νmax," ",length(idx_chern_minus)+length(idx_chern_plus)/2)
+    # println(νmax," ",length(idx_chern_minus))
     if νmax < length(idx_chern_minus)
         states_to_populate .= shuffle(idx_chern_minus)[1:νmax]
     else

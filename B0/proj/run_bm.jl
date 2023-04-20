@@ -6,9 +6,9 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
 lk = 19
-# params = Params(ϵ=0.003,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.00,Da=0,w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
+# params = Params(ϵ=0.00,Da=0,w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
