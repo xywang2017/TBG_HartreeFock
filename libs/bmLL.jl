@@ -79,6 +79,7 @@ function constructbmLL(A::bmLL,params::Params;
     constructOffDiagonals(A)
     constructΣz(A)
     computeSpectrum(A)
+    # computeSpectrum_remote(A)
 
     A.fname = fname 
     # write energies and wavefunctions
@@ -257,6 +258,47 @@ function computeSpectrum(A::bmLL)
     end
     return nothing
 end
+
+
+function computeSpectrum_remote(A::bmLL)
+    A.vec = zeros(ComplexF64,2A.nH*A.p,4A.q,A.q,A.nq,A.nq) # inner x 2q x rk1 x nkq x nk1
+    A.spectrum = zeros(Float64,4A.q,A.nq,A.nq)
+    A.PΣz = zeros(ComplexF64,4A.q,4A.q,A.nq,A.nq)
+    A.σz = zeros(Float64,4A.q,A.nq,A.nq)
+    A.σzE = zeros(Float64,4A.q,A.nq,A.nq)
+
+    Σz = reshape(A.Σz,2A.nH*A.p,2A.nH*A.p)
+    H = reshape(A.H,2A.nH*A.p,2A.nH*A.p,A.nq,A.nq)
+    for i2 in 1:size(H,4), i1 in 1:size(H,3)
+        idmid = A.nH*A.p
+        idx_flat = (idmid+1-2A.q):(idmid+2A.q)
+        # F = eigen( Hermitian( H[:,:,i1,i2], :U))
+        # A.spectrum[:,i1,i2] = F.values[idx_flat]
+        # if norm(F.vectors*F.vectors' - I) >1e-8
+        #     println("Error with normalization LL")
+        # end  
+        # # pick out 2q states in the middle 
+        # vec .= F.vectors[:,idx_flat]
+        
+        # vals,vec = eigs(Hermitian(view(H,:,:,i1,i2), :U),nev=2A.q,which=:SM)
+        vals,vec = eigen(Hermitian(view(H,:,:,i1,i2), :U),idx_flat)
+        # if norm(imag(vals))>1e-6
+        #     println("Error with Hermitican",norm(imag(vals))," ",i1," ",i2)
+        # end
+        idx_perm = sortperm(real(vals))
+        A.spectrum[:,i1,i2]= real(vals[idx_perm])
+        A.vec[:,:,1,i1,i2] = @view vec[:,idx_perm]
+        # generateU(A.vec,A.q,A.p,A.nq)
+        A.PΣz[:,:,i1,i2] .= view(vec,:,idx_perm)' * Σz * view(vec,:,idx_perm)
+        if imag(tr(A.PΣz[:,:,i1,i2]))>1e-6
+            println("Error with realness of tr(PΣz)")
+        end
+        A.σzE[:,i1,i2] = real(diag(A.PΣz[:,:,i1,i2]))[idx_perm]
+        A.σz[:,i1,i2] = real(eigvals(Hermitian(A.PΣz[:,:,i1,i2])))
+    end
+    return nothing
+end
+
 
 function data_writeout(A::bmLL)
     writedlm(A.fname,[A.spectrum[:] A.σzE[:] A.σz[:]])
