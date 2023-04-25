@@ -1,2 +1,18 @@
 seed 5 for data_w07 4-10 correspond to strain 0.3% director 0, and dielectric constant 25 
 seed 1,2,3 correspond to dielectric constant 15
+
+# ------------------------------- Apr 25 2023 ---------------------------------- # 
+Strained at 1.05 degrees; vF=2482meV, w0=77meV, w1 = 110meV
+omitting small angle Pauli rotation 
+strain 0.2%, director 0 degrees,
+strained BM bandwidth +/- 8 meV,
+gap to remote band ~ 20meV
+dielectric constant 15, e^2/epsilon Lm ~ 9meV
+
+Data organization --- 
+
+for every flux ratio, density----
+xx lowest energy always 1_random or 1_flavor 
+xx also keeep other files that have converged but named with different numbers 
+xx convergence criterion is norm difference < 0.001
+xx also keeps track of metastable states that have also stablized

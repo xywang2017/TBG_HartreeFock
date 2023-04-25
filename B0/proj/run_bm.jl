@@ -1,19 +1,20 @@
 using PyPlot
 using JLD2
-fpath = joinpath(pwd(),"B0")
-include(joinpath(fpath,"libs/BM_mod.jl"))
-include(joinpath(fpath,"libs/plot_helpers.jl"))
+fpath = pwd()
+include(joinpath(fpath,"B0/libs/BM_mod.jl"))
+include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
 lk = 19
-params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
-# params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.002,Da=-4100,dθ=1.27π/180,w1=110,w0=77,vf=2680)
+params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.00,Da=0,w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"data/bm_lk$(lk).jld2")
+bm_path = joinpath(fpath,"feldman/B0/data/test_bm_lk$(lk).jld2")
 
 # ------------------ non-interacting part ------------------ #
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")

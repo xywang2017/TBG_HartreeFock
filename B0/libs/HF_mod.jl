@@ -83,7 +83,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
 
     # Hartree-Fock iterations
     norm_convergence = 10.0 
-    iter = 1
+    iter = 0
     iter_err = Float64[]
     iter_energy = Float64[]
     iter_oda = Float64[]
@@ -98,37 +98,29 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P)
 
             #Δ is a projector to make it closed shell -- incompatible with ODA
-            if norm_convergence <1e-4
-                Δ = 0.0 
-            else 
-                Δ = 0.0
-            end
+            Δ = 0.0
             norm_convergence,λ = update_P(hf;Δ=Δ)
-        end
-        println("Iter: ",iter)
-        println("Running HF energy: ",Etot)
-        println("Running norm convergence: ",norm_convergence)
-        println("ODA parameter λ: ",λ)
-        push!(iter_energy,Etot)
-        push!(iter_err,norm_convergence)
-        push!(iter_oda,λ)
-        # if iter == 1 
-        #     jldopen("typical_starting_point.jld2","w") do file 
-        #         file["hf"] = hf 
-        #     end
-        # end
-        iter +=1
-        if (mod(iter,10) == 0 )|| norm_convergence < hf.precision
-            jldopen(savename,"w") do file 
-                file["hf"] = hf
-                file["iter_energy"] = iter_energy
-                file["iter_err"] = iter_err 
-                file["iter_oda"] = iter_oda
+            push!(iter_energy,Etot)
+            push!(iter_err,norm_convergence)
+            push!(iter_oda,λ)
+            iter +=1
+            if (mod(iter,10) == 1 )|| norm_convergence < hf.precision
+                jldopen(savename,"w") do file 
+                    file["hf"] = hf
+                    file["iter_energy"] = iter_energy
+                    file["iter_err"] = iter_err 
+                    file["iter_oda"] = iter_oda
+                end
             end
-        end
 
-        if iter >300 || λ < 1e-3
-            break 
+            if iter >300 || λ < 1e-3
+                break 
+            end
+
+            println("Iter: ",iter)
+            println("Running HF energy: ",Etot)
+            println("Running norm convergence: ",norm_convergence)
+            println("ODA parameter λ: ",λ)
         end
     end
 

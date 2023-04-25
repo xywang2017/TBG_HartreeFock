@@ -105,7 +105,7 @@ function computeSpectrum(A::HBM)
         # check_Hermitian(A.H[:,:,iη,ik])
         H0 = view(A.H,:,:,iη,ik)
         idx_mid = size(H0,1)÷2
-        A.spectrum[:,iη,ik], A.Uk[:,:,iη,ik] = eigen(Hermitian(H0),idx_mid:(idx_mid+A.nb-1))
+        A.spectrum[:,iη,ik], A.Uk[:,:,iη,ik] = eigen(Hermitian(H0),(idx_mid-A.nb÷2+1):(idx_mid+A.nb÷2))
         
     end
 
