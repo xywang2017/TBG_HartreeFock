@@ -4,10 +4,10 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Hartree Fock related 
-params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
-
-p, q = 2, 5 
-jldopen(joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")) do file 
+params = Params(w1=110,w0=77,vf=2482,dθ=1.05π/180)
+initParamsWithStrain(params)
+p, q = 1,8
+jldopen(joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")) do file 
     m,n = 3,3q
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
