@@ -6,8 +6,8 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     contour(kx,ky,ϵ,levels=contourlines)
     plot(real(points),imag(points),"k+")
     colorbar(pl)
-    xlabel(L"k_x")
-    ylabel(L"k_y")
+    xlabel(L"k_x/|g_1|")
+    ylabel(L"k_y/|g_1|")
     axis("equal")
     tight_layout()
     savefig("test.pdf")
@@ -19,7 +19,7 @@ end
 function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
     fig = figure(figsize=(4,4))
     for i in 1:size(ϵ,1)
-        plot(kvec,ϵ[i,:],"o-",ms=2,markeredgecolor="none",label="band $(i)")
+        plot(kvec,ϵ[i,:],"-",ms=2,markeredgecolor="none",label="band $(i)")
     end
     for line in lines 
         axhline(line,ls=":",c="gray")
