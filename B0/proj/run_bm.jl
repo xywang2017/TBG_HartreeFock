@@ -20,7 +20,7 @@ bm_path = joinpath(fpath,"feldman/B0/data/test_bm_lk$(lk).jld2")
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
     bm = HBM()
     initHBM(bm,latt,params;
-            lg=9,_σrotation=false,_calculate_overlap=true,fname=fname)
+            lg=9,_σrotation=false,_calculate_overlap=false,fname=fname)
     return bm
 end
 
@@ -30,8 +30,8 @@ bm = compute_bm(latt,params,fname=bm_path);
 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(load(bm_path,"E"),:,lk,lk)
-plot_contour_maps(kvec,ϵ0[5,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
+# plot_contour_maps(kvec,ϵ0[5,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[:,:,iΓ],:,length(kcut))
-plot_energy_cuts(kcut,Ecut,lines=[0.0])
+plot_energy_cuts(kcut,Ecut,lines=Float64[])

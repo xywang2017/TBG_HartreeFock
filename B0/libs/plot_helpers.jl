@@ -17,18 +17,18 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
 end
 
 function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
-    fig = figure(figsize=(5,4))
+    fig = figure(figsize=(4,4))
     for i in 1:size(ϵ,1)
         plot(kvec,ϵ[i,:],"o-",ms=2,markeredgecolor="none",label="band $(i)")
     end
     for line in lines 
         axhline(line,ls=":",c="gray")
     end
-    xlim([minimum(kvec)-0.1,2.5*maximum(kvec)])
+    # xlim([minimum(kvec)-0.1,2.5*maximum(kvec)])
     xlabel("k")
     ylabel("E (meV)")
     # ylim([-30,30])
-    legend()
+    # legend()
     tight_layout()
     savefig("test.pdf")
     display(fig)
@@ -37,7 +37,7 @@ function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vect
 end
 
 function plot_energy_cuts_with_order_parameters(kvec::Vector{Float64},ϵ::Array{Float64,2},σz::Array{Float64,2};lines::Vector{Float64}=[])
-    fig = figure(figsize=(5,4))
+    fig = figure(figsize=(4,4))
     # for i in 1:size(ϵ,1)
     #     plot(kvec,ϵ[i,:],"-",c="gray",lw=1)
     # end
