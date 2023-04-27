@@ -4,19 +4,20 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Hartree Fock related 
-params = Params(w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
+params = Params(w1=110,w0=77,vf=2482,dθ=1.05π/180)
+initParamsWithStrain(params)
 
 ##
 flag = "random"
 seed =1
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,8
-νF = 0 +(0)*p/q
+p,q = 1,4
+νF = 0 +(2)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
-    metadata = joinpath(fpath,"princeton/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    metadata = joinpath(fpath,"feldman/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     println("HF energy: ",load(metadata,"iter_energy")[end])
     println("Convergence: ",load(metadata,"iter_err")[end])
     # hf = load(metadata,"hf")
@@ -38,7 +39,7 @@ p, q = 1,8
 flag = "chern"
 νF = 1 + (3)*p/q
 νstr = round(Int,1000*νF)
-metadata = joinpath(fpath,"princeton/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+metadata = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
 # plot_density_matrix_bm(metadata)
 plot_density_matrix_sublattice(metadata)

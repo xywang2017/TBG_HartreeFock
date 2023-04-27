@@ -35,7 +35,7 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
     A._σrotation = _σrotation
     A.params = params 
     A.latt = latt
-    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 4, 4
+    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 2, 4
     A.nt = A.nη*A.ns*A.nb 
     A.fname = fname
 

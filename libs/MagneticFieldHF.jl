@@ -123,7 +123,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     iter_energy = Float64[]
     iter_oda = Float64[]
     # strong coupling 
-    hf.H0 .= 0.0
+    # hf.H0 .= 0.0
     while norm_convergence > hf.precision
         @time begin 
             hf.H .= hf.H0 * 1.0
