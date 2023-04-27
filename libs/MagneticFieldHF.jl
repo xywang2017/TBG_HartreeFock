@@ -93,7 +93,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
 
     # cannot save the overlap matrix for all of gvecs, so instead only save one gvec at a time
     hf.gvec = reshape(collect(-hf.ng:hf.ng),:,1)*hf.params.g1 .+ reshape(collect(-hf.ng*hf.q:hf.ng*hf.q),1,:)*hf.params.g2 ./hf.q
-    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
+    # hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
 
     # BM band structure and projected sublattice info
     hf.H0 = zeros(ComplexF64,hf.nt,hf.nt,hf.lk)
@@ -118,7 +118,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     
     # --------- Hartree Fock Iterations ---------- #
     norm_convergence = 10.0 
-    iter = 1
+    iter = 0
     iter_err = Float64[]
     iter_energy = Float64[]
     iter_oda = Float64[]
@@ -139,28 +139,25 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
             end
             norm_convergence,λ = update_P(hf;Δ=Δ)
             
+            push!(iter_energy,Etot)
+            push!(iter_err,norm_convergence)
+            push!(iter_oda,λ)
+
+            if mod(iter,10) ==0 || norm_convergence < hf.precision
+                hf.Λ = Array{ComplexF64,4}(undef,0,0,0,0)
+                save(hf.savename,"hf",hf,
+                        "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
+            end
+
+            iter +=1
+            
+            if iter > 300 || λ < 1e-3
+                break 
+            end
             println("Iter: ",iter)
             println("Running HF energy (per moire u.c.): ",Etot)
             println("Running norm convergence: ",norm_convergence)
             println("Running ODA paramter λ: ",λ)
-        end
-        push!(iter_energy,Etot)
-        push!(iter_err,norm_convergence)
-        push!(iter_oda,λ)
-        # if iter ==1 
-        #     save("typical_starting_point.jld2","hf",hf,
-        #             "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
-        # end
-
-        if mod(iter,10) ==0 || norm_convergence < hf.precision
-            save(hf.savename,"hf",hf,
-                    "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
-        end
-
-        iter +=1
-        
-        if iter > 300 || λ < 1e-3
-            break 
         end
     end
 
@@ -197,6 +194,7 @@ function add_Hartree(hf::HartreeFock;β::Float64=1.0)
     """
         Hartree Contribution suppressed by parameter β
     """
+    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
@@ -226,6 +224,7 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     """
         Fock Contribution 
     """
+    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
@@ -259,6 +258,7 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
 end
 
 function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
+    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
@@ -370,7 +370,7 @@ end
 
 function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0)
     # compute coefficients b λ + a λ^2/2
-
+    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
