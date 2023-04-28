@@ -9,12 +9,12 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = [1//8;1//4;2//7;3//7;1//2]
+ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 sts = unique([[s,t] for s in 0:3 for t in 0:4])
 # ------------------------------------------ # 
 # for st in sts 
 #     s,t = st[1], st[2]
-    s,t = 3,1
+    s,t = 0,2
     metadatas = String[]
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
@@ -38,8 +38,8 @@ sts = unique([[s,t] for s in 0:3 for t in 0:4])
 
 
 ## -------------------------------- plot all gaps ------------------------------ #
-# ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
-ϕs = [1//8;1//4;2//7;3//7;1//2]
+ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+# ϕs = [1//8;1//4;2//7;3//7;1//2]
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
 fig = figure(figsize=(6,4))
@@ -74,7 +74,7 @@ for ϕ in ϕs
     fillings, gaps = fillings[idx_sort],gaps[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5)
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^4/600)
 end
 xlim([-0.3,4.3])
 ylim([0.0,0.55])
