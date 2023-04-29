@@ -14,24 +14,26 @@ sts = unique([[s,t] for s in 0:3 for t in 0:4])
 # ------------------------------------------ # 
 # for st in sts 
 #     s,t = st[1], st[2]
-    s,t = 0,2
+    s,t = 2,4
     metadatas = String[]
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
-        metadata = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","random","chern"], seed in 1:6 
-            metadata0 = joinpath(fpath,"feldman/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            if isfile(metadata0)
-                E0 = load(metadata0,"iter_energy")[end]
-                if E0<=E 
-                    E, metadata = E0, metadata0 
+        if s+t*p/q < 4
+            metadata = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            E = load(metadata,"iter_energy")[end]
+            for flag in ["flavor","random","chern"], seed in 1:6 
+                metadata0 = joinpath(fpath,"feldman/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                if isfile(metadata0)
+                    E0 = load(metadata0,"iter_energy")[end]
+                    if E0<=E 
+                        E, metadata = E0, metadata0 
+                    end
                 end
             end
+            println(metadata)
+            push!(metadatas,metadata)
         end
-        println(metadata)
-        push!(metadatas,metadata)
     end
     Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))");
 # end
@@ -74,7 +76,7 @@ for ϕ in ϕs
     fillings, gaps = fillings[idx_sort],gaps[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^4/600)
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5)
 end
 xlim([-0.3,4.3])
 ylim([0.0,0.55])
