@@ -12,9 +12,9 @@ w0 = "07"
 ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 sts = unique([[s,t] for s in 0:3 for t in 0:4])
 # ------------------------------------------ # 
-# for st in sts 
-#     s,t = st[1], st[2]
-    s,t = 2,4
+for st in sts 
+    s,t = st[1], st[2]
+    # s,t = 0,0
     metadatas = String[]
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
@@ -31,12 +31,13 @@ sts = unique([[s,t] for s in 0:3 for t in 0:4])
                     end
                 end
             end
-            println(metadata)
+            println("Iter err: ",load(metadata,"iter_err")[end])
+            # println(metadata)
             push!(metadatas,metadata)
         end
     end
     Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))");
-# end
+end
 
 
 ## -------------------------------- plot all gaps ------------------------------ #
