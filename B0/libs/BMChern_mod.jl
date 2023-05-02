@@ -1,4 +1,4 @@
-include("Parameters_mod.jl")
+include("ParametersChern_mod.jl")
 include("Lattice_mod.jl")
 include("helpers.jl")
 # --------------------------------------------------------------------------------------------------------------- #
@@ -89,7 +89,7 @@ function constructHBM(A::HBM)
         ζ = 3-2iη
         generate_T12(T12,ζ,A)
         for ik in 1:A.latt.nk
-            kval = latt.kvec[ik]
+            kval = A.latt.kvec[ik]
             constructDiagonals(H0,kval,ζ,A)
             A.H[:,:,iη,ik] = H0 + T12 - params.μ*I
         end
@@ -116,10 +116,6 @@ function enforceSymmetry(A::HBM)
     s0 = Float64[1 0; 0 1]
     s1 = Float64[0 1; 1 0]
     is2 = Float64[0 1; -1 0]
-    # this gives i mu_y I operation in the Bloch basis
-    Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
-    Ph = -kron(Ig,kron(is2,s0))
-
     # this gives C2T eigenstates
     Ig = Array{Float64}(I,A.lg^2,A.lg^2)
     C2T = kron(Ig,kron(s0,s1)) # × conj(...)
@@ -129,6 +125,20 @@ function enforceSymmetry(A::HBM)
         A.Uk[:,:,iη,ik] = (view(A.Uk,:,:,iη,ik) .+ C2T*conj.(view(A.Uk,:,:,iη,ik)))
         for j in 1:size(A.Uk,2)
             normalize!(view(A.Uk,:,j,iη,ik))
+        end
+    end
+
+    # particle -hole 
+    # this gives i mu_y I operation in the Bloch basis
+    Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
+    Ph = -kron(Ig,kron(is2,s0))
+    tmpU = deepcopy(A.Uk)
+    for iη in 1:A.nη, ik in 1:A.latt.nk
+        # use lower BM band to constrain upper band 
+        tmpU[:,2,iη,ik] = Ph*view(A.Uk,:,1,iη,A.latt.nk+1-ik)
+        val = abs( abs(view(tmpU,:,2,iη,ik)'*view(A.Uk,:,2,iη,ik)) -1)
+        if val > 1e-6
+            println("error with applying PH: ",val," ")
         end
     end
     return nothing
@@ -161,10 +171,14 @@ function generate_T12(T12::Matrix{ComplexF64},ζ::Int,A::HBM)
     T12 .= 0.0 + 0.0im
     # p.b.c. is used 
     idg = reshape(collect(1:A.lg^2),A.lg,A.lg)
-    # per Oskar & Jian choice of g1 and g2
-    idg_nn1 = circshift(idg,(0,ζ))  # T1 * (|t><b|)
-    idg_nn2 = circshift(idg,(ζ,ζ))  # T2 * (|t><b|)
-    idg_nn12 = circshift(idg,(0,0))  # T0 * (|t><b|)
+    # # per Oskar & Jian choice of g1 and g2
+    # idg_nn1 = circshift(idg,(0,ζ))  # T1 * (|t><b|)
+    # idg_nn2 = circshift(idg,(ζ,ζ))  # T2 * (|t><b|)
+    # idg_nn12 = circshift(idg,(0,0))  # T0 * (|t><b|)
+    # chosing Kt = - Kb, implicitly inversion symmetric
+    idg_nn1 = circshift(idg,(-ζ,ζ))  # T1 * (|t><b|)
+    idg_nn2 = circshift(idg,(0,ζ))  # T2 * (|t><b|)
+    idg_nn12 = circshift(idg,(-ζ,0))  # T0 * (|t><b|)
 
     tmp = reshape(T12,A.nlocal,A.lg^2,A.nlocal,A.lg^2)
     if ζ ==1 

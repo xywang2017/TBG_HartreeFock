@@ -77,7 +77,7 @@ for ϕ in ϕs
     fillings, gaps = fillings[idx_sort],gaps[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5)
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="gray")
 end
 xlim([-0.3,4.3])
 ylim([0.0,0.55])
