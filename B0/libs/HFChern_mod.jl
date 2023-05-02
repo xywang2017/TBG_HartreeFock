@@ -130,13 +130,9 @@ end
 
 function BM_info(hf::HartreeFock)
     hf.H0 = zeros(ComplexF64,size(hf.H))
-    hbm = zeros(ComplexF64,hf.nt,hf.latt.nk)
 
     jldopen(hf.fname,"r") do file
-        hbm .= file["E"]
-        for ifl in 1:hf.nt
-            hf.H0[ifl,ifl,:] = hbm[ifl,:] 
-        end
+        hf.H0 .= file["E"]
         hf.Σz .= file["Σz"]
     end
     return nothing

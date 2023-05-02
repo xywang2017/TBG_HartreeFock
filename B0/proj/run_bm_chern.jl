@@ -5,7 +5,7 @@ include(joinpath(fpath,"B0/libs/BMChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
-lk = 9
+lk = 19
 # params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.002,Da=-4100,dθ=1.27π/180,w1=110,w0=77,vf=2680)
 params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
@@ -14,13 +14,13 @@ initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"feldman/B0/data/test_bm_lk$(lk).jld2")
+bm_path = joinpath(fpath,"feldman/B0/data/bm_lk$(lk).jld2")
 
 # ------------------ non-interacting part ------------------ #
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
     bm = HBM()
     initHBM(bm,latt,params;
-            lg=9,_σrotation=false,_calculate_overlap=false,fname=fname)
+            lg=9,_σrotation=false,_calculate_overlap=true,fname=fname)
     return bm
 end
 

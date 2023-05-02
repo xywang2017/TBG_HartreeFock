@@ -18,6 +18,7 @@ mutable struct HBM
     Σz::Array{ComplexF64,3}  #sublattice operator, will save in data file as σzτz
     Uk::Array{ComplexF64,4}
     spectrum::Array{Float64,3} # Hbm energies nb x nη x nk
+    chern_ham::Array{ComplexF64,4} # BM in chern basis: nb x nb x nη x nk 
     lg::Int 
     gvec::Vector{ComplexF64}
 

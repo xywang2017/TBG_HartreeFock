@@ -16,8 +16,9 @@ mutable struct HBM
 
     H::Array{ComplexF64,4}
     Σz::Array{ComplexF64,3}  #sublattice operator, will save in data file as σzτz
-    Uk::Array{ComplexF64,4}
+    Uk::Array{ComplexF64,4}  # vectors in chern basis 
     spectrum::Array{Float64,3} # Hbm energies nb x nη x nk
+    chern_ham::Array{ComplexF64,4} # BM in chern basis: nb x nb x nη x nk 
     lg::Int 
     gvec::Vector{ComplexF64}
 
@@ -49,10 +50,10 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
     calculateChern(A)
 
     jldopen(A.fname, "w") do file
-        hbm = zeros(Float64,A.nt,A.latt.nk)
-        tmp_hbm = reshape(hbm,A.ns,A.nη,A.nb,A.latt.nk)
+        hbm = zeros(ComplexF64,A.nt,A.nt,A.latt.nk)
+        tmp_hbm = reshape(hbm,A.ns,A.nη,A.nb,A.ns,A.nη,A.nb,A.latt.nk)
         for is in 1:A.ns, iη in 1:A.nη
-            tmp_hbm[is,iη,:,:] = A.spectrum[:,iη,:] 
+            tmp_hbm[is,iη,:,is,iη,:,:] = A.chern_ham[:,:,iη,:] 
         end
         file["E"] = hbm
         file["nη"] = A.nη
@@ -116,6 +117,7 @@ function enforceSymmetry(A::HBM)
     s0 = Float64[1 0; 0 1]
     s1 = Float64[0 1; 1 0]
     is2 = Float64[0 1; -1 0]
+    s3 = Float64[1 0;0 -1]
     # this gives C2T eigenstates
     Ig = Array{Float64}(I,A.lg^2,A.lg^2)
     C2T = kron(Ig,kron(s0,s1)) # × conj(...)
@@ -128,19 +130,58 @@ function enforceSymmetry(A::HBM)
         end
     end
 
-    # particle -hole 
-    # this gives i mu_y I operation in the Bloch basis
+    # this gives Ph i mu_y I operation in the Bloch basis
     Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
     Ph = -kron(Ig,kron(is2,s0))
-    tmpU = deepcopy(A.Uk)
     for iη in 1:A.nη, ik in 1:A.latt.nk
         # use lower BM band to constrain upper band 
-        tmpU[:,2,iη,ik] = Ph*view(A.Uk,:,1,iη,A.latt.nk+1-ik)
-        val = abs( abs(view(tmpU,:,2,iη,ik)'*view(A.Uk,:,2,iη,ik)) -1)
-        if val > 1e-6
-            println("error with applying PH: ",val," ")
-        end
+        A.Uk[:,2,iη,ik] = Ph*view(A.Uk,:,1,iη,A.latt.nk+1-ik)
+        # val = abs( abs(view(tmpU,:,2,iη,ik)'*view(A.Uk,:,2,iη,ik)) -1)
+        # if val > 1e-6
+        #     println("error with applying PH: ",val," ")
+        # end
     end
+
+    # C2 σ1I 
+    # tmpU = deepcopy(A.Uk)
+    Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
+    C2 = kron(Ig,kron(s0,s1))
+    for ik in 1:A.latt.nk
+        A.Uk[:,:,2,ik] = C2*view(A.Uk,:,:,1,A.latt.nk+1-ik)
+        # val = norm( abs.(view(tmpU,:,:,2,ik)'*view(A.Uk,:,:,2,ik)) -I)
+        # if val > 1e-6
+        #     println("error with applying C2: ",val," ")
+        # end
+    end
+
+    # going to Chern basis 
+    UChern = deepcopy(A.Uk)
+    A.chern_ham = zeros(ComplexF64,A.nb,A.nb,A.nη,A.latt.nk)
+    vec = zeros(ComplexF64,size(A.Uk,1))
+    mat = ComplexF64[1 1;1im -1im]/sqrt(2)
+    σz = kron(Array{Float64}(I,A.lg^2,A.lg^2),kron(s0,s3))
+    for iη in 1:A.nη, ik in 1:A.latt.nk 
+        vec .= (view(A.Uk,:,1,iη,ik) .+ 1im * view(A.Uk,:,2,iη,ik))./sqrt(2)
+        if real(vec'*σz*vec)*(3-2iη) < 0
+            A.Uk[:,2,iη,ik] = view(A.Uk,:,2,iη,ik) * (-1)
+        end
+        UChern[:,1,iη,ik] = (view(A.Uk,:,1,iη,ik) + 1im * view(A.Uk,:,2,iη,ik))./sqrt(2)
+        UChern[:,2,iη,ik] = (view(A.Uk,:,1,iη,ik) - 1im * view(A.Uk,:,2,iη,ik))./sqrt(2)
+        for j in 1:A.nb 
+            normalize!(view(UChern,:,j,iη,ik))
+        end
+        A.chern_ham[:,:,iη,ik] = mat' * Diagonal(A.spectrum[:,iη,ik]) * mat
+    end
+
+    A.Uk .= UChern
+    # test energies: 
+    # for iη in 1:A.nη, ik in 1:A.latt.nk 
+    #     vals = eigvals(A.chern_ham[:,:,iη,ik])
+    #     norm_diff = norm(vals - A.spectrum[:,iη,ik])
+    #     if norm_diff > 1e-6
+    #         println("error with Chern hamiltonian: ",norm_diff," ")
+    #     end
+    # end
     return nothing
 end
 
