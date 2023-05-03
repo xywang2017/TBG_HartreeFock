@@ -75,10 +75,10 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     BM_info(hf)
 
     # order parameters 
-    ηs = ["η0","η1","η2","η3"]
+    γs = ["γ0","γ1","γ2","γ3"]
     σs = ["s0","s1","s2","s3"]
-    ns = ["n0","n1","n2","n3"]
-    hf.Δstr = [ns[i]*ηs[j]*σs[k] for i in 1:4 for j in 1:4 for k in 1:4]
+    τs = ["τ0","τ1","τ2","τ3"]
+    hf.Δstr = [γs[i]*τs[j]*σs[k] for i in 1:4 for j in 1:4 for k in 1:4]
     hf.Δ = zeros(Float64,size(hf.Δstr))
 
     # Hartree-Fock iterations
