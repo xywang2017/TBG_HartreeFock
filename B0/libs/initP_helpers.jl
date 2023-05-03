@@ -7,8 +7,20 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     """
     if isequal(_Init,"random") # random occupation of BM bands
         init_P_random(hf)
-    elseif isequal(_Init,"flavor")
+    elseif isequal(_Init,"tivc")
+        init_P_flavor_polarization(hf;flag="vp")
+        init_P_ivc_rotation(hf)
+    elseif isequal(_Init,"kivc")
+        init_P_flavor_polarization(hf;flag="sublattice")
+        init_P_ivc_rotation(hf)
+    elseif isequal(_Init,"vp")
+        init_P_flavor_polarization(hf;flag="vp")
+    elseif isequal(_Init,"sp")
         init_P_flavor_polarization(hf;flag="sp")
+    elseif isequal(_Init,"chern")
+        init_P_flavor_polarization(hf;flag="chern")
+    elseif isequal(_Init,"flavor")
+        init_P_flavor_polarization(hf;flag="random")
     else
         hf.P .= P0 
     end
@@ -17,8 +29,6 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     # init_P_valley_rotation(hf;α=1.0)
     if isequal(_Init,"random")
         init_P_random_rotation(hf;α=1.0)
-    elseif isequal(_Init,"flavor")
-        # init_P_ivc_rotation(hf)
     end
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     

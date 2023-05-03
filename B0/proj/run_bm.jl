@@ -5,9 +5,9 @@ include(joinpath(fpath,"B0/libs/BM_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
-lk = 19
-# params = Params(ϵ=0.002,Da=-4100,dθ=1.06π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+lk = 17
+params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
