@@ -4,7 +4,7 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-prefix = 1
+prefix = 3
 flag = "random"
 # νs = collect(0.0:0.2:4.0)
 ν = 2.0
@@ -29,7 +29,7 @@ kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
-# plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 # ----------------- valley-spin-bamd polarization info ----------------- # 
 fig, ax = subplots(1,2,sharex=true,figsize=(4,5))
@@ -42,7 +42,7 @@ ax[2].axvline(0,c="gray")
 ax[2].plot(hf.Δ[(s÷2+1):end],eachindex(hf.Δ)[(s÷2+1):end],"b^")
 ax[2].set_yticks(collect(eachindex(hf.Δ))[(s÷2+1):end])
 ax[2].set_yticklabels(hf.Δstr[(s÷2+1):end])
-ax[2].set_xlim(-0.1,0.1)
+ax[2].set_xlim(-0.2,0.2)
 tight_layout()
 savefig("test.pdf")
 display(fig)
