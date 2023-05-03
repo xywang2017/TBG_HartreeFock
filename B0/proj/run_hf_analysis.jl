@@ -4,16 +4,15 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/HF_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-prefix = 2
+prefix = 1
 flag = "random"
 # νs = collect(0.0:0.2:4.0)
-ν = -3.0
+ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 19
-params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
-# params = Params(ϵ=0.002,Da=-4100,dθ=1.27π/180,w1=110,w0=77,vf=2680)
-# params = Params(ϵ=0.00,Da=0,w1=96.056,w0=0.7*96.056,vf=2135.4,dθ=1.05π/180)
+# params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
@@ -50,7 +49,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s1,s0))*F.vectors))
 end
 # Δ .= hf.σzτz
 

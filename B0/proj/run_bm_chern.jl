@@ -34,7 +34,7 @@ for i2 in 1:lk, i1 in 1:lk
     ϵ0[:,i1,i2] = eigvals(Hermitian(tmp[:,:,i1,i2]))
 end 
 # plot_contour_maps(kvec,ϵ0[9,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
-plot_contour_maps(kvec,ϵ0[1,:,:];points=ComplexF64[],contourlines=Float64[])
+# plot_contour_maps(kvec,ϵ0[1,:,:];points=ComplexF64[],contourlines=Float64[])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[1:2:end,:,iΓ],:,length(kcut))

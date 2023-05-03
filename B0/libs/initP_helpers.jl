@@ -17,6 +17,8 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     # init_P_valley_rotation(hf;α=1.0)
     if isequal(_Init,"random")
         init_P_random_rotation(hf;α=1.0)
+    elseif isequal(_Init,"flavor")
+        init_P_valley_rotation(hf;α=1.0)
     end
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     

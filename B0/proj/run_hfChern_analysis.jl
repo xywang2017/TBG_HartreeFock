@@ -4,8 +4,8 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-prefix = 2
-flag = "random"
+prefix = 1
+flag = "flavor"
 # νs = collect(0.0:0.2:4.0)
 ν = 0.0
 νstr = round(Int,1000*ν)
@@ -49,7 +49,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s3,kron(s1,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s3,kron(s2,s0))*F.vectors))
 end
 # Δ .= hf.σzτz
 
