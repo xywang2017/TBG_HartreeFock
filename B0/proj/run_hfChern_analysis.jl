@@ -5,9 +5,9 @@ include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 3
-flag = "random"
+flag = "tivc"
 # νs = collect(0.0:0.2:4.0)
-ν = 2.0
+ν = 2.5
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 17
@@ -55,7 +55,7 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s1,kron(s0,s3))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s0))*F.vectors))
 end
 # Δ .= hf.σzτz
 

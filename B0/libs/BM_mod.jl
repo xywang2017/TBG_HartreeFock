@@ -201,8 +201,13 @@ function constructDiagonals(H::Matrix{ComplexF64},k::ComplexF64,ζ::Int,A::HBM)
     # dispersive part
     for ig in 1:A.lg^2
         qc = A.gvec[ig]
-        kb = k - ζ*A.params.Kb + qc
-        kt = k - ζ*A.params.Kt + qc
+        if ζ == 1 
+            kb = k - A.params.Kb + qc
+            kt = k - A.params.Kt + qc
+        else 
+            kb = k - A.params.Kt + qc
+            kt = k - A.params.Kb + qc
+        end
         if (A._σrotation==true)
             k1 = (I + R - A.params.S*A.params.α)*[real(kb);imag(kb)]
             k2 = (I - R + A.params.S*(1-A.params.α))*[real(kt);imag(kt)]

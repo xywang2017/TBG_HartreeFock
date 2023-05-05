@@ -124,7 +124,7 @@ function init_P_flavor_polarization(hf::HartreeFock;flag::String="vp")
         n_remain = νmax - (length(flavors_to_populate)-1)*n_per_flavor 
         states_to_populate = randperm(n_per_flavor)[1:n_remain]
         for ip in states_to_populate 
-            tmpP[ifl,ifl,ip] = 1.0 
+            hf.P[ifl,ifl,ip] = 1.0 
         end
     end
     
