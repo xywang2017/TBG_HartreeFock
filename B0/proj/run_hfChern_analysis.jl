@@ -4,10 +4,10 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-prefix = 3
-flag = "tivc"
+prefix = 1
+flag = "random"
 # νs = collect(0.0:0.2:4.0)
-ν = 2.5
+ν = -2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 17
@@ -55,13 +55,14 @@ s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s3,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s2,kron(s0,s0))*F.vectors))
 end
 # Δ .= hf.σzτz
 
-plot_energy_cuts_with_order_parameters(kcut,Ecut,
-                reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
+# plot_energy_cuts_with_order_parameters(kcut,Ecut,
+#                 reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
 
+plot_contour_maps(kvec,reshape(Δ,:,lk,lk)[2,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 
 # ----------------- Hartree-Fock statistics ---------------- # 
 iter_oda = load(hf_path,"iter_oda");
