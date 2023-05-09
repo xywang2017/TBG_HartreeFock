@@ -25,7 +25,7 @@ iter_energy = load(hf_path,"iter_energy");
 println(iter_energy[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[5,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+# plot_contour_maps(kvec,ϵ0[2,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
@@ -53,17 +53,38 @@ s1 = ComplexF64[0 1;1 0]
 s2 = ComplexF64[0 -1im;1im 0]
 s3 = ComplexF64[1 0;0 -1]
 Δ = zeros(size(hf.ϵk))
+δ = zeros(size(hf.ϵk,2))
 for ik in 1:size(hf.ϵk,2)
     F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s2,kron(s0,s0))*F.vectors))
+    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s2,s0))*F.vectors))
+    # Δ[:,ik] = sqrt.(real(diag(F.vectors'*kron(s0,kron(s1,s0))*F.vectors)).^2 + 
+    #             real(diag(F.vectors'*kron(s0,kron(s2,s0))*F.vectors)).^2 )
+    δ[ik] = real(tr((hf.P[:,:,ik]+I/2)*kron(s3,kron(s0,s0))))/2
 end
 # Δ .= hf.σzτz
 
 # plot_energy_cuts_with_order_parameters(kcut,Ecut,
 #                 reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
 
-plot_contour_maps(kvec,reshape(Δ,:,lk,lk)[2,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+# plot_contour_maps(kvec,reshape(Δ,:,lk,lk)[1,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+plot_contour_maps(kvec,collect(reshape(δ,lk,lk)),points=[params.Kt/abs(params.g1)],contourlines=Float64[])
 
+# ---------------------------- Hartree only ---------------------------------- # 
+Δ = zeros(size(hf.ϵk))
+δ = zeros(size(hf.ϵk,2))
+ϵk = zeros(size(hf.ϵk))
+for ik in 1:size(hf.ϵk,2)
+    tmpH = reshape(view(hf.H,:,:,ik),4,2,4,2)
+    for j in 1:4
+        ϵk[(2j-1):(2j),ik] = eigvals(Hermitian(tmpH[j,:,j,:])) 
+    end
+end
+# Δ .= hf.σzτz
+
+# plot_energy_cuts_with_order_parameters(kcut,Ecut,
+#                 reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
+
+plot_contour_maps(kvec,reshape(ϵk,:,lk,lk)[6,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
 # ----------------- Hartree-Fock statistics ---------------- # 
 iter_oda = load(hf_path,"iter_oda");
 iter_err = load(hf_path,"iter_err");

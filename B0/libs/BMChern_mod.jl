@@ -173,6 +173,21 @@ function enforceSymmetry(A::HBM)
         A.chern_ham[:,:,iη,ik] = mat' * Diagonal(A.spectrum[:,iη,ik]) * mat
     end
 
+    # smooth gauge for chern basis along g1 direction
+    tmpUChern = reshape(UChern,:,2,2,A.latt.lk,A.latt.lk) 
+    for iη in 1:A.nη
+        for ik2 in 1:A.latt.lk, ik1 in 2:A.latt.lk
+            if real(view(tmpUChern,:,1,iη,ik1-1,ik2)'*view(tmpUChern,:,1,iη,ik1,ik2)) <0 
+                tmpUChern[:,:,iη,ik1,ik2] .*= -1 
+            end
+        end
+        for ik2 in 2:A.latt.lk 
+            if real(view(tmpUChern,:,1,iη,1,ik2-1)'*view(tmpUChern,:,1,iη,1,ik2)) <0 
+                tmpUChern[:,:,iη,:,ik2] .*= -1 
+            end
+        end  
+    end
+
     A.Uk .= UChern
     # test energies: 
     # for iη in 1:A.nη, ik in 1:A.latt.nk 

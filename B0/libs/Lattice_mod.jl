@@ -4,6 +4,7 @@ mutable struct Lattice
     k1::Vector{Float64}
     k2::Vector{Float64}
     nk::Int # total k points in the mesh
+    lk::Int # linear dimension of k points
     kvec::Vector{ComplexF64} # k1+ik2
     flag_inv::Bool # if true, the kvec is inverse symmetric
 
@@ -20,6 +21,7 @@ function initLattice(latt::Lattice,params::Params;lk::Int=12)
     # latt.k2 = collect(0:(lk-1)) ./ lk 
     latt.kvec = (reshape(latt.k1,:,1)*params.g1 .+ reshape(latt.k2,1,:)*params.g2)[:]
     latt.nk = length(latt.kvec)
+    latt.lk = lk 
     latt.flag_inv = true
     return nothing
 end

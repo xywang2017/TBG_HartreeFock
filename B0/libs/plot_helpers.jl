@@ -3,7 +3,9 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     kx,ky = real(kvec), imag(kvec)
     fig = figure(figsize=(4,3))
     pl=contourf(kx,ky,ϵ,cmap="Spectral_r",levels=20)
-    contour(kx,ky,ϵ,levels=contourlines)
+    if !isempty(contourlines)
+        contour(kx,ky,ϵ,levels=contourlines)
+    end
     plot(real(points),imag(points),"k+")
     colorbar(pl)
     xlabel(L"k_x/|g_1|")
