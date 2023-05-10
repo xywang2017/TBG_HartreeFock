@@ -1,8 +1,36 @@
 function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
-        points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[])
+        points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
     kx,ky = real(kvec), imag(kvec)
     fig = figure(figsize=(4,3))
-    pl=contourf(kx,ky,ϵ,cmap="Spectral_r",levels=20)
+    if !isempty(limits)
+        pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20,vmin=limits[1],vmax=limits[2])
+    else
+        pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20)
+    end
+    if !isempty(contourlines)
+        contour(kx,ky,ϵ,levels=contourlines)
+    end
+    plot(real(points),imag(points),"k+")
+    colorbar(pl)
+    xlabel(L"k_x/|g_1|")
+    ylabel(L"k_y/|g_1|")
+    axis("equal")
+    tight_layout()
+    savefig("test.pdf")
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+function plot_density_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
+    points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
+    kx,ky = real(kvec), imag(kvec)
+    fig = figure(figsize=(4,3))
+    if !isempty(limits)
+        pl=pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=limits[1],vmax=limits[2])
+    else
+        pl=pcolormesh(kx,ky,ϵ,cmap="bwr")
+    end
     if !isempty(contourlines)
         contour(kx,ky,ϵ,levels=contourlines)
     end
