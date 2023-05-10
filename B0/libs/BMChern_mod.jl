@@ -187,7 +187,6 @@ function enforceSymmetry(A::HBM)
             end
         end  
     end
-
     A.Uk .= UChern
     # test energies: 
     # for iη in 1:A.nη, ik in 1:A.latt.nk 

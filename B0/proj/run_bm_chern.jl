@@ -18,7 +18,7 @@ bm_path = joinpath(fpath,"feldman/B0/data/bm_lk$(lk).jld2")
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
     bm = HBM()
     initHBM(bm,latt,params;
-            lg=9,_σrotation=false,_calculate_overlap=true,fname=fname)
+            lg=9,_σrotation=false,_calculate_overlap=false,fname=fname)
     return bm
 end
 
@@ -38,3 +38,10 @@ iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[1:2:end,:,iΓ],:,length(kcut))
 plot_energy_cuts(kcut,Ecut,lines=Float64[])
+
+# ----------------- plot real space chern states ------------------- #
+# check that smooth gauge is properly implemented.
+include(joinpath(fpath,"B0/libs/hybridWannier_mod.jl"));
+hWS_r = initHybridWannierRealSpace(bm); 
+# plot_HybridWannier_RealSpace(hWS_r,params);
+plot_HybridWannier_RealSpaceCombined(hWS_r,params,nk=1);

@@ -65,3 +65,4 @@ function plot_energy_cuts_with_order_parameters(kvec::Vector{Float64},ϵ::Array{
     close(fig)
     return nothing
 end
+
