@@ -1,4 +1,4 @@
-include("BM_mod.jl")
+include("BMChern_mod.jl")
 
 mutable struct HartreeFock
     ns::Int 
