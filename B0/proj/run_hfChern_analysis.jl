@@ -6,19 +6,20 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 1
 flag = "random"
+phi = 40
 # νs = collect(0.0:0.2:4.0)
 ν = -3.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 23
+lk = 20
 # params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 params = Params(ϵ=0.002,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"feldman/B0/data/bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"feldman/B0/data/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
+bm_path = joinpath(fpath,"feldman/B0/data/phi$(phi)/bm_lk$(lk).jld2")
+hf_path = joinpath(fpath,"feldman/B0/data/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 
 # ----------------- Hartree-Fock dispersion part ---------------- # 
 hf = load(hf_path,"hf");
@@ -26,11 +27,11 @@ iter_energy = load(hf_path,"iter_energy");
 println(iter_energy[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[1,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
+# plot_contour_maps(kvec,ϵ0[1,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ],limits=Float64[-30,-2])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
-plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+# plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 # ----------------- valley-spin-chern polarization info ----------------- # 
 s0 = ComplexF64[1 0;0 1]
@@ -48,6 +49,13 @@ for ik in 1:size(hf.ϵk,2)
     for i in 1:4, j in 1:4, k in 1:4
         δs[i,j,k,ik] = real(tr(transpose(hf.P[:,:,ik]+I/2)*kron(paulis[i],kron(paulis[j],paulis[k]))))/8
     end
+    tmpP = zeros(ComplexF64,8,8)
+    for i in 1:4, j in 1:4, k in 1:4
+        tmpP .+= δs[i,j,k,ik]* kron(paulis[i],kron(paulis[j],paulis[k]))
+    end
+    if norm(tmpP .- transpose(hf.P[:,:,ik]+I/2) ) > 1e-10
+        println(norm(tmpP .- transpose(hf.P[:,:,ik]+I/2) ))
+    end
 end
 # Δ .= hf.σzτz
 
@@ -55,8 +63,10 @@ end
 #                 reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
 
 # plot_contour_maps(kvec,reshape(Δ,:,lk,lk)[1,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
-plot_density_maps(kvec,collect(reshape(δs[1,4,4,:],lk,lk)),
-            points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[-0.25,0.25])
+# plot_density_maps(kvec,collect(reshape(δs[2,4,4,:],lk,lk)),
+#             points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[])
+plot_density_maps_collective(kvec,collect(reshape(δs,4,4,4,lk,lk)),
+            points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[])
 
 fig = figure(figsize=(4,3))
 quiver(real(kvec),imag(kvec),collect(reshape(δs[1,4,4,:],lk,lk)),collect(reshape(δs[2,4,4,:],lk,lk)))
@@ -119,12 +129,14 @@ display(fig)
 close(fig)
 
 ### all the chemical potentials 
-νs = collect(0:0.2:4.0)
+νs = collect(-3.9:0.1:3.9)
+lk = 20
+phi = 50
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
     νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/2_strain_hf_$(νstr)_lk19.jld2")
+    hf_path = joinpath(fpath,"feldman/B0/data/phi$(phi)/1_random_hf_$(νstr)_lk$(lk).jld2")
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
@@ -132,15 +144,18 @@ for ν in νs
     end
 end
 fig = figure(figsize=(5,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
+for i in -4:4 
+    axvline(i,ls=":",c="gray")
+end
+axhline(0,ls=":",c="gray")
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=2)
 xlabel("ν")
 ylabel("μ")
 axhline(0,ls="--",c="gray")
 # ylim([0,30])
 # ylim([0,14])
-xlim([-0.1,4.1])
+xlim([-4.2,4.2])
 tight_layout()
-# savefig("cascade_strain_gapless.pdf")
+savefig("cascade_strain_phi$(phi).pdf")
 display(fig)
 close(fig)
-

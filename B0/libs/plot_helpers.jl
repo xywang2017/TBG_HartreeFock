@@ -5,7 +5,8 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     if !isempty(limits)
         pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20,vmin=limits[1],vmax=limits[2])
     else
-        pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20)
+        bound = maximum(abs.(ϵ))
+        pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20,vmin=-bound,vmax=bound)
     end
     if !isempty(contourlines)
         contour(kx,ky,ϵ,levels=contourlines)
@@ -29,7 +30,8 @@ function plot_density_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     if !isempty(limits)
         pl=pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=limits[1],vmax=limits[2])
     else
-        pl=pcolormesh(kx,ky,ϵ,cmap="bwr")
+        bound = maximum(abs.(ϵ))
+        pl=pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
     end
     if !isempty(contourlines)
         contour(kx,ky,ϵ,levels=contourlines)
@@ -45,6 +47,45 @@ function plot_density_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     close(fig)
     return nothing
 end
+
+
+function plot_density_maps_collective(kvec::Matrix{ComplexF64},Δs::Array{Float64,5};
+    points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
+    kx,ky = real(kvec), imag(kvec)
+    γstr = ["γx","γy","γz"]
+    τstr = ["τx","τy","τz"]
+    sstr = ["sx","sy","sz"]
+    titlestrs = [γstr,τstr,sstr]
+    fig,ax = subplots(3,3,sharex=true,sharey=true,figsize=(12,9))
+    for r in 1:3, c in 1:3
+        str = titlestrs[r][c]
+        if r == 1
+            ϵ = Δs[c,4,4,:,:]
+        elseif r == 2
+            ϵ = Δs[4,c,4,:,:]
+        elseif r ==3 
+            ϵ = Δs[4,4,c,:,:]
+        end
+        bound = maximum(abs.(ϵ))
+        pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
+        ax[c,r].set_title(str)
+        colorbar(pl,ax=ax[r,c])
+    end
+    for r in 1:3, c in 1:3
+        if r == 3 
+            ax[r,c].set_xlabel(L"k_x/|g_1|")
+        end
+        if c == 1
+            ax[r,c].set_ylabel(L"k_y/|g_1|")
+        end
+    end
+    # ax[1,1].set_aspect("equal", adjustable="datalim")
+    savefig("test.pdf")
+    display(fig)
+    close(fig)
+    return nothing
+end
+
 
 function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
     fig = figure(figsize=(4,4))
