@@ -105,12 +105,14 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
             push!(iter_oda,λ)
             iter +=1
             if (mod(iter,10) == 1 )|| norm_convergence < hf.precision
+                hf.Λ = Array{ComplexF64}(undef,0,0);
                 jldopen(savename,"w") do file 
                     file["hf"] = hf
                     file["iter_energy"] = iter_energy
                     file["iter_err"] = iter_err 
                     file["iter_oda"] = iter_oda
                 end
+                hf.Λ = zeros(ComplexF64,hf.nt*latt.nk,hf.nt*latt.nk)
             end
 
             if iter >300 || λ < 1e-3
