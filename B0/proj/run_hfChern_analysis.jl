@@ -30,7 +30,7 @@ kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = ϵ0[:,:,iΓ]
-# plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 # ----------------- valley-spin-chern polarization info ----------------- # 
 s0 = ComplexF64[1 0;0 1]
@@ -38,11 +38,11 @@ s1 = ComplexF64[0 1;1 0]
 s2 = ComplexF64[0 -1im;1im 0]
 s3 = ComplexF64[1 0;0 -1]
 paulis = [s1,s2,s3,s0]
-Δ = zeros(size(hf.ϵk))
+# Δ = zeros(size(hf.ϵk))
 δs = zeros(Float64,4,4,4,size(hf.ϵk,2))
 for ik in 1:size(hf.ϵk,2)
-    F = eigen(Hermitian(view(hf.H,:,:,ik)))
-    Δ[:,ik] = real(diag(F.vectors'*kron(s0,kron(s1,s0))*F.vectors))
+    # F = eigen(Hermitian(view(hf.H,:,:,ik)))
+    # Δ[:,ik] = real(diag(F.vectors'*kron(s,kron(s1,s0))*F.vectors))
     # Δ[:,ik] = sqrt.(real(diag(F.vectors'*kron(s0,kron(s1,s0))*F.vectors)).^2 + 
     #             real(diag(F.vectors'*kron(s0,kron(s2,s0))*F.vectors)).^2 )
     for i in 1:4, j in 1:4, k in 1:4
@@ -55,12 +55,14 @@ end
 #                 reshape(Δ,:,lk,lk)[:,:,iΓ],lines=[hf.μ])
 
 # plot_contour_maps(kvec,reshape(Δ,:,lk,lk)[1,:,:],points=[params.Kt/abs(params.g1)],contourlines=[hf.μ])
-plot_density_maps(kvec,collect(reshape(δs[4,4,3,:],lk,lk)),
-            points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[-0.1,0.1])
+plot_density_maps(kvec,collect(reshape(δs[1,4,4,:],lk,lk)),
+            points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[-0.25,0.25])
 
-fig = figure(figsize=(5,4))
+fig = figure(figsize=(4,3))
 quiver(real(kvec),imag(kvec),collect(reshape(δs[1,4,4,:],lk,lk)),collect(reshape(δs[2,4,4,:],lk,lk)))
 axis("equal")
+tight_layout()
+savefig("test.pdf")
 display(fig)
 close(fig)
 # ----------------- order parameters ----------------- # 

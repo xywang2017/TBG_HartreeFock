@@ -133,9 +133,11 @@ function enforceSymmetry(A::HBM)
     # this gives Ph i mu_y I operation in the Bloch basis
     Ig = reverse(Array{Float64}(I,A.lg^2,A.lg^2),dims=1)
     Ph = -kron(Ig,kron(is2,s0))
+    # tmpU = zeros(ComplexF64,size(A.Uk))
     for iη in 1:A.nη, ik in 1:A.latt.nk
         # use lower BM band to constrain upper band 
         A.Uk[:,2,iη,ik] = Ph*view(A.Uk,:,1,iη,A.latt.nk+1-ik)
+        # tmpU[:,2,iη,ik] = Ph*view(A.Uk,:,1,iη,A.latt.nk+1-ik)
         # val = abs( abs(view(tmpU,:,2,iη,ik)'*view(A.Uk,:,2,iη,ik)) -1)
         # if val > 1e-6
         #     println("error with applying PH: ",val," ")
