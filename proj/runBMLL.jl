@@ -1,7 +1,7 @@
 using PyPlot
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/bmLL_old.jl"))
 
 BLAS.set_num_threads(1)
 
@@ -40,7 +40,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     # params = Params(w1=96.056,w0=w0*96.056,vf=2135.4,dθ=1.05π/180)
-    params = Params(ϵ=0.002,Da=-4100,φ=60.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
@@ -125,7 +125,7 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     return nothing
 end
 
-plot_LL_spectrum(1 .// collect(1:17) ,"07")
+# plot_LL_spectrum(1 .// collect(1:17) ,"07")
 3
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
