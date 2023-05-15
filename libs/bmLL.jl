@@ -72,13 +72,15 @@ function constructbmLL(A::bmLL,params::Params;
     constructLattice(A.latt,A.params;lk = A.nq*A.q)  #[0,1)x[0,1), so far works for p/q < 1
 
     A.lB = sqrt( A.q/(2π*abs(A.p)) * A.params.area )
-    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0; 1im; 1+1im] : Complex{Int}[0; -1im; -1-1im]
+    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0-1; -1+1im; 1im] : Complex{Int}[1; 1-1im; -1im]
+    # A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0; 1im; 1+1im] : Complex{Int}[0; -1im; -1-1im]
     
     A.H = zeros(ComplexF64,A.nH,A.p,2,A.nH,A.p,2,A.nq,A.nq)
     constructDiagonals(A)
     constructOffDiagonals(A)
     constructΣz(A)
     computeSpectrum(A)
+    enforceC2P(A)
     # computeSpectrum_remote(A)
 
     A.fname = fname 
@@ -259,6 +261,9 @@ function computeSpectrum(A::bmLL)
     return nothing
 end
 
+function enforceC2P(A::bmLL)
+    return nothing
+end
 
 function computeSpectrum_remote(A::bmLL)
     A.vec = zeros(ComplexF64,2A.nH*A.p,4A.q,A.q,A.nq,A.nq) # inner x 2q x rk1 x nkq x nk1

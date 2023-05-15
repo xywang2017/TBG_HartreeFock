@@ -124,7 +124,6 @@ end
 
 # plot_LL_spectrum(1 .// collect(1:17) ,"07")
 
-3
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
 #     s=0

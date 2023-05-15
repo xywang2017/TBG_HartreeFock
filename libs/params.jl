@@ -7,7 +7,7 @@
     δ::Float64 = 0 # 17.0 # hBN alignment induced C2 symmetry breaking, only bottom layer
 
     # distance between Kt and Kb
-    kb::Float64 = 8π/3*sin(dθ/2)
+    kb::Float64 = 4π/3*dθ
 
     # primary Moire real and recirpocal lattice vectors 
 
@@ -21,8 +21,10 @@
 
     # coordinates for special points (Γ is at origin)
     Γ::ComplexF64 = 0.0im
-    Kt::ComplexF64 = kb * exp(1im * 5π/6)
-    Kb::ComplexF64 = kb * exp(- 1im * 5π/6)
+    # Kt::ComplexF64 = kb * exp(1im * 5π/6)
+    # Kb::ComplexF64 = kb * exp(- 1im * 5π/6)
+    Kt::ComplexF64 = kb * exp(1im*π/2)
+    Kb::ComplexF64 = -Kt
 
     # Tunneling matrix
     ω::ComplexF64 = exp(1im * 2π/3)
@@ -88,6 +90,10 @@ function initParamsWithStrain(params::Params)
     
     params.Kt = params.Kt + (strain.A[1]+1im*strain.A[2])/2 - (strain.S[1,1]+1im*strain.S[2,1])*2π/3
     params.Kb = params.Kb - (strain.A[1]+1im*strain.A[2])/2 + (strain.S[1,1]+1im*strain.S[2,1])*2π/3
+    
+    # make Γ inversion symmetric point 
+    params.Kt -= params.g1/2 
+    params.Kb += params.g1/2
     
     return nothing 
 
