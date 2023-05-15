@@ -72,7 +72,7 @@ function constructbmLL(A::bmLL,params::Params;
     constructLattice(A.latt,A.params;lk = A.nq*A.q)  #[0,1)x[0,1), so far works for p/q < 1
 
     A.lB = sqrt( A.q/(2π*abs(A.p)) * A.params.area )
-    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0-1; -1+1im; 1im] : Complex{Int}[1; 1-1im; -1im]
+    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[-1; -1+1im; 1im] : Complex{Int}[1; 1-1im; -1im]
     # A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0; 1im; 1+1im] : Complex{Int}[0; -1im; -1-1im]
     
     A.H = zeros(ComplexF64,A.nH,A.p,2,A.nH,A.p,2,A.nq,A.nq)
@@ -138,10 +138,9 @@ function constructDiagonals(A::bmLL)
     end
 
     if (A._strain==true)
-        strain = Strain()
         for iH in 1:A.nH
             n,γ = inγ(iH)
-            def_pot = strain.Da * (strain.S[1,1]+strain.S[2,2])/2
+            def_pot = A.params.Da * (A.params.S[1,1]+A.params.S[2,2])/2
             for ip in 1:A.p
                 A.H[iH,ip,1,iH,ip,1,:,:] .-= def_pot
                 A.H[iH,ip,2,iH,ip,2,:,:] .+= def_pot

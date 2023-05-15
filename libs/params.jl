@@ -23,7 +23,7 @@
     Γ::ComplexF64 = 0.0im
     # Kt::ComplexF64 = kb * exp(1im * 5π/6)
     # Kb::ComplexF64 = kb * exp(- 1im * 5π/6)
-    Kt::ComplexF64 = kb * exp(1im*π/2)
+    Kt::ComplexF64 = kb/2 * exp(1im*π/2)
     Kb::ComplexF64 = -Kt
 
     # Tunneling matrix
@@ -31,11 +31,9 @@
     T0::Matrix{ComplexF64} = [[w0 w1];[w1 w0]]  # intra-unit cell, 
     T1::Matrix{ComplexF64} = [[w0 w1*ω];[w1*conj(ω) w0]]  # t -> b along +g1
     T2::Matrix{ComplexF64} = [[w0 w1*conj(ω)];[w1*ω w0]]  # t -> b along +g2
-end
 
-@with_kw mutable struct Strain
-    # this contains info about strain based on Bi Zhen and Fu Liang 
-    ϵ::Float64 = 0.002
+    # heterostrain
+    ϵ::Float64 = 0.003
     φ::Float64 = 0.0*π/180
     ν::Float64 =  0.16
     ϵxx::Float64 = -ϵ * cos(φ)^2 + ν * ϵ * sin(φ)^2
@@ -45,9 +43,12 @@ end
     A::Vector{Float64} = (sqrt(3)*βg/2)*[ϵxx-ϵyy;-2ϵxy]
     Rφ::Matrix{Float64} = [cos(φ) -sin(φ);sin(φ) cos(φ)]
     S::Matrix{Float64} = Rφ' * [-ϵ 0; 0 ν*ϵ] * Rφ
-    Da::Float64 = -4100
-end
 
+    # alpha=0.5 means heterostrain, alpha=1/0 means strain on single layer
+    α::Float64 = 0.5  
+    # deformation potential strength 
+    Da::Float64 = -4100.0 # meV
+end
 
 # function initParamsWithStrain(params::Params)
 #     strain = Strain()
@@ -74,11 +75,10 @@ end
 
 
 function initParamsWithStrain(params::Params)
-    strain = Strain()
     T = params.dθ/2 * Float64[0 -1; 1 0]
     G1, G2 = 4π/sqrt(3) * [0.0;-1], 4π/sqrt(3) * [sqrt(3)/2;0.5]
-    tmp1 = (2T - strain.S)*G1
-    tmp2 = (2T - strain.S)*G2
+    tmp1 = (2T - params.S)*G1
+    tmp2 = (2T - params.S)*G2
     params.g1 = tmp1[1] + 1im * tmp1[2]
     params.g2 = tmp2[1] + 1im * tmp2[2]
     
@@ -88,13 +88,13 @@ function initParamsWithStrain(params::Params)
 
     params.θ12 = angle(params.a2) - angle(params.a1)
     
-    params.Kt = params.Kt + (strain.A[1]+1im*strain.A[2])/2 - (strain.S[1,1]+1im*strain.S[2,1])*2π/3
-    params.Kb = params.Kb - (strain.A[1]+1im*strain.A[2])/2 + (strain.S[1,1]+1im*strain.S[2,1])*2π/3
+    params.Kt = params.Kt + (params.A[1]+1im*params.A[2])/2 - (params.S[1,1]+1im*params.S[2,1])*2π/3
+    params.Kb = params.Kb - (params.A[1]+1im*params.A[2])/2 + (params.S[1,1]+1im*params.S[2,1])*2π/3
     
     # make Γ inversion symmetric point 
     params.Kt -= params.g1/2 
     params.Kb += params.g1/2
-    
+
     return nothing 
 
 end
