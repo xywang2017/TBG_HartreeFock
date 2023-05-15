@@ -4,7 +4,7 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/BMChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-phi = 60 #parse(Int,ARGS[1])
+phi = 0 #parse(Int,ARGS[1])
 strain = 2 #parse(Int,ARGS[2])
 # ------------------ Specification ------------------ #
 lk = 19

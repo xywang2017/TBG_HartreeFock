@@ -40,9 +40,9 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     # params = Params(w1=96.056,w0=w0*96.056,vf=2135.4,dθ=1.05π/180)
-    params = Params(ϵ=0.002,Da=-4100,φ=60.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=120.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
-    constructbmLL(bm,params;ϕ= ϕ,nLL=20*q÷p,nq=nq,fname=fname,α=w0, 
+    constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
     return bm
 end
@@ -106,16 +106,16 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
         #     # plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
         # end
     end
-    # lk = 19
-    # bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi60/bm_lk$(lk).jld2")
-    # tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
-    # ϵ0 = zeros(Float64,8,lk,lk)
-    # for i2 in 1:lk, i1 in 1:lk 
-    #     ϵ0[:,i1,i2] = eigvals(Hermitian(tmp[:,:,i1,i2]))
-    # end 
-    # plot(ones(length(ϵ0))*0.0,ϵ0[:],"k.",ms=1)
+    lk = 19
+    bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi60/bm_lk$(lk).jld2")
+    tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
+    ϵ0 = zeros(Float64,8,lk,lk)
+    for i2 in 1:lk, i1 in 1:lk 
+        ϵ0[:,i1,i2] = eigvals(Hermitian(tmp[:,:,i1,i2]))
+    end 
+    plot(ones(length(ϵ0))*0.0,ϵ0[:],"k.",ms=1)
 
-    # ylim([-9,9])
+    ylim([-10,10])
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
@@ -125,7 +125,7 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     return nothing
 end
 
-plot_LL_spectrum(1 .// collect(1:10) ,"00")
+plot_LL_spectrum(1 .// collect(1:10) ,"07")
 3
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
