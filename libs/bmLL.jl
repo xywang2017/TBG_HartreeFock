@@ -114,8 +114,8 @@ function constructDiagonals(A::bmLL)
     for iH in 1:A.nH
         n,γ = inγ(iH)
         for ip in 1:A.p
-            A.H[iH,ip,1,iH,ip,1,:,:] .-= γ*sqrt(2n) * ϵB
-            A.H[iH,ip,2,iH,ip,2,:,:] .-= γ*sqrt(2n) * ϵB
+            A.H[iH,ip,1,iH,ip,1,:,:] .+= γ*sqrt(2n) * ϵB
+            A.H[iH,ip,2,iH,ip,2,:,:] .+= γ*sqrt(2n) * ϵB
         end
     end
 

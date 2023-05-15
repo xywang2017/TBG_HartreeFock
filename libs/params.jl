@@ -85,6 +85,7 @@ function initParamsWithStrain(params::Params)
     area = abs(real(params.g1)*imag(params.g2)-imag(params.g1)*real(params.g2))
     params.a1 = 2π/area * (imag(params.g2)-1im*real(params.g2))
     params.a2 = 2π/area * (-imag(params.g1)+1im*real(params.g1))
+    params.area = abs(imag(params.a1'*params.a2))
 
     params.θ12 = angle(params.a2) - angle(params.a1)
     
@@ -92,8 +93,8 @@ function initParamsWithStrain(params::Params)
     params.Kb = params.Kb - (params.A[1]+1im*params.A[2])/2 + (params.S[1,1]+1im*params.S[2,1])*2π/3
     
     # make Γ inversion symmetric point 
-    # params.Kt -= params.g1/2 
-    # params.Kb += params.g1/2
+    params.Kt -= params.g1/2 
+    params.Kb += params.g1/2
 
     return nothing 
 
