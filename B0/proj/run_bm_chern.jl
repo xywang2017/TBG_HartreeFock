@@ -4,7 +4,7 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/BMChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-phi = 0 #parse(Int,ARGS[1])
+phi = 120 #parse(Int,ARGS[1])
 strain = 2 #parse(Int,ARGS[2])
 # ------------------ Specification ------------------ #
 lk = 19
@@ -28,17 +28,17 @@ bm = compute_bm(latt,params,fname=bm_path);
 
 # ------------------ non-interacting analysis ------------------ #
 
-kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
-tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
-ϵ0 = zeros(Float64,8,lk,lk)
-for i2 in 1:lk, i1 in 1:lk 
-    ϵ0[:,i1,i2] = eigvals(Hermitian(tmp[:,:,i1,i2]))
-end 
+# kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
+# tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
+# ϵ0 = zeros(Float64,8,lk,lk)
+# for i2 in 1:lk, i1 in 1:lk 
+#     ϵ0[:,i1,i2] = eigvals(Hermitian(tmp[:,:,i1,i2]))
+# end 
 # plot_contour_maps(kvec,ϵ0[9,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
-plot_contour_maps(kvec,ϵ0[1,:,:];points=ComplexF64[],contourlines=Float64[],limits=Float64[-10,0])
-iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
-kcut = real(kvec[:,iΓ])
-Ecut = reshape(ϵ0[1:2:end,:,iΓ],:,length(kcut))
+# plot_contour_maps(kvec,ϵ0[1,:,:];points=ComplexF64[],contourlines=Float64[],limits=Float64[-10,0])
+# iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
+# kcut = real(kvec[:,iΓ])
+# Ecut = reshape(ϵ0[1:2:end,:,iΓ],:,length(kcut))
 # plot_energy_cuts(kcut,Ecut,lines=Float64[])
 
 # ----------------- plot real space chern states ------------------- #

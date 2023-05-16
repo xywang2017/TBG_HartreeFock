@@ -71,9 +71,10 @@ end
 
 
 function _tLL_v1(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
-    lB::Float64, θ1::Float64, θ2::Float64, _σrotation::Bool)
+    lB::Float64,θ0::Float64, θ1::Float64, θ2::Float64, _σrotation::Bool)
     # computes the matrix element of T exp(-iq r) in the LL basis, specified by (n1γ1l1,n2γ2l2)
-    # T is 2x2 Hamiltonian in the sublattice basis 
+    # T is 2x2 Hamiltonian in the sublattice basis
+    # θ0 is a global rotation of axis in the presence of strain 
 
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
@@ -87,16 +88,16 @@ function _tLL_v1(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
             if n1 != 0 && n2 != 0 # if not zeroth LL 
                 oLL[iH1, iH2] = (T[1, 1] * (γ1 * γ2 * exp(1im * (θ2 - θ1))) * _alv1[n1, n2]
                                  + T[2, 2] * _alv1[n1+1, n2+1]
-                                 + T[1, 2] * (1im * γ1 * exp(-1im * θ1)) * _alv1[n1, n2+1]
-                                 + T[2, 1] * (-1im * γ2 * exp(1im * θ2)) * _alv1[n1+1, n2]) / 2.0
+                                 + T[1, 2] * (1im * γ1 * exp(-1im * (θ1-θ0))) * _alv1[n1, n2+1]
+                                 + T[2, 1] * (-1im * γ2 * exp(1im * (θ2-θ0))) * _alv1[n1+1, n2]) / 2.0
             elseif n1 == 0 && n2 == 0
                 oLL[iH1, iH2] = T[2, 2] * _alv1[n1+1, n2+1]
             elseif n1 == 0 && n2 != 0
                 oLL[iH1, iH2] = (T[2, 2] * _alv1[n1+1, n2+1]
-                                 + T[2, 1] * (-1im * γ2 * exp(1im * θ2)) * _alv1[n1+1, n2]) / sqrt(2.0)
+                                 + T[2, 1] * (-1im * γ2 * exp(1im * (θ2-θ0))) * _alv1[n1+1, n2]) / sqrt(2.0)
             elseif n1 != 0 && n2 == 0
                 oLL[iH1, iH2] = (T[2, 2] * _alv1[n1+1, n2+1]
-                                 +T[1, 2] * (1im * γ1 * exp(-1im * θ1)) * _alv1[n1, n2+1]) / sqrt(2.0)
+                                 +T[1, 2] * (1im * γ1 * exp(-1im * (θ1-θ0))) * _alv1[n1, n2+1]) / sqrt(2.0)
             else
                 println("Error with _tLL σrotation true")
             end
@@ -104,16 +105,16 @@ function _tLL_v1(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
             if n1 != 0 && n2 != 0 # if not zeroth LL 
                 oLL[iH1, iH2] = (T[1, 1] * (γ1 * γ2) * _alv1[n1, n2]
                                  + T[2, 2] * _alv1[n1+1, n2+1]
-                                 + T[1, 2] * (1im * γ1) * _alv1[n1, n2+1]
-                                 + T[2, 1] * (-1im * γ2) * _alv1[n1+1, n2]) / 2.0
+                                 + T[1, 2] * (1im * γ1 * exp(1im*θ0)) * _alv1[n1, n2+1]
+                                 + T[2, 1] * (-1im * γ2 * exp(-1im*θ0)) * _alv1[n1+1, n2]) / 2.0
             elseif n1 == 0 && n2 == 0
                 oLL[iH1, iH2] = T[2, 2] * _alv1[n1+1, n2+1]
             elseif n1 == 0 && n2 != 0
                 oLL[iH1, iH2] = (T[2, 2] * _alv1[n1+1, n2+1]
-                                 + T[2, 1] * (-1im * γ2) * _alv1[n1+1, n2]) / sqrt(2.0)
+                                 + T[2, 1] * (-1im * γ2*exp(-1im*θ0)) * _alv1[n1+1, n2]) / sqrt(2.0)
             elseif n1 != 0 && n2 == 0
                 oLL[iH1, iH2] = (T[2, 2] * _alv1[n1+1, n2+1]
-                                 +  T[1, 2] * (1im * γ1) * _alv1[n1, n2+1]) / sqrt(2.0)
+                                 +  T[1, 2] * (1im * γ1*exp(1im*θ0)) * _alv1[n1, n2+1]) / sqrt(2.0)
             else
                 println("Error with _tLL σrotation false")
             end
@@ -228,9 +229,11 @@ function _tLLvalleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, n1::Int, γ1::In
 end
 
 function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
-    lB::Float64, θ1::Float64, θ2::Float64, _σrotation::Bool)
+    lB::Float64, θ0::Float64,θ1::Float64, θ2::Float64, _σrotation::Bool)
     # computes the matrix element of T exp(-iq r) in the LL basis, specified by (n1γ1l1,n2γ2l2)
     # T is 2x2 Hamiltonian in the sublattice basis 
+    # θ0 is a global rotation angle due to strain 
+    
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
     # _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
@@ -243,16 +246,16 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
             if n1 != 0 && n2 != 0 # if not zeroth LL 
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
                     + T[2, 2] * (γ1 * γ2 * exp(1im * (θ2 - θ1))) * _alv1[n1,n2]
-                    + T[1, 2] * (1im * γ2 * exp(1im * θ2)) * _alv1[n1+1,n2]
-                    + T[2, 1] * (-1im * γ1 * exp(-1im * θ1)) * _alv1[n1,n2+1]) / 2.0
+                    + T[1, 2] * (1im * γ2 * exp(1im * (θ2-θ0))) * _alv1[n1+1,n2]
+                    + T[2, 1] * (-1im * γ1 * exp(-1im * (θ1-θ0))) * _alv1[n1,n2+1]) / 2.0
             elseif n1 == 0 && n2 == 0
                 oLL[iH1, iH2] = T[1, 1] * _alv1[n1+1,n2+1]
             elseif n1 != 0 && n2 == 0
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
-                    + T[2, 1] * (-1im * γ1 * exp(-1im * θ1)) * _alv1[n1,n2+1]) / sqrt(2.0)
+                    + T[2, 1] * (-1im * γ1 * exp(-1im * (θ1-θ0))) * _alv1[n1,n2+1]) / sqrt(2.0)
             elseif n1 == 0 && n2 != 0
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
-                    + T[1, 2] * (1im * γ2 * exp(1im * θ2)) * _alv1[n1+1,n2]) / sqrt(2.0)
+                    + T[1, 2] * (1im * γ2 * exp(1im * (θ2-θ0))) * _alv1[n1+1,n2]) / sqrt(2.0)
             else
                 println("Error with _tLL σrotation true")
             end
@@ -260,16 +263,16 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
             if n1 != 0 && n2 != 0 # if not zeroth LL 
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
                                 + T[2, 2] * (γ1 * γ2 ) * _alv1[n1,n2]
-                                + T[1, 2] * (1im * γ2 ) * _alv1[n1+1,n2]
-                                + T[2, 1] * (-1im * γ1) * _alv1[n1,n2+1]) / 2.0
+                                + T[1, 2] * (1im * γ2*exp(-1im*θ0) ) * _alv1[n1+1,n2]
+                                + T[2, 1] * (-1im * γ1*exp(1im*θ0)) * _alv1[n1,n2+1]) / 2.0
             elseif n1 == 0 && n2 == 0
                 oLL[iH1, iH2] = T[1, 1] * _alv1[n1+1,n2+1]
             elseif n1 != 0 && n2 == 0
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
-                    + T[2, 1] * (-1im * γ1 ) * _alv1[n1,n2+1]) / sqrt(2.0)
+                    + T[2, 1] * (-1im * γ1 * exp(1im*θ0) ) * _alv1[n1,n2+1]) / sqrt(2.0)
             elseif n1 == 0 && n2 != 0
                 oLL[iH1, iH2] = (T[1, 1] * _alv1[n1+1,n2+1]
-                    + T[1, 2] * (1im * γ2 ) * _alv1[n1+1,n2]) / sqrt(2.0)
+                    + T[1, 2] * (1im * γ2 *exp(-1im*θ0)) * _alv1[n1+1,n2]) / sqrt(2.0)
             else
                 println("Error with _tLL σrotation false")
             end

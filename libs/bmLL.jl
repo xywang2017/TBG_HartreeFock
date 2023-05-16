@@ -169,9 +169,9 @@ function constructOffDiagonals(A::bmLL)
         # rewrite it as qx + i qy in rotated coordinate system, important for strained calculation
         _q = projector_norm(_q,A.params.a2) + 1im * projector_para(_q,A.params.a2)  
         if isequal(A._valley,"K")
-            T12 .= _tLL_v1(_Tj,_q,A.nLL,A.nH,A.lB,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
+            T12 .= _tLL_v1(_Tj,_q,A.nLL,A.nH,A.lB,θ_strain,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
         else
-            T12 .= _tLL_v1_valleyKprime(conj(_Tj),_q,A.nLL,A.nH,A.lB,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
+            T12 .= _tLL_v1_valleyKprime(conj(_Tj),_q,A.nLL,A.nH,A.lB,θ_strain,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
         end
         # for iH1 in 1:A.nH, iH2 in 1:A.nH
         #     n1,γ1 = inγ(iH1)
