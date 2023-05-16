@@ -100,11 +100,11 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
             # scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=2,vmin=-1,vmax=1)
             plot(ones(length(energies))*ϕ,energies,"b.",ms=1)
         end
-        # fname = joinpath(fpath,"feldman/B/nonint/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
-        # jldopen(fname) do file 
-        #     energies = file["E"][:]
-        #     # plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
-        # end
+        fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
+        jldopen(fname) do file 
+            energies = file["E"][:]
+            plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
+        end
     end
     lk = 19
     bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi30/bm_lk$(lk).jld2")
@@ -125,7 +125,7 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     return nothing
 end
 
-# plot_LL_spectrum(1 .// collect(1:14) ,"07")
+plot_LL_spectrum(1 .// collect(1:14) ,"07")
 3
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
