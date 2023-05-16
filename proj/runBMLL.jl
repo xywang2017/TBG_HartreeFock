@@ -40,10 +40,10 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     # params = Params(w1=96.056,w0=w0*96.056,vf=2135.4,dθ=1.05π/180)
-    params = Params(ϵ=0.002,Da=-4100,φ=30.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
     return bm
 end
 
@@ -98,16 +98,16 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
                 chern[ik,:,:] = tmp_z[ik,ik,:,:]
             end
             # scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=2,vmin=-1,vmax=1)
-            plot(ones(length(energies))*ϕ,energies,"b.",ms=1)
+            plot(ones(length(energies))*ϕ,energies,"bo",ms=1)
         end
-        fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
-        jldopen(fname) do file 
-            energies = file["E"][:]
-            plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
-        end
+        # fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
+        # jldopen(fname) do file 
+        #     energies = file["E"][:]
+        #     plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
+        # end
     end
     lk = 19
-    bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi30/bm_lk$(lk).jld2")
+    bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi60/bm_lk$(lk).jld2")
     tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
     ϵ0 = zeros(Float64,8,lk,lk)
     for i2 in 1:lk, i1 in 1:lk 
@@ -125,8 +125,8 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     return nothing
 end
 
-plot_LL_spectrum(1 .// collect(1:14) ,"07")
-3
+# plot_LL_spectrum(1 .// collect(1:10) ,"07")
+
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
 #     s=0
