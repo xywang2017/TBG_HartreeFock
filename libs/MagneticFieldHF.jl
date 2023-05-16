@@ -106,7 +106,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.Δstr = [σs[k]*ηs[j] for k in 1:4 for j in 1:4]
     hf.Δ = zeros(Float64,size(hf.Δstr))
     # ------------------------------------------------- Begin Hartree Fock Procedure -------------------------------- #
-    
+    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     hf.P = zeros(ComplexF64,size(hf.H0))
     hf.H = zeros(ComplexF64,size(hf.H0))
     hf.ϵk = zeros(Float64,size(hf.H0,1),size(hf.H0,3))
@@ -147,6 +147,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
                 hf.Λ = Array{ComplexF64,4}(undef,0,0,0,0)
                 save(hf.savename,"hf",hf,
                         "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
+                hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
             end
 
             iter +=1
@@ -194,7 +195,6 @@ function add_Hartree(hf::HartreeFock;β::Float64=1.0)
     """
         Hartree Contribution suppressed by parameter β
     """
-    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     metadata = zeros(ComplexF64,2hf.q*hf.lk,2hf.q*hf.lk)
@@ -224,7 +224,6 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
     """
         Fock Contribution 
     """
-    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
@@ -258,7 +257,6 @@ function add_Fock(hf::HartreeFock;β::Float64=1.0)
 end
 
 function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
-    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
@@ -370,7 +368,6 @@ end
 
 function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0)
     # compute coefficients b λ + a λ^2/2
-    hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
     Lm = sqrt(abs(hf.params.a1)*abs(hf.params.a2))
     tmpΛ = reshape(hf.Λ,2hf.q,hf.nη,hf.ns,hf.lk,2hf.q,hf.nη,hf.ns,hf.lk)
     kvec = reshape( reshape(collect(0:(hf.q-1))./hf.q*hf.params.g1,:,1,1) .+ 
