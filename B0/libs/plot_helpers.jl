@@ -88,6 +88,29 @@ function plot_density_maps_collective(kvec::Matrix{ComplexF64},Δs::Array{Float6
 end
 
 
+function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Float64,5};
+    points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
+    kx,ky = real(kvec), imag(kvec)
+    γstr = ["γx","γy","γz"]
+    τstr = ["τx","τy","τz"]
+    sstr = ["sx","sy","sz"]
+    fig,ax = subplots(8,8,sharex=true,sharey=true,figsize=(20,20))
+    order_params = reshape(Δs,8,8,size(kvec,1),size(kvec,2))
+    bound = maximum(abs.(order_params))
+    for r in 1:8, c in 1:8
+        ϵ = order_params[r,c,:,:]
+        pl=ax[r,c].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
+        # pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr")
+        # ax[r,c].set_title(str)
+        colorbar(pl,ax=ax[r,c])
+    end
+    savefig("test.pdf")
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
 function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
     fig = figure(figsize=(4,4))
     for i in 1:size(ϵ,1)

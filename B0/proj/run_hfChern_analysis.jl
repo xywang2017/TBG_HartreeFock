@@ -9,7 +9,7 @@ flag = "random"
 phi = 0
 strain = 2
 # νs = collect(0.0:0.2:4.0)
-ν = 2.0
+ν = -2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 20
@@ -51,11 +51,21 @@ for ik in 1:size(hf.ϵk,2)
         δs[i,j,k,ik] = real(tr(transpose(hf.P[:,:,ik]+I/2)*kron(paulis[i],kron(paulis[j],paulis[k]))))/8
     end
     tmpP = zeros(ComplexF64,8,8)
-    for i in 1:4, j in 1:4, k in 1:4
-        tmpP .+= δs[i,j,k,ik]* kron(paulis[i],kron(paulis[j],paulis[k]))
+    # for i in 1:4, j in 1:4, k in 1:4
+    #     tmpP .+= δs[i,j,k,ik]* kron(paulis[i],kron(paulis[j],paulis[k]))
+    # end
+    term0 = deepcopy(tmpP)
+    term1 = zeros(ComplexF64,2,2)
+    term2, term3 = deepcopy(term1), deepcopy(term1)
+    term0 = (δs[4,4,4,ik]-1)*kron(paulis[4],kron(paulis[4],paulis[4]))
+    for i in 1:3 
+        term1 .+= δs[i,4,4,ik]*paulis[i]
+        term2 .+= δs[4,i,4,ik]*paulis[i]
+        term3 .+= δs[4,4,i,ik]*paulis[i]
     end
+    tmpP .= term0 + kron((I+term1),kron((I+term2),(I+term3)))
     if norm(tmpP .- transpose(hf.P[:,:,ik]+I/2) ) > 1e-10
-        println(norm(tmpP .- transpose(hf.P[:,:,ik]+I/2) ))
+        println(maximum(abs.(tmpP .- transpose(hf.P[:,:,ik]+I/2) )))
     end
 end
 # Δ .= hf.σzτz
@@ -69,6 +79,8 @@ end
 plot_density_maps_collective(kvec,collect(reshape(δs,4,4,4,lk,lk)),
             points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[])
 
+plot_density_maps_collectivev0(kvec,collect(reshape(δs,4,4,4,lk,lk)),
+            points=[params.Kt/abs(params.g1)],contourlines=Float64[],limits=Float64[])
 fig = figure(figsize=(4,3))
 quiver(real(kvec),imag(kvec),collect(reshape(δs[1,4,4,:],lk,lk)),collect(reshape(δs[2,4,4,:],lk,lk)))
 axis("equal")
