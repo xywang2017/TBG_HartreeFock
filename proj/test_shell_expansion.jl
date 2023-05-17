@@ -6,9 +6,9 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
-p, q = 1,8
+p, q = 3,7
 jldopen(joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/_$(p)_$(q)_K_metadata.jld2")) do file 
-    m,n = 3,-3q
+    m,n = 3,3q
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
     pl=imshow(abs.(Λ),origin="lower")

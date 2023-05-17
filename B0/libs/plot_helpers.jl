@@ -58,17 +58,18 @@ function plot_density_maps_collective(kvec::Matrix{ComplexF64},Δs::Array{Float6
     titlestrs = [γstr,τstr,sstr]
     fig,ax = subplots(3,3,sharex=true,sharey=true,figsize=(12,9))
     for r in 1:3, c in 1:3
-        str = titlestrs[r][c]
-        if r == 1
-            ϵ = Δs[c,4,4,:,:]
-        elseif r == 2
-            ϵ = Δs[4,c,4,:,:]
-        elseif r ==3 
-            ϵ = Δs[4,4,c,:,:]
+        str = titlestrs[c][r]
+        if c == 1
+            ϵ = Δs[r,4,4,:,:]
+        elseif c == 2
+            ϵ = Δs[4,r,4,:,:]
+        elseif c ==3 
+            ϵ = Δs[4,4,r,:,:]
         end
         bound = maximum(abs.(ϵ))
-        pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
-        ax[c,r].set_title(str)
+        pl=ax[r,c].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
+        # pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr")
+        ax[r,c].set_title(str)
         colorbar(pl,ax=ax[r,c])
     end
     for r in 1:3, c in 1:3

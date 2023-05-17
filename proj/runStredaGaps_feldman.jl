@@ -4,13 +4,13 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Hartree Fock related 
-params = Params(w1=110,w0=77,vf=2482,dθ=1.05π/180)
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = [1//12;1//10;1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
-sts = unique([[Float64(s),t] for s in 0:3 for t in 0:4])
+ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+sts = unique([[s,t] for s in 0:3 for t in 0:4])
 # push!(sts,[2.5,1])
 # ------------------------------------------ # 
 for st in sts 
@@ -33,7 +33,9 @@ for st in sts
                         end
                     end
                 end
-                println("Iter err: ",load(metadata,"iter_err")[end])
+                if load(metadata,"iter_err")[end] > 1e-5
+                    println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
+                end
                 # println(metadata)
                 push!(metadatas,metadata)
             end
@@ -44,7 +46,7 @@ end
 
 
 ## -------------------------------- plot all gaps ------------------------------ #
-ϕs = [1//12;1//10;1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 # ϕs = [1//8;1//4;2//7;3//7;1//2]
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -54,7 +56,6 @@ for lines in [0.0,1.0,2.0,3.0,4.0]
 end
 for ϕ in ϕs 
     p,q = numerator(ϕ), denominator(ϕ)
-    println(p," ",q)
     gaps = Float64[]
     fillings = Float64[]
     for st in sts 
@@ -81,7 +82,7 @@ for ϕ in ϕs
     fillings, gaps = fillings[idx_sort],gaps[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="gray")
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5)
 end
 xlim([-0.3,4.3])
 ylim([0.0,0.55])

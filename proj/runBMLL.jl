@@ -20,13 +20,13 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
         mkpath(joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
-    # nq = (denominator(ϕ)>6) ? 1 : 2
-    # if q == 3 
-    #     nq = 4 
-    # elseif q ==2 
-    #     nq = 6
-    # end
-    nq = 16÷denominator(ϕ) 
+    nq = (denominator(ϕ)>6) ? 1 : 2
+    if q == 3 
+        nq = 4 
+    elseif q ==2 
+        nq = 6
+    end
+    # nq = 16÷denominator(ϕ) 
     # if q ==1
     #     nq = 20
     # elseif q ==2 
@@ -44,7 +44,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
     return bm
 end
 
@@ -98,8 +98,8 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
             for ik in 1:size(chern,1)
                 chern[ik,:,:] = tmp_z[ik,ik,:,:]
             end
-            # scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=2,vmin=-1,vmax=1)
-            plot(ones(length(energies))*ϕ,energies,"bo",ms=1)
+            scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=3,vmin=-1,vmax=1)
+            # plot(ones(length(energies))*ϕ,energies,"bo",ms=1)
         end
         # fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
         # jldopen(fname) do file 
@@ -126,7 +126,7 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     return nothing
 end
 
-plot_LL_spectrum(collect(1:16) .//16 ,"07")
+# plot_LL_spectrum(collect(1:16) .//16 ,"07")
 3
 # ## weak coupling (0,2) gaps 
 # function find_gaps(ϕs::Vector{Rational{Int}},str::String)
