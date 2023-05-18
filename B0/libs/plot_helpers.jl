@@ -91,17 +91,20 @@ end
 function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Float64,5};
     points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
     kx,ky = real(kvec), imag(kvec)
-    γstr = ["γx","γy","γz"]
-    τstr = ["τx","τy","τz"]
-    sstr = ["sx","sy","sz"]
-    fig,ax = subplots(8,8,sharex=true,sharey=true,figsize=(20,20))
-    order_params = reshape(Δs,8,8,size(kvec,1),size(kvec,2))
+    γstr = ["γx","γy","γz","γ0"]
+    τstr = ["τx","τy","τz","τ0"]
+    sstr = ["sx","sy","sz","s0"]
+    fig,ax = subplots(4,4,sharex=true,sharey=true,figsize=(16,16))
+    order_params = view(Δs,:,:,4,:,:)
     bound = maximum(abs.(order_params))
-    for r in 1:8, c in 1:8
+    for r in 1:4, c in 1:4
         ϵ = order_params[r,c,:,:]
+        bound = maximum(abs.(ϵ))
+        str = γstr[r]*τstr[c]
+        # str = τstr[r]*sstr[c]
         pl=ax[r,c].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
         # pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr")
-        # ax[r,c].set_title(str)
+        ax[r,c].set_title(str)
         colorbar(pl,ax=ax[r,c])
     end
     savefig("test.pdf")
