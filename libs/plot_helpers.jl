@@ -74,7 +74,8 @@ function computegap(metadata::String;savename::String="tmp.pdf")
     if i<length(chern)
         # i = i-1
         ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
-        Δ = (ϵsorted[i+1] - ϵsorted[i]) 
+        i = length(ϵsorted[ϵsorted .<=hf.μ])
+        Δ = ϵsorted[i+1] - ϵsorted[i]
     else
         ϵF = ϵsorted[end]
         Δ = 0 
@@ -108,12 +109,13 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
             i += 1
         end
         push!(ϵFs,(ϵsorted[i+1] + ϵsorted[i])/2) 
-        push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
+        # push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
+        push!(Δs,(ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ]) +1] - ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ])]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
     title(titlestr)
     xlim([0,0.6])
-    ylim([-25,40])
+    ylim([-30,40])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]

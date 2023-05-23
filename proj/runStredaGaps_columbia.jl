@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Hartree Fock related 
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.2π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 w0 = "07"
@@ -16,6 +16,7 @@ for s in 0:3, t in 0:4
     push!(sts,[-s,-t])
 end
 sts = unique(sts)
+# push!(sts,[2.5,1])
 # ------------------------------------------ # 
 for st in sts 
     s,t = st[1], st[2]
@@ -24,12 +25,12 @@ for st in sts
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
-        if abs(s+t*p/q) < 4
-            metadata = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+        if s+t*p/q < 4
+            metadata = joinpath(fpath,"columbia/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if isfile(metadata)
                 E = load(metadata,"iter_energy")[end]
                 for flag in ["flavor","random","chern"], seed in 1:6 
-                    metadata0 = joinpath(fpath,"feldman/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                    metadata0 = joinpath(fpath,"columbia/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
                         if E0<=E 
@@ -51,6 +52,7 @@ end
 
 ## -------------------------------- plot all gaps ------------------------------ #
 ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+# ϕs = [1//8;1//4;2//7;3//7;1//2]
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
 fig = figure(figsize=(8,4))
@@ -66,10 +68,10 @@ for ϕ in ϕs
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
             push!(fillings,s+t*p/q)
-            metadata = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"columbia/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             E = load(metadata,"iter_energy")[end]
             for flag in ["flavor","random","chern"], seed in 1:6 
-                metadata0 = joinpath(fpath,"feldman/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata0 = joinpath(fpath,"columbia/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                 if isfile(metadata0)
                     E0 = load(metadata0,"iter_energy")[end]
                     if E0<=E 
