@@ -54,7 +54,32 @@ function checkReconstructionValidity(A::DensityMat,reconstr_range::Vector{Int})
         end
     end
 
-    norm_diff = norm(P1 .- A.P)
+    norm_diff = norm(P1 .- A.P) / norm(A.P)
     println("Norm difference of reconstructed density matrix is: ",norm_diff)
     return norm_diff
+end
+
+function plot_formfactor_info(dm::DensityMat,idx::Int)
+    fig,ax = subplots(3,1,figsize=(4,9))
+    pl = ax[1].contourf(real(kvec),imag(kvec),reshape(dm.φs[idx,:],lk,lk),cmap="Spectral")
+    colorbar(pl,ax=ax[1])
+    ax[1].set_xlabel(L"k_1")
+    ax[1].set_ylabel(L"k_2")
+    ax[1].set_title("φ(k)")
+    ax[1].axis("equal")
+    bound = maximum(abs.(dm.Oφs[:,:,idx]))
+    pl = ax[2].imshow(real.(dm.Oφs[:,:,idx]),origin="lower",extent=(0.5,8.5,0.5,8.5),vmin=-bound,vmax=bound,cmap="bwr")
+    ax[2].axhline(4.5,c="k",ls=":")
+    ax[2].axvline(4.5,c="k",ls=":")
+    ax[2].set_title("Re[Oφ]")
+    colorbar(pl,ax=ax[2])
+    pl = ax[3].imshow(imag.(dm.Oφs[:,:,idx]),origin="lower",extent=(0.5,8.5,0.5,8.5),vmin=-bound,vmax=bound,cmap="bwr")
+    ax[3].set_title("Im[Oφ]")
+    ax[3].axhline(4.5,c="k",ls=":")
+    ax[3].axvline(4.5,c="k",ls=":")
+    colorbar(pl,ax=ax[3])
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing
 end

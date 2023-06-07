@@ -9,7 +9,7 @@ prefix = 1
 flag = "random"
 phi = 0
 strain = 2
-ν = -2.0
+ν = -1.0
 νstr = round(Int,1000*ν)
 lk = 20
 latt = Lattice()
@@ -21,10 +21,14 @@ println("HF convergence: ",load(hf_path,"iter_err")[end])
 
 # ---------------- Density Matrix analysis ---------------- # 
 dm = constructDensityMat(hf);
-# checkReconstructionValidity(dm,collect(52:64))
-plot_contour_maps(kvec,reshape(dm.φs[64,:],lk,lk),points=ComplexF64[0+0im],contourlines=[100.],limits=Float64[])
+checkReconstructionValidity(dm,collect(51:64))
+# plot_contour_maps(kvec,reshape(dm.φs[64,:],lk,lk),points=ComplexF64[0+0im],contourlines=[100.],limits=Float64[])
 
 # ----------------------- Plot all density matrix coefficients in the format of γiτjsk
 plot_density_maps_collectivev0(kvec,collect(reshape(dm.δs,4,4,4,lk,lk)),
             points=[0.0+0.0im],contourlines=Float64[],limits=Float64[])
 
+# ------------------- Analysis of structures of 8x8 matrices Oϕs ----------------- # 
+for idx in 56:64
+    plot_formfactor_info(dm,idx)
+end
