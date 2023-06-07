@@ -6,6 +6,7 @@ mutable struct DensityMat
     basis_mat::Vector{Matrix{ComplexF64}} # vector container of decomposition matrices 
 
     corr::Array{Float64,2} # correlation matrix defined as sum_{k} 
+    corr_vals::Vector{Float64} # correlation matrix eigenvalues
     φs::Array{Float64,2} # extracted basis vectors from analysis of correlation matrix 
     U::Array{Float64,2} # conversion coefficients defined as δs_a = sum_{b} U_{a,b}φs_{b}
     Oφs::Array{ComplexF64,3} # 8x8 matrices associated with each ϕs
@@ -36,6 +37,7 @@ function constructDensityMat(hf::HartreeFock)
     A.corr = ( A.δs * A.δs' )/size(A.δs,2)
     F = eigen(A.corr)
     A.U = F.vectors 
+    A.corr_vals = F.values
     A.φs = F.vectors'* A.δs
     A.Oφs = zeros(ComplexF64,8,8,64)
     for α in 1:64, j in 1:64
@@ -54,14 +56,14 @@ function checkReconstructionValidity(A::DensityMat,reconstr_range::Vector{Int})
         end
     end
 
-    norm_diff = norm(P1 .- A.P) / norm(A.P)
+    norm_diff = norm(P1 .- A.P)/size(A.P,3)
     println("Norm difference of reconstructed density matrix is: ",norm_diff)
     return norm_diff
 end
 
 function plot_formfactor_info(dm::DensityMat,idx::Int)
     fig,ax = subplots(3,1,figsize=(4,9))
-    pl = ax[1].contourf(real(kvec),imag(kvec),reshape(dm.φs[idx,:],lk,lk),cmap="Spectral")
+    pl = ax[1].pcolormesh(real(kvec),imag(kvec),reshape(dm.φs[idx,:],lk,lk),cmap="bwr")
     colorbar(pl,ax=ax[1])
     ax[1].set_xlabel(L"k_1")
     ax[1].set_ylabel(L"k_2")
@@ -78,6 +80,19 @@ function plot_formfactor_info(dm::DensityMat,idx::Int)
     ax[3].axhline(4.5,c="k",ls=":")
     ax[3].axvline(4.5,c="k",ls=":")
     colorbar(pl,ax=ax[3])
+    tight_layout()
+    savefig("test.pdf",transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+
+function plot_corr_values(dm::DensityMat)
+    fig = figure(figsize=(4,3))
+    plot(eachindex(dm.corr_vals),dm.corr_vals,"g.")
+    yscale("log")
     tight_layout()
     display(fig)
     close(fig)
