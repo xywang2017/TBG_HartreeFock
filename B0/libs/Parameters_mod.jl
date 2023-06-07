@@ -20,8 +20,8 @@ using Parameters
 
     # coordinates for special points (Γ is at origin)
     Γ::ComplexF64 = 0.0im
-    Kt::ComplexF64 = kb * exp(1im * 5π/6)
-    Kb::ComplexF64 = kb * exp(- 1im * 5π/6)
+    Kt::ComplexF64 = kb/2 * exp(1im * π/2)
+    Kb::ComplexF64 = -Kt
 
     # if valley K prime, Kt and Kb are swapped
 
@@ -66,6 +66,8 @@ function initParamsWithStrain(params::Params)
     params.Kt = params.Kt + (params.A[1]+1im*params.A[2])*params.α - (params.S[1,1]+1im*params.S[2,1])*4π/3 * params.α
     params.Kb = params.Kb - (params.A[1]+1im*params.A[2])*(1-params.α) + (params.S[1,1]+1im*params.S[2,1])*4π/3 *(1-params.α)
     
+     # this places Dirac cones at zone corners while still respecting particle hole symmetry
+     params.Kt, params.Kb = params.Kt - params.g1/2, params.Kb + params.g1/2
     return nothing 
 
 end

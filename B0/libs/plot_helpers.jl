@@ -5,19 +5,19 @@ function plot_contour_maps(kvec::Matrix{ComplexF64},ϵ::Matrix{Float64};
     if !isempty(limits)
         pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20,vmin=limits[1],vmax=limits[2])
     else
-        bound = maximum(abs.(ϵ))
-        pl=contourf(kx,ky,ϵ,cmap="bwr",levels=20,vmin=-bound,vmax=bound)
+        # bound = maximum(abs.(ϵ))
+        pl=contourf(kx,ky,ϵ,cmap="Spectral_r",levels=20)
     end
     if !isempty(contourlines)
         contour(kx,ky,ϵ,levels=contourlines)
     end
     plot(real(points),imag(points),"k+")
     colorbar(pl)
-    xlabel(L"k_x/|g_1|")
-    ylabel(L"k_y/|g_1|")
+    xlabel(L"k_1")
+    ylabel(L"k_2")
     axis("equal")
     tight_layout()
-    savefig("test.pdf")
+    savefig("test.pdf",transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -91,11 +91,11 @@ end
 function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Float64,5};
     points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
     kx,ky = real(kvec), imag(kvec)
-    γstr = ["γx","γy","γz","γ0"]
-    τstr = ["τx","τy","τz","τ0"]
-    sstr = ["sx","sy","sz","s0"]
+    γstr = ["γ0","γx","γy","γz"]
+    τstr = ["τ0","τx","τy","τz"]
+    sstr = ["s0","sx","sy","sz"]
     fig,ax = subplots(4,4,sharex=true,sharey=true,figsize=(16,16))
-    order_params = view(Δs,:,:,4,:,:)
+    order_params = view(Δs,:,:,1,:,:)
     bound = maximum(abs.(order_params))
     for r in 1:4, c in 1:4
         ϵ = order_params[r,c,:,:]
@@ -114,10 +114,16 @@ function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Floa
 end
 
 
-function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
-    fig = figure(figsize=(4,4))
+function plot_energy_cutsv0(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
+    fig = figure(figsize=(4,3))
+    colors = ["r","b"]
+    valleys = ["K","K\'"]
     for i in 1:size(ϵ,1)
-        plot(kvec,ϵ[i,:],"-",ms=2,markeredgecolor="none",label="band $(i)")
+        if mod(i-1,2)==0
+            plot(kvec,ϵ[i,:],"-",c=colors[(i-1)÷2+1],label=valleys[(i-1)÷2+1],lw=1)
+        else
+            plot(kvec,ϵ[i,:],"-",c=colors[(i-1)÷2+1],lw=1)
+        end
     end
     for line in lines 
         axhline(line,ls=":",c="gray")
@@ -126,9 +132,30 @@ function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vect
     xlabel("k")
     ylabel("E (meV)")
     # ylim([-30,30])
-    # legend()
+    legend()
     tight_layout()
-    savefig("test.pdf")
+    savefig("test.pdf",transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+
+function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
+    fig = figure(figsize=(4,3))
+    for i in 1:size(ϵ,1)
+        plot(kvec,ϵ[i,:],"-",lw=1)
+    end
+    for line in lines 
+        axhline(line,ls=":",c="gray")
+    end
+    # xlim([minimum(kvec)-0.1,2.5*maximum(kvec)])
+    xlabel("k")
+    ylabel("E (meV)")
+    # ylim([-30,30])
+    tight_layout()
+    savefig("test.pdf",transparent=true)
     display(fig)
     close(fig)
     return nothing

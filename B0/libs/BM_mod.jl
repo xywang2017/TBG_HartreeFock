@@ -36,7 +36,7 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
     A._σrotation = _σrotation
     A.params = params 
     A.latt = latt
-    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 2, 4
+    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 4, 4
     A.nt = A.nη*A.ns*A.nb 
     A.fname = fname
 
@@ -163,9 +163,9 @@ function generate_T12(T12::Matrix{ComplexF64},ζ::Int,A::HBM)
     # p.b.c. is used 
     idg = reshape(collect(1:A.lg^2),A.lg,A.lg)
     # per Oskar & Jian choice of g1 and g2
-    idg_nn1 = circshift(idg,(0,ζ))  # T1 * (|t><b|)
-    idg_nn2 = circshift(idg,(ζ,ζ))  # T2 * (|t><b|)
-    idg_nn12 = circshift(idg,(0,0))  # T0 * (|t><b|)
+    idg_nn1 = circshift(idg,(-ζ,ζ))  # T1 * (|t><b|)
+    idg_nn2 = circshift(idg,(0,ζ))  # T2 * (|t><b|)
+    idg_nn12 = circshift(idg,(-ζ,0))  # T0 * (|t><b|)
 
     tmp = reshape(T12,A.nlocal,A.lg^2,A.nlocal,A.lg^2)
     if ζ ==1 
