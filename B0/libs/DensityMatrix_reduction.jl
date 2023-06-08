@@ -88,6 +88,35 @@ function plot_formfactor_info(dm::DensityMat,idx::Int)
 end
 
 
+function plot_formfactor_info_band_basis(dm::DensityMat,idx::Int)
+    Oφs = dm.Oφs[:,:,idx]
+    R = kron(ComplexF64[1 -1im;1 1im],Array{ComplexF64}(I,4,4))/sqrt(2)
+    Oφs = R' * Oφs * R
+    fig,ax = subplots(3,1,figsize=(4,9))
+    pl = ax[1].pcolormesh(real(kvec),imag(kvec),reshape(dm.φs[idx,:],lk,lk),cmap="bwr")
+    colorbar(pl,ax=ax[1])
+    ax[1].set_xlabel(L"k_1")
+    ax[1].set_ylabel(L"k_2")
+    ax[1].set_title("φ(k)")
+    ax[1].axis("equal")
+    bound = maximum(abs.(Oφs))
+    pl = ax[2].imshow(real.(Oφs),origin="lower",extent=(0.5,8.5,0.5,8.5),vmin=-bound,vmax=bound,cmap="bwr")
+    ax[2].axhline(4.5,c="k",ls=":")
+    ax[2].axvline(4.5,c="k",ls=":")
+    ax[2].set_title("Re[Oφ]")
+    colorbar(pl,ax=ax[2])
+    pl = ax[3].imshow(imag.(Oφs),origin="lower",extent=(0.5,8.5,0.5,8.5),vmin=-bound,vmax=bound,cmap="bwr")
+    ax[3].set_title("Im[Oφ]")
+    ax[3].axhline(4.5,c="k",ls=":")
+    ax[3].axvline(4.5,c="k",ls=":")
+    colorbar(pl,ax=ax[3])
+    tight_layout()
+    savefig("test.pdf",transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
 
 function plot_corr_values(dm::DensityMat)
     fig = figure(figsize=(4,3))
