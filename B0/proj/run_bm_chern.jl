@@ -9,13 +9,13 @@ strain = 0 #parse(Int,ARGS[2])
 # ------------------ Specification ------------------ #
 lk = 20
 # params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.001*strain,Da=-4100,φ=phi*π/180,dθ=1.2π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.001*strain,Da=-4100,φ=phi*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.001*strain,Da=-4100,φ=phi*π/180,dθ=1.2π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"columbia/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
+bm_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
 # bm_path = joinpath(fpath,"columbia/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
 
 # ------------------ non-interacting part ------------------ #

@@ -8,7 +8,7 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 prefix =1
 flag = "random"
 phi = 0
-strain = 2
+strain = 0
 ν = 0.0
 νstr = round(Int,1000*ν)
 lk = 20
