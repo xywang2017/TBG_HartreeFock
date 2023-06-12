@@ -5,8 +5,8 @@ include(joinpath(fpath,"B0/libs/DensityMatrix_reduction.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Load Hartree Fock results ------------------ #
-prefix =2
-flag = "random"
+prefix =1
+flag = "kivc"
 phi = 0
 strain = 0
 ν = 0.0
@@ -25,13 +25,13 @@ println("HF convergence: ",load(hf_path,"iter_err")[end])
 
 # ---------------- Density Matrix analysis ---------------- # 
 dm = constructDensityMat(hf);
-checkReconstructionValidity(dm,collect(61:64))
+checkReconstructionValidity(dm,collect(62:64))
 # plot_contour_maps(kvec,reshape(dm.φs[64,:],lk,lk),points=ComplexF64[0+0im],contourlines=[100.],limits=Float64[])
 
 # ----------------------- plot correlation values --------  #
 # plot_corr_values(dm)
 # ------------------- Analysis of structures of 8x8 matrices Oϕs ----------------- # 
-for idx in 64:64
+for idx in 63:63
     plot_formfactor_info(dm,idx)
     # plot_formfactor_info_band_basis(dm,idx)
 end

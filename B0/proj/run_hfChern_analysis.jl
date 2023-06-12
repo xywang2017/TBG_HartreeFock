@@ -5,7 +5,7 @@ include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 1
-flag = "random"
+flag = "kivc"
 phi = 0
 strain = 0
 # νs = collect(0.0:0.2:4.0)
