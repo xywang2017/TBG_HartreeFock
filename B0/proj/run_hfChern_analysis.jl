@@ -19,8 +19,8 @@ initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
+bm_path = joinpath(fpath,"columbia/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
+hf_path = joinpath(fpath,"columbia/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 
 # ----------------- Hartree-Fock dispersion part ---------------- # 
 hf = load(hf_path,"hf");
