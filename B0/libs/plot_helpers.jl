@@ -143,7 +143,7 @@ end
 
 
 function plot_energy_cuts(kvec::Vector{Float64},ϵ::Array{Float64,2};lines::Vector{Float64}=[])
-    fig = figure(figsize=(3,3))
+    fig = figure(figsize=(4,3))
     for i in 1:size(ϵ,1)
         plot(kvec,ϵ[i,:],"-",lw=1)
     end

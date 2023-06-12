@@ -5,7 +5,7 @@ include(joinpath(fpath,"B0/libs/DensityMatrix_reduction.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Load Hartree Fock results ------------------ #
-prefix =1
+prefix =2
 flag = "random"
 phi = 0
 strain = 0
@@ -18,7 +18,7 @@ latt = Lattice()
 initLattice(latt,params;lk=lk)
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(latt.k1,:,1) .+ 1im*reshape(latt.k2,1,:)
-hf_path = joinpath(fpath,"feldman/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
+hf_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 hf = load(hf_path,"hf");
 println("HF energy: ",load(hf_path,"iter_energy")[end])
 println("HF convergence: ",load(hf_path,"iter_err")[end])
@@ -31,7 +31,7 @@ checkReconstructionValidity(dm,collect(61:64))
 # ----------------------- plot correlation values --------  #
 # plot_corr_values(dm)
 # ------------------- Analysis of structures of 8x8 matrices Oϕs ----------------- # 
-for idx in 63:63
-    # plot_formfactor_info(dm,idx)
-    plot_formfactor_info_band_basis(dm,idx)
+for idx in 64:64
+    plot_formfactor_info(dm,idx)
+    # plot_formfactor_info_band_basis(dm,idx)
 end
