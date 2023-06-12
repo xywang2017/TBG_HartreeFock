@@ -5,11 +5,11 @@ include(joinpath(fpath,"B0/libs/DensityMatrix_reduction.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Load Hartree Fock results ------------------ #
-prefix =2
-flag = "random"
+prefix =1
+flag = "kivc"
 phi = 0
 strain = 0
-ν = 0.0
+ν = -3.0
 νstr = round(Int,1000*ν)
 lk = 20
 params = Params(ϵ=0.001*strain,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
@@ -31,7 +31,7 @@ checkReconstructionValidity(dm,collect(61:64))
 # ----------------------- plot correlation values --------  #
 # plot_corr_values(dm)
 # ------------------- Analysis of structures of 8x8 matrices Oϕs ----------------- # 
-for idx in 64:64
+for idx in 61:64
     plot_formfactor_info(dm,idx)
     # plot_formfactor_info_band_basis(dm,idx)
 end
