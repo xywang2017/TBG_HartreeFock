@@ -1,9 +1,9 @@
-Strained at 1.27 degrees; vF=2680, w0=77meV, w1 = 110meV
+Unstrained at 1.2 degrees; vF=2482, w0=77meV, w1 = 110meV
 omitting small angle Pauli rotation 
-strain 0.2%, director 0 degrees,
-strained BM bandwidth +/- 50 meV,
-gap to remote band ~ 50meV
-dielectric constant 15, e^2/epsilon Lm ~ 7meV
+strain 0.0%, director 0 degrees,
+strained BM bandwidth +/- 20 meV,
+gap to remote band ~ 42meV
+dielectric constant 15, e^2/epsilon Lm ~ 6.36meV
 
 Data organization --- 
 

@@ -6,7 +6,7 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
 lk = 33
-params = Params(ϵ=0.002,φ=0.0,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,φ=0.0,Da=-4100,dθ=1.2π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -26,7 +26,7 @@ bm = compute_bm(latt,params,fname=bm_path);
 
 # ------------------ non-interacting analysis ------------------ #
 
-# kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
+kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 kvec = reshape(latt.k1,:,1) .+ 1im*reshape(latt.k2,1,:) 
 ϵ0 = reshape(load(bm_path,"E"),:,lk,lk)
 # plot_contour_maps(kvec,ϵ0[9,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
