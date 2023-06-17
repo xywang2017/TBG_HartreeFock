@@ -36,7 +36,7 @@ function initHBM(A::HBM,latt::Lattice,params::Params;lg::Int=9,
     A._σrotation = _σrotation
     A.params = params 
     A.latt = latt
-    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 4, 4
+    A.nη,A.ns,A.nb, A.nlocal = 2, 2, 2, 4
     A.nt = A.nη*A.ns*A.nb 
     A.fname = fname
 
@@ -237,4 +237,16 @@ function calculate_overlap(A::HBM,m::Int,n::Int)
         end 
     end
     return nothing
+end
+
+function  calculateLayerPolarization(A::HBM)
+    s0 = ComplexF64[1 0; 0 1]
+    sz = ComplexF64[1 0; 0 -1]
+    σz = kron(Array{ComplexF64,2}(I,A.lg^2,A.lg^2),kron(sz,s0))
+
+    PLayer = zeros(ComplexF64,A.nb,A.nb,A.latt.nk)
+    for ik in 1:A.latt.nk
+        PLayer[:,:,ik] = view(A.Uk,:,:,1,ik)' * σz * view(A.Uk,:,:,1,ik)  
+    end
+    return PLayer
 end
