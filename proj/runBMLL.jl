@@ -16,8 +16,8 @@ q = parse(Int,ARGS[4])
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
-    if !isdir(joinpath(fpath,"columbia/B/data_w$(w0str)/_$(p)_$(q)"))
-        mkpath(joinpath(fpath,"columbia/B/data_w$(w0str)/_$(p)_$(q)"))
+    if !isdir(joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)"))
+        mkpath(joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
     nq = (denominator(ϕ)>6) ? 1 : 2
@@ -38,13 +38,13 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     # end
     # nq = 16÷q
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"columbia/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = joinpath(fpath,"feldman/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     # params = Params(w1=96.056,w0=w0*96.056,vf=2135.4,dθ=1.05π/180)
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.2π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
     return bm
 end
 
@@ -53,7 +53,7 @@ bm = compute_bmLL(ϕ,str,w0,w0str);
 
 #
 
-# jldopen(joinpath(fpath,"columbia/B/data_w07/_1_8/_1_8_K_metadata.jld2")) do file 
+# jldopen(joinpath(fpath,"feldman/B/data_w07/_1_8/_1_8_K_metadata.jld2")) do file 
     # @time begin 
     #     for m in -3:3, n in -36:36 
     #     Λ = file["$(m)_$(n)"]
@@ -90,7 +90,7 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
     fig = figure(figsize=(4,3))
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
-        fname = joinpath(fpath,"columbia/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_K_metadata.jld2")
+        fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_K_metadata.jld2")
         jldopen(fname) do file 
             energies = file["E"][:]
             tmp_z = real(file["PΣz"])
@@ -101,14 +101,14 @@ function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
             scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=3,vmin=-1,vmax=1)
             # plot(ones(length(energies))*ϕ,energies,"bo",ms=1)
         end
-        # fname = joinpath(fpath,"columbia/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
+        # fname = joinpath(fpath,"feldman/B/data_w$(str)/_$(p)_$(q)/_$(p)_$(q)_Kprime_metadata.jld2")
         # jldopen(fname) do file 
         #     energies = file["E"][:]
         #     plot(ones(length(energies))*ϕ,energies,"m.",ms=1)
         # end
     end
     # lk = 19
-    # bm_path = joinpath(fpath,"columbia/B0/data/strain2/phi60/bm_lk$(lk).jld2")
+    # bm_path = joinpath(fpath,"feldman/B0/data/strain2/phi60/bm_lk$(lk).jld2")
     # tmp = reshape(load(bm_path,"E"),8,8,lk,lk)
     # ϵ0 = zeros(Float64,8,lk,lk)
     # for i2 in 1:lk, i1 in 1:lk 

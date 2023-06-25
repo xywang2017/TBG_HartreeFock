@@ -38,7 +38,7 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
         Δ = 0 
     end
     # Δ = (ϵsorted[i] - ϵsorted[i-1]) 
-    # println("Gap size: ", Δ)
+    println("Gap size: ", Δ)
     axhline(ϵF,ls=":",c="gray")
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")

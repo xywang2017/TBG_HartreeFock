@@ -4,16 +4,16 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Hartree Fock related 
-params = Params(w1=110,w0=77,vf=2482,dθ=1.05π/180)
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed =1
+seed = 3
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,4
-νF = 0 +(2)*p/q
+p,q = 1,10
+νF = 0+(8)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
