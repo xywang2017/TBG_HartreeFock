@@ -9,10 +9,10 @@ initParamsWithStrain(params)
 
 ##
 flag = "random"
-seed = 3
+seed = 2
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,10
+p,q = 1,12
 νF = 0+(8)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
