@@ -5,11 +5,11 @@ include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 1
-flag = "sp"
+flag = "random"
 phi = 0
-strain = 0
+strain = 2
 # νs = collect(0.0:0.2:4.0)
-ν = -2.0
+ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 20
@@ -19,8 +19,8 @@ initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"princeton/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
+bm_path = joinpath(fpath,"feldman/B0/data/strain$(strain)/phi$(phi)/bm_lk$(lk).jld2")
+hf_path = joinpath(fpath,"feldman/B0/data/strain$(strain)/phi$(phi)/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
 
 # ----------------- Hartree-Fock dispersion part ---------------- # 
 hf = load(hf_path,"hf");
@@ -29,7 +29,7 @@ println("HF convergence: ",load(hf_path,"iter_err")[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(hf.latt.k1,:,1) .+ 1im*reshape(hf.latt.k2,1,:) 
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[2,:,:],points=ComplexF64[0+0im],contourlines=[hf.μ],limits=Float64[])
+plot_contour_maps(kvec,ϵ0[2,:,:],points=ComplexF64[0+0im],contourlines=[hf.μ],limits=Float64[])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
