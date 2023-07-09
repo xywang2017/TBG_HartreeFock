@@ -78,8 +78,8 @@ function _tLL_v1(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH::Int,
 
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
-    # _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
-    _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
+    _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
+    # _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
     oLL = zeros(ComplexF64, nH, nH)
     for iH1 in 1:nH, iH2 in 1:nH
         n1, γ1 = inγ(iH1)
@@ -236,8 +236,8 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
     
     cplus = -1im * lB / sqrt(2) * (real(q) - 1im * imag(q))
     cminus = -1im * lB / sqrt(2) * (real(q) + 1im * imag(q))
-    # _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
-    _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
+    _alv1 = _associatedlaguerre_v1(nLL, cplus, cminus)
+    # _alv1 = _associatedlaguerre_v2(nLL, cplus, cminus)
     oLL = zeros(ComplexF64, nH, nH)
     for iH1 in 1:nH, iH2 in 1:nH
         n1, γ1 = inγ(iH1)
