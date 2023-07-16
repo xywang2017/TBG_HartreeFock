@@ -5,25 +5,11 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-foldername = "princeton"
-params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
+twist_angle = 138
+foldername = "$(twist_angle)_nostrain"
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
-# ------------------------------------------------------------------------------ # 
-foldername = "feldman"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=77,vf=2482)
-initParamsWithStrain(params)
-# ------------------------------------------------------------------------------ # 
-foldername = "columbia"
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.2π/180,w1=110,w0=77,vf=2482)
-initParamsWithStrain(params)
-# ------------------------------------------------------------------------------ # 
-foldername = "columbia_strain"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.2π/180,w1=110,w0=77,vf=2482)
-initParamsWithStrain(params)
-# ------------------------------------------------------------------------------ # 
-foldername = "goldhaber"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=77,vf=2482)
-initParamsWithStrain(params)
+
 
 w0 = "07"
 
