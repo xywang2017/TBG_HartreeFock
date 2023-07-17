@@ -8,16 +8,16 @@ params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=77,vf=24
 initParamsWithStrain(params)
 
 ##
-flag = "random"
-seed = 2
+flag = "chern"
+seed =1
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 1,10
-νF = 0+(0)*p/q
+p,q = 1,8
+νF = 1+(3)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
-    metadata = joinpath(fpath,"feldman/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    metadata = joinpath(fpath,"105_nostrain/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     println("HF energy: ",load(metadata,"iter_energy")[end])
     println("Convergence: ",load(metadata,"iter_err")[end])
     # hf = load(metadata,"hf")
@@ -34,16 +34,16 @@ for w0 in w0s
 end 
 
 ## BM basis 
-seed = 2
-p, q = 1,10
+seed = 1
+p, q = 1,8
 flag = "random"
-νF = -3 + (-1)*p/q
+νF = 1 + (3)*p/q
 νstr = round(Int,1000*νF)
-metadata = joinpath(fpath,"105_strain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+metadata = joinpath(fpath,"105_nostrain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
 plot_density_matrix_bm(metadata)
 # plot_density_matrix_sublattice(metadata)
-# plot_density_matrix_sublattice_full(metadata)
+plot_density_matrix_sublattice_full(metadata)
 
 
 ## strong coupling basis at reference point defined by metadata0
