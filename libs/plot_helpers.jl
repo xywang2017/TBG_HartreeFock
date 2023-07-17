@@ -166,8 +166,9 @@ function plot_density_matrix_bm(fname::String)
     fig = figure(figsize=(6,6))
     P0 = view(hf.P,:,:,ik) + 0.5I
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower")
-    colorbar(pl)
+    # colorbar(pl)
     tight_layout()
+    savefig("test.pdf")
     display(fig)
     close(fig)
     return nothing

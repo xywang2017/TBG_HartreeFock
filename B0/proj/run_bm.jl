@@ -6,13 +6,12 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 # ------------------ Specification ------------------ #
 lk = 33
-params = Params(ϵ=0.002,φ=0.0,Da=-4100,dθ=1.38π/180,w1=110,w0=77,vf=2482)
-# params = Params(ϵ=0.00,Da=0,dθ=1.06π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,φ=0.0,Da=-4100,dθ=1.05π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
-bm_path = joinpath(fpath,"feldman/B0/data/bm_lk$(lk).jld2")
+bm_path = joinpath(fpath,"B0/data/bm_lk$(lk).jld2")
 
 # ------------------ non-interacting part ------------------ #
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
@@ -24,18 +23,17 @@ end
 
 bm = compute_bm(latt,params,fname=bm_path);
 
-layer_P= real( calculateLayerPolarization(bm) );
+# layer_P= real( calculateLayerPolarization(bm) );
 
 # ------------------ non-interacting analysis ------------------ #
 
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(latt.k1,:,1) .+ 1im*reshape(latt.k2,1,:) 
 ϵ0 = reshape(load(bm_path,"E"),:,lk,lk)
-k_indx = sortperm((ϵ0[5,:,:].-ϵ0[1,:,:])[:])[[1;2]]
-layer = reshape(layer_P,2,2,lk,lk)
+# layer = reshape(layer_P,2,2,lk,lk)
 # plot_contour_maps(kvec,ϵ0[9,:,:];points=[params.Kt/abs(params.g1)],contourlines=[100.])
-plot_contour_maps(kvec,ϵ0[5,:,:];points=kvec[k_indx],contourlines=Float64[])
-plot_contour_maps(kvec,layer[2,2,:,:];points=kvec[k_indx],contourlines=Float64[])
+plot_contour_maps(kvec,ϵ0[5,:,:];points=[params.Kt/abs(params.g1)],contourlines=Float64[])
+# plot_contour_maps(kvec,layer[2,2,:,:];points=kvec[k_indx],contourlines=Float64[])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
 Ecut = reshape(ϵ0[1:2:end,:,iΓ],:,length(kcut))

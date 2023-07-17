@@ -5,9 +5,9 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 138
-foldername = "$(twist_angle)_nostrain"
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+twist_angle = 105
+foldername = "$(twist_angle)_strain"
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -78,7 +78,7 @@ close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
-sts = [[3,1]]
+sts = [[0,8]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -87,9 +87,12 @@ for st in sts
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
             metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            if !isfile(metadata)
+                metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            end
             if isfile(metadata)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong"], seed in 1:6 
+                for flag in ["flavor","random","chern","bm","strong"], seed in 1:10
                     metadata0 = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
