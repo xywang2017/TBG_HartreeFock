@@ -8,9 +8,9 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 prefix =1
 flag = "random"
 twist_angle = 1.20
-_is_strain = "nostrain"
+_is_strain = "strain"
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-ν = 0.0
+ν = -2.0
 νstr = round(Int,1000*ν)
 lk = 16
 params = Params(ϵ=0.000,Da=-4100,dθ=twist_angle*π/180,w1=110,w0=77,vf=2482)
