@@ -36,11 +36,13 @@ flag = "random"
 metadata = joinpath(fpath,"138_nostrain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
 plot_density_matrix_bm(metadata)
+
+## -------------- density matrix in sublattice basis ----------------- ##
 # plot_density_matrix_sublattice(metadata)
 plot_density_matrix_sublattice_full(metadata)
 
 
-## strong coupling basis at reference point defined by metadata0
+## -------------- density matrix in strong coupling basis at reference data metadata0 ----------------- ##
 seed = 1
 flag  = "random"
 νF0 = 0+ (0)*p/q
