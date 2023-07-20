@@ -17,6 +17,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
         init_P_sublattice_no_momentum(hf)
     elseif isequal(_Init,"bm")
         init_P_bm(hf)
+    elseif isequal(_Init,"bm_cascade")
+        init_P_bm_cascade(hf)
     else
         init_P_strong_coupling(hf,P0=P0,H0=H0)
     end
@@ -35,6 +37,27 @@ end
 
 function init_P_bm(hf::HartreeFock)
     # random initialization of density matrix for all flavors 
+    νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1) * size(hf.P,3))
+    ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
+    for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
+        ϵ0[i,j] = hf.H0[i,i,j]
+    end
+    idx = sortperm(ϵ0[:])
+    n_total = size(hf.P,1) * size(hf.P,3)
+    states_to_populate = idx[1:νmax]
+    for ip in states_to_populate
+        iq = (ip-1)%size(hf.P,1) +1 
+        ik = (ip-1)÷size(hf.P,1) +1 
+        hf.P[iq,iq,ik] = 1.0 
+    end
+    for ik in 1:size(hf.P,3)
+        hf.P[:,:,ik] .= hf.P[:,:,ik] - 0.5I
+    end
+    return nothing
+end
+
+function init_P_bm_cascade(hf::HartreeFock)
+    # only works for (0,4)  (2,2), (1,3) (3,1)
     νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1) * size(hf.P,3))
     ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
     for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
