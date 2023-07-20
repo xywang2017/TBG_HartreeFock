@@ -13,11 +13,11 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 flag = "random"
-seed = 3
+seed = 2
 w0s = ["07"]
 w0snum = [0.7]
-p,q = 2,5
-νF = -2+(-2)*p/q
+p,q = 1,2
+νF = -3+(-1)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -28,14 +28,14 @@ for w0 in w0s
 end 
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
-seed = 3
-p, q = 2,5
+seed =3
+p, q = 1,2
 flag = "random"
-νF = (-2) + (-2)*p/q
+νF = (-1) + (-3)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"124_strain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
-plot_density_matrix_bm(metadata,ik=13)
+plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 plot_density_matrix_sublattice_full(metadata)
 
