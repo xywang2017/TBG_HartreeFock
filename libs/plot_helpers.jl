@@ -159,10 +159,9 @@ function plot_hf_iterations(fname::String)
 end
 
 ### density matrix analysis 
-function plot_density_matrix_bm(fname::String)
+function plot_density_matrix_bm(fname::String;ik::Int=3)
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    ik = 1
     fig = figure(figsize=(6,6))
     P0 = view(hf.P,:,:,ik) + 0.5I
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower")
