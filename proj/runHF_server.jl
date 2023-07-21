@@ -1,10 +1,9 @@
 using JLD2
+using Printf
 fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
-
-foldername = "105_nostrain"
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -14,6 +13,10 @@ q = parse(Int,ARGS[2])
 flag = ARGS[4]
 w0 = ARGS[5]
 seed = ARGS[6]
+twist_angle = parse(Float64,ARGS[7])
+_is_strain = ARGS[8]
+
+foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
 savename = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 ϕ = p//q 
 if isequal(flag,"flavor")
@@ -24,15 +27,20 @@ elseif isequal(flag,"random")
     _Init = "Random"
 elseif isequal(flag,"bm")
     _Init = "bm"
+elseif isequal(flag,"bm_cascade")
+    _Init = "bm_cascade"
 elseif isequal(flag,"strong")
     _Init = " "
 end
 
 println("Running parameters: ","ϕ=",ϕ,", ν=",ν,", Init=",flag,", w0=",w0)
 println(savename)
-# params = Params(w1=96.056,w0=parse(Float64,ARGS[5])*0.1*96.056,vf=2135.4,dθ=1.05π/180)
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
-# params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.2π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+
+if isequal(_is_strain,"strain")
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+elseif isequal(_is_strain,"nostrain")
+    params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+end
 initParamsWithStrain(params)
 hf = HartreeFock()
 
@@ -44,6 +52,3 @@ else
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="$(foldername)/B/data_w$(w0)/_$(p)_$(q)/",_Init=" ",H0=H0,P0=P0,savename=savename)
 end
-
-# save(savename,"H",hf.H,"P",hf.P,"spectrum",hf.ϵk,"chern",hf.σzτz,"iter_err",iter_err,"iter_energy",iter_energy)
-#

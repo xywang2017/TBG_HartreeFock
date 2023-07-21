@@ -44,7 +44,7 @@ for ϕ in ϕs
             if isfile(metadata)
                 push!(fillings,s+t*p/q)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong"], seed in 1:10 
+                for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10 
                     metadata0 = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
@@ -78,7 +78,7 @@ close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
-sts = [[-1,-3]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -92,7 +92,7 @@ for st in sts
             end
             if isfile(metadata)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong"], seed in 1:10
+                for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10
                     metadata0 = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
@@ -102,7 +102,7 @@ for st in sts
                     end
                 end
                 if load(metadata,"iter_err")[end] > 1e-6
-                    println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
+                    println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_energy")[end])
                 end
                 println(metadata)
                 push!(metadatas,metadata)

@@ -58,19 +58,40 @@ end
 
 function init_P_bm_cascade(hf::HartreeFock)
     # only works for (0,4)  (2,2), (1,3) (3,1)
-    νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1) * size(hf.P,3))
-    ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
-    for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
-        ϵ0[i,j] = hf.H0[i,i,j]
+    stlist = [[0,4],[0,-4],[1,3],[-1,-3],[2,2],[-2,-2],[3,1],[-3,-1]]
+    s,t = 0,0
+    for i in eachindex(stlist)
+        s,t = stlist[i][1],stlist[i][2]
+        if abs(hf.ν-(s+t*hf.p/hf.q)) <1e-5 
+            break 
+        end
     end
-    idx = sortperm(ϵ0[:])
-    n_total = size(hf.P,1) * size(hf.P,3)
-    states_to_populate = idx[1:νmax]
-    for ip in states_to_populate
-        iq = (ip-1)%size(hf.P,1) +1 
-        ik = (ip-1)÷size(hf.P,1) +1 
-        hf.P[iq,iq,ik] = 1.0 
+    if s==0 && t ==0 
+        println("Abort calculation, (s,t) does not belong to desired pairs")
+    else
+        ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
+        for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
+            ϵ0[i,j] = hf.H0[i,i,j]
+        end
+        νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1))
+        indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
+        if s<=-0.01
+            # for ifl in 1:(4-abs(s)), ib in 1:(hf.q-1)
+            for ifl in [3], ib in 1:(hf.q-1)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
+            end 
+        else 
+            for ifl in 1:4, ib in 1:(hf.nb*hf.q)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
+            end
+            for ifl in 1:(4-abs(s)), ib in (hf.q+2):(hf.nb*hf.q)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 0.0 
+            end
+        end
     end
+    
+    νinit = tr(hf.P[:,:,1])/(hf.q) - 4 
+    println("Init density is: ",νinit)
     for ik in 1:size(hf.P,3)
         hf.P[:,:,ik] .= hf.P[:,:,ik] - 0.5I
     end
