@@ -62,29 +62,29 @@ function init_P_bm_cascade(hf::HartreeFock)
     s,t = 0,0
     for i in eachindex(stlist)
         s,t = stlist[i][1],stlist[i][2]
-        if abs(hf.ν-(s+t*hf.p/hf.q)) <1e-5 
+        if abs(hf.ν-(s+t*hf.p/hf.q)) <1e-3
             break 
         end
     end
     if s==0 && t ==0 
         println("Abort calculation, (s,t) does not belong to desired pairs")
     else
+        println("s:",s," t:",t)
         ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
         for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
             ϵ0[i,j] = hf.H0[i,i,j]
         end
-        νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1))
         indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
         if s<=-0.01
-            # for ifl in 1:(4-abs(s)), ib in 1:(hf.q-1)
-            for ifl in [3], ib in 1:(hf.q-1)
+            for ifl in 1:(4-abs(s)), ib in 1:(hf.q-hf.p)
+            # for ifl in [3], ib in 1:(hf.q-1)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
             end 
         else 
             for ifl in 1:4, ib in 1:(hf.nb*hf.q)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
             end
-            for ifl in 1:(4-abs(s)), ib in (hf.q+2):(hf.nb*hf.q)
+            for ifl in 1:(4-abs(s)), ib in (hf.q+hf.p+1):(hf.nb*hf.q)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 0.0 
             end
         end

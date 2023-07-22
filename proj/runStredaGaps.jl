@@ -78,7 +78,7 @@ close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
-sts = [[-3,-1]]
+sts = [[-2,-2]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]

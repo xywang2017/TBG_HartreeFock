@@ -12,12 +12,12 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-flag = "random"
-seed = 3
+flag = "bm_cascade"
+seed = 1
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
-νF = (-3)+(-1)*p/q
+νF = (-2)+(-2)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -31,7 +31,7 @@ end
 seed = 1
 p, q = 1,4
 flag = "bm_cascade"
-νF = (-3) + (-1)*p/q
+νF = (-2) + (-2)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"124_strain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
