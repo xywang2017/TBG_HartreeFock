@@ -77,7 +77,7 @@ function init_P_bm_cascade(hf::HartreeFock)
         indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
         if s<=-0.01
             for ifl in 1:(4-abs(s)), ib in 1:(hf.q-hf.p)
-            # for ifl in [3], ib in 1:(hf.q-1)
+            # for ifl in [1,4], ib in 1:(hf.q-hf.p)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
             end 
         else 

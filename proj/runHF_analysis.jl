@@ -6,18 +6,18 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 124
+twist_angle = 128
 foldername = "$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-flag = "bm_cascade"
+flag = "random"
 seed = 1
 w0s = ["07"]
 w0snum = [0.7]
 p,q = 1,4
-νF = (-2)+(-2)*p/q
+νF = (-3)+(-1)*p/q
 νstr = round(Int,1000*νF)
 hf = 0
 for w0 in w0s
@@ -28,14 +28,14 @@ for w0 in w0s
 end 
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
-seed = 1
-p, q = 1,4
-flag = "bm_cascade"
-νF = (-2) + (-2)*p/q
+seed = 5
+p, q = 1,8
+flag = "random"
+νF = (-1) + (-3)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"124_strain/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 # plot_density_matrix_bm_valley_spin(metadata)
-plot_density_matrix_bm(metadata,ik=2)
+plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 plot_density_matrix_sublattice_full(metadata)
 

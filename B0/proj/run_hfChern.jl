@@ -2,8 +2,8 @@ using PyPlot
 using JLD2
 using Printf
 fpath = pwd()
-include(joinpath(fpath,"libs/HFChern_mod.jl"))
-include(joinpath(fpath,"libs/plot_helpers.jl"))
+include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
+include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 BLAS.set_num_threads(1)
 
