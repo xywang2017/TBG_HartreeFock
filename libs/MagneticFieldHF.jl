@@ -64,6 +64,18 @@ function CoulombUnit(params::Params)
      return V0
 end
 
+function ZeemanUnit(params::Params)
+    """
+    Zeeman energy unit 
+    """
+    hbar = 1.054571817e-34
+    me = 9.1093837e-31
+    ee = 1.6e-19
+    aa = 2.46e-10 
+    V0 = 2π * hbar^2 / (2*me*params.area*aa^2) / ee * 1000 # in units of meV 
+    return V0 
+end
+
 function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",savename::String="placeholder.txt",
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
@@ -178,7 +190,7 @@ function BM_info(hf::HartreeFock)
         jldopen(hf.metadata[iη]) do file 
             hbm .= file["E"]
             for rk1 in 1:hf.q, iq in 1:(hf.nb*hf.q), is in 1:2
-                tmp_ϵk[iq,iη,is,iq,iη,is,rk1,:,:] .= view(hbm,iq,:,:)
+                tmp_ϵk[iq,iη,is,iq,iη,is,rk1,:,:] .= view(hbm,iq,:,:) .+ (3-2is) * ZeemanUnit(hf.params)*hf.p/hf.q
             end
 
             σz .= file["PΣz"]
