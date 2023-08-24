@@ -2,6 +2,7 @@ using LinearAlgebra
 using Parameters
 using DelimitedFiles
 using GSL 
+using ClassicalOrthogonalPolynomials
 
 # contains model independent helper functions 
 function inγ(iH::Int)
@@ -28,9 +29,9 @@ function _associatedlaguerre(n::Int, m::Int, cplus::ComplexF64, cminus::ComplexF
     x = -real(cplus * cminus)
     val = 0.0 + 0.0im
     # if n >= m
-    #     val = exp(-x / 2) * sqrt(factorial(big(m)) / factorial(big(n))) * big(cplus)^(n - m) * sf_laguerre_n(m, n - m, x)
+    #     val = exp(-x / 2) * sqrt(factorial(big(m)) / factorial(big(n))) * big(cplus)^(n - m) * laguerrel(m, n - m, x)
     # else
-    #     val = exp(-x / 2) * sqrt(factorial(big(n)) / factorial(big(m))) * big(cminus)^(m - n) * sf_laguerre_n(n, m - n, x)
+    #     val = exp(-x / 2) * sqrt(factorial(big(n)) / factorial(big(m))) * big(cminus)^(m - n) * laguerrel(n, m - n, x)
     # end
     if n >= m
         val = exp(-x / 2) * exp((sf_lnfact(m)-sf_lnfact(n))/2) * cplus^(n - m) * sf_laguerre_n(m, n - m, x)

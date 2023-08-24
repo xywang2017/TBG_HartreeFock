@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 124
+twist_angle = 138
 foldername = "$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -69,7 +69,7 @@ for ϕ in ϕs
 end
 xlim([-4.3,4.3])
 ylim([0.0,0.55])
-xlabel("ν")
+xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
 savefig(joinpath(fpath,"$(foldername)/streda_line.pdf"),transparent=true)

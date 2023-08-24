@@ -7,8 +7,9 @@
 # julia proj/runHF_server.jl 1 6 2.333 bm_cascade 07 1 1.20 strain
 # julia proj/runHF_server.jl 2 5 2.8 bm_cascade 07 1 1.20 strain
 # julia proj/runHF_server.jl 3 7 2.857 bm_cascade 07 1 1.20 strain
-# julia proj/runHF_server.jl 2 7 2.571 bm_cascade 07 1 1.20 strain
+# julia proj/runHF_server.jl 2 7 2.571 random 07 5 1.20 strain
 # julia proj/runHF_server.jl 1 8 2.25 bm_cascade 07 1 1.20 strain
+# julia proj/runHF_server.jl 1 7 2.571 random 07 5 1.20 strain
 
 # julia proj/runHF_server.jl 1 2 3.5 bm_cascade 07 1 1.20 strain
 # julia proj/runHF_server.jl 1 3 3.333 bm_cascade 07 1 1.20 strain

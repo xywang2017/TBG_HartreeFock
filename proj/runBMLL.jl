@@ -16,8 +16,8 @@ q = parse(Int,ARGS[4])
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
-    if !isdir(joinpath(fpath,"124_strain/B/data_w$(w0str)/_$(p)_$(q)"))
-        mkpath(joinpath(fpath,"124_strain/B/data_w$(w0str)/_$(p)_$(q)"))
+    if !isdir(joinpath(fpath,"120_strain/B/data_w$(w0str)/_$(p)_$(q)"))
+        mkpath(joinpath(fpath,"120_strain/B/data_w$(w0str)/_$(p)_$(q)"))
     end
     bm = bmLL()
     nq = (denominator(ϕ)>6) ? 1 : 2
@@ -38,10 +38,10 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     # end
     # nq = 16÷q
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"124_strain/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = joinpath(fpath,"120_strain/B/data_w$(w0str)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)
     # params = Params(w1=96.056,w0=w0*96.056,vf=2135.4,dθ=1.05π/180)
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.24π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)

@@ -80,7 +80,7 @@ function constructbmLL(A::bmLL,params::Params;
     constructOffDiagonals(A)
     constructΣz(A)
     computeSpectrum(A)
-    enforceC2P(A)
+    # enforceC2P(A)
     # computeSpectrum_remote(A)
 
     A.fname = fname 

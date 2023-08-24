@@ -5,7 +5,7 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/BMChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-twist_angle = 1.28 #parse(Float64,ARGS[1])
+twist_angle = 1.20 #parse(Float64,ARGS[1])
 _is_strain = "strain" #ARGS[2]
 lk = 15 #parse(Int,ARGS[3])
 
@@ -22,9 +22,9 @@ initLattice(latt,params;lk=lk)
 
 bm_path = joinpath(fpath,"$(foldername)/B0/bm_lk$(lk).jld2")
 
-# if !isdir(bm_path)
-#     mkpath(bm_path)
-# end
+if !isdir(bm_path)
+    mkpath(joinpath(fpath,"$(foldername)/B0"))
+end
 
 # ------------------ non-interacting part ------------------ #
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")

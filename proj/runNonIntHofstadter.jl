@@ -5,69 +5,109 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 
 BLAS.set_num_threads(1)
 
+ϕmin = 1//40
 str = "K"
 w0 = 0.7
 w0str = "07"
-p = parse(Int,ARGS[1])
-q = parse(Int,ARGS[2])
-ϕ = p//q
+
+ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+ϕs = ϕs[ϕs .>= ϕmin]
 
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "105_nostrain"
+    fname = "138_nostrain"
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 16÷denominator(ϕ) 
-    if q ==1
-        nq = 20
-    elseif q ==2 
-        nq = 20 
-    elseif q==3 
-        nq = 16 
-    elseif q ==4 
-        nq = 10 
-    end
-    nq = 16÷q
+    nq = 45÷denominator(ϕ) 
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"$(fname)/B/_$(p)_$(q)_$(str)_metadata.jld2")
-    println(fname)
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*w0,vf=2482)
+    # fname = joinpath(fpath,"$(fname)/B/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = ""
+    params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
-    constructbmLL(bm,params;ϕ= ϕ,nLL=40*q÷p,nq=nq,fname=fname,α=w0, 
+    constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
-    return bm
+    return bm.spectrum
 end
 
 #
-bm = compute_bmLL(ϕ,str,w0,w0str);
+data = Dict()
+for ϕ in ϕs 
+    @time begin
+        # println("ϕ: ",ϕ)
+        tmp = compute_bmLL(ϕ,str,w0,w0str);
+        data["$(ϕ)"] = tmp[:]
+    end
+end
 
-#
+fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+jldopen(fname, "w") do file
+    file["hoftstadter_data"] = data
+end
+
 
 # plot spectrum 
-function plot_LL_spectrum(ϕs::Vector{Rational{Int}},str::String)
-    foldername = "105_nostrain"
+function plot_LL_spectrum()
+    fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+    data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4,3))
+    ϕmin = 1//40
+    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕs = ϕs[ϕs .>= ϕmin]
     for ϕ in ϕs
-        p,q = numerator(ϕ), denominator(ϕ)
-        fname = joinpath(fpath,"$(foldername)/B/_$(p)_$(q)_K_metadata.jld2")
-        jldopen(fname) do file 
-            energies = file["E"][:]
-            tmp_z = real(file["PΣz"])
-            chern = zeros(Float64,size(tmp_z,2),size(tmp_z,3),size(tmp_z,4))
-            for ik in 1:size(chern,1)
-                chern[ik,:,:] = tmp_z[ik,ik,:,:]
-            end
-            scatter(ones(length(energies))*ϕ,energies,c=chern[:],cmap="coolwarm",s=3,vmin=-1,vmax=1)
-        end
+        energies = data["$(ϕ)"]
+        plot(ones(length(energies))*ϕ,energies,"k.",ms=1,markeredgecolor="none")
     end
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    savefig("BMLL.pdf")
+    savefig("BMLL_138_nostrain.png",dpi=600)
     display(fig)
     close(fig)
     return nothing
 end
 
-plot_LL_spectrum(collect(1:16) .//16 ,"07")
+plot_LL_spectrum()
+
+# Wannier plot
+function plot_wannier(flag=false)
+    fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+    data = load(fname,"hoftstadter_data");
+    ϕmin = 1//40
+    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕs = ϕs[ϕs .>= ϕmin]
+   
+    fig = figure(figsize=(3,3))
+    γ = 0.1   # meV
+    E = collect(-50:0.1:50)
+    νs = zeros(Float64,length(E),length(ϕs))
+    ρνϕ = zeros(Float64,size(νs,1),length(ϕs))
+    for iϕ in eachindex(ϕs)
+        ϕ = ϕs[iϕ]
+        ϵ = data["$(ϕ)"]   
+        μB = 5.7883818012*0.01
+        # B = 23* 2*ϕ # assuming 25T at half flux
+        # ϵ = [ϵ .- μB*B; ϵ .+ μB *B]
+        for iE in eachindex(E)
+            ρνϕ[iE,iϕ] = 1/π * sum(γ./((ϵ .- E[iE]).^2 .+ γ^2))  / (length(ϵ))
+            νs[iE,iϕ] = 8/π * sum(atan.((ϵ .- E[iE]) ./ γ)) / (length(ϵ))
+        end
+    end
+    pcolor(νs,repeat(ϕs',size(νs,1)),1 ./ (ρνϕ).^(1/6),cmap="Blues_r" )
+    # pcolormesh(νs.*4,ϕs,ρνϕ')
+    # colorbar()
+    xlim([-4,4])
+    ylim([0,1])
+    xlabel(L"n/n_s")
+    ylabel(L"ϕ/ϕ_0")
+    tight_layout()
+    display(fig)
+    if (flag ==true)
+        fname = joinpath(fpath,"Wannier_138_nostrain.png")
+        savefig(fname,dpi=500,transparent=false)
+    end
+    close(fig)
+    return nothing
+end
+
+plot_wannier(true)
