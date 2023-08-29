@@ -6,14 +6,14 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 138
-foldername = "$(twist_angle)_strain"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+foldername = "zeeman/$(twist_angle)_strain"
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
 w0 = "07"
 
-ϕs = [1//12;1//10;1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 # ϕs = [1//12;1//10;1//8;1//6]
 sts = []
 for s in -3:3, t in -12:12
@@ -25,7 +25,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(8,4))
+fig = figure(figsize=(5,4))
 for lines in -4:4
     axvline(lines,ls=":",c="gray")
 end
@@ -36,7 +36,7 @@ for ϕ in ϕs
     for st in sts 
         s,t = st[1], st[2]
         νstr = round(Int,1000*(s+t*p/q))
-        if abs(s+t*p/q) < 4
+        if abs(s+t*p/q) < 4 && (s+t*p/q) <=0
             metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
                 metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -67,18 +67,18 @@ for ϕ in ϕs
     # end
     scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="k")
 end
-xlim([-4.3,4.3])
+xlim([-4.3,0.3])
 ylim([0.0,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
-savefig(joinpath(fpath,"$(foldername)/streda_line.pdf"),transparent=true)
+savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=500)
 display(fig)
 close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
-sts = [[1,3]]
+sts = [[-1,-3]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
