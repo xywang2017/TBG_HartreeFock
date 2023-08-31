@@ -58,14 +58,19 @@ for ϕ in ϕs
             end
         end
     end
+    # fillings = round.(fillings,digits=8)
     idx_sort = sortperm(fillings)
     fillings, gaps = fillings[idx_sort],gaps[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
-    # if q==8
-    #     println(fillings) 
+    
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="k",edgecolor="none")
+    # for t in 1:4 
+    #     s = -4 
+    #     νtest = round(s + (p/q)*t,digits=8)
+    #     idx = fillings .==νtest
+    #     scatter(fillings[idx],ones(length(fillings[idx]))*ϕ,s=gaps[idx].^2/5,c="b",edgecolor="none")
     # end
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="k")
 end
 xlim([-4.3,0.3])
 ylim([0.0,0.55])
@@ -78,7 +83,7 @@ close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
-sts = [[-3,-1]]
+sts = [[-1.5,-2]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -110,4 +115,16 @@ for st in sts
         end
     end
     Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))");
+
+    fig = figure(figsize=(3,2))
+    plot(ϕs,Δs,"b^-",ms=5,markeredgecolor="none",label="($(s),$(t))")
+    legend()
+    xlabel(L"ϕ/ϕ_0")
+    ylabel("Δ (meV)")
+    xlim([0,0.53])
+    ylim([0,1.2*maximum(Δs)])
+    tight_layout()
+    savefig("tmp.png",transparent=true,dpi=500)
+    display(fig)
+    close(fig)
 end

@@ -109,7 +109,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
             i += 1
         end
         push!(ϵFs,(ϵsorted[i+1] + ϵsorted[i])/2) 
-        # push!(Δs,(ϵsorted[i+1] - ϵsorted[i]))
+        push!(Δs,max((ϵsorted[i+1] - ϵsorted[i]),(ϵsorted[i] - ϵsorted[i-1])))
         # push!(Δs,(ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ]) +1] - ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ])]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
@@ -175,10 +175,9 @@ end
 
 
 ### density matrix analysis 
-function plot_density_matrix_bm_valley_spin(fname::String)
+function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1)
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    ik = 1
     P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
     fig,ax = subplots(2,2,figsize=(6,6))
     states = ["K↑","K'↑","K↓","K'↓"]
@@ -188,7 +187,7 @@ function plot_density_matrix_bm_valley_spin(fname::String)
         ax[r,c].set_title(states[r+2(c-1)])
     end
     tight_layout()
-    savefig("test.pdf")
+    savefig("test.png",dpi=500,transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -245,19 +244,34 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
     return nothing 
 end
 
-function plot_order_parameters(fname::String)
+function plot_density_matrix_global_order_parameters(fname::String)
     hf = load(fname,"hf");
-    fig = figure(figsize=(2,6))
-    println(hf.Δ)
-    plot(hf.Δ,eachindex(hf.Δ),"b^")
-    yticks(eachindex(hf.Δ),hf.Δstr)
-    axvline(0)
-    xlim([-0.4,0.5])
+    P = reshape(hf.P,8hf.q,8hf.q,:)
+    PP = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
+    s0 = ComplexF64[1 0;0 1]
+    sx = ComplexF64[0 1;1 0]
+    sy = ComplexF64[0 -1im;1im 0]
+    sz = ComplexF64[1 0;0 -1]
+    Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
+
+    Os = kron(sz,kron(s0,Iq))
+    Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),hf.nq*hf.q,hf.nq) ./(hf.q)
+    # println(sum(Sk)/length(Sk))
+    fig = figure(figsize=(8,2))
+    pl=imshow(real(Sk)',origin="lower",extent=(0,1,0,1/hf.q))
+    colorbar()
+    xlabel(L"k_1")
+    ylabel(L"k_2")
+    title(L"s_z")
+    tight_layout()
+    savefig("tmp.png",dpi=500,transparent=true)
     display(fig)
     close(fig)
+
+    return nothing
 end
 
-
+plot_density_matrix_global_order_parameters(metadata)
 
 ### strong coupling basis  valley spin
 function plot_density_matrix_sublattice(fname::String)
