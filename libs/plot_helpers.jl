@@ -271,7 +271,7 @@ function plot_density_matrix_global_order_parameters(fname::String)
     return nothing
 end
 
-plot_density_matrix_global_order_parameters(metadata)
+# plot_density_matrix_global_order_parameters(metadata)
 
 ### strong coupling basis  valley spin
 function plot_density_matrix_sublattice(fname::String)
