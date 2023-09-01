@@ -29,10 +29,10 @@ println("HF convergence: ",load(hf_path,"iter_err")[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(hf.latt.k1,:,1) .+ 1im*reshape(hf.latt.k2,1,:) 
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-# plot_contour_maps(kvec,ϵ0[1,:,:],points=ComplexF64[0+0im],contourlines=[hf.μ],limits=Float64[])
+plot_contour_maps(kvec,ϵ0[4,:,:],points=ComplexF64[0+0im],contourlines=[1.],limits=Float64[])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
-Ecut = [ϵ0[j,i,i] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
+Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
 plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 

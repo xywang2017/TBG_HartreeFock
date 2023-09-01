@@ -1,4 +1,5 @@
 using PyPlot
+using Printf
 using JLD2
 fpath = pwd() 
 include(joinpath(fpath,"B0/libs/DensityMatrix_reduction.jl"))
@@ -33,9 +34,13 @@ checkReconstructionValidity(dm,collect(55:64))
 # ----------------------- plot correlation values --------  #
 # plot_corr_values(dm)
 # ------------------- Analysis of structures of 8x8 matrices Oϕs ----------------- # 
-for idx in 60:64
+for idx in 55:64
     # plot_formfactor_info(dm,idx)
-    # plot_formfactor_info_band_basis(dm,idx)
-    plot_contour_maps(kvec,reshape(dm.δs[4,:],lk,lk),points=ComplexF64[0+0im],contourlines=[100.],limits=Float64[])
+    plot_formfactor_info_band_basis(dm,idx)
+    # plot_contour_maps(kvec,reshape(dm.δs[4,:],lk,lk),points=ComplexF64[0+0im],contourlines=[100.],limits=Float64[])
 
 end
+
+# ---------- 
+Δs = real(reshape(dm.δs,4,4,4,lk,lk));
+plot_density_maps_collectivev0(kvec,collect(Δs))

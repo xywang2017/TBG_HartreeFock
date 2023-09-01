@@ -88,19 +88,18 @@ function plot_density_maps_collective(kvec::Matrix{ComplexF64},Δs::Array{Float6
 end
 
 
-function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Float64,5};
-    points::Vector{ComplexF64}=[],contourlines::Vector{Float64}=[],limits::Vector{Float64}=Float64[])
+function plot_density_maps_collectivev0(kvec::Matrix{ComplexF64},Δs::Array{Float64,5})
     kx,ky = real(kvec), imag(kvec)
     γstr = ["γ0","γx","γy","γz"]
     τstr = ["τ0","τx","τy","τz"]
     sstr = ["s0","sx","sy","sz"]
     fig,ax = subplots(4,4,sharex=true,sharey=true,figsize=(16,16))
-    order_params = view(Δs,:,:,1,:,:)
+    order_params = view(Δs,1,:,:,:,:)
     bound = maximum(abs.(order_params))
     for r in 1:4, c in 1:4
         ϵ = order_params[r,c,:,:]
         bound = maximum(abs.(ϵ))
-        str = γstr[r]*τstr[c]
+        str = γstr[c]*τstr[r]
         # str = τstr[r]*sstr[c]
         pl=ax[r,c].pcolormesh(kx,ky,ϵ,cmap="bwr",vmin=-bound,vmax=bound)
         # pl=ax[c,r].pcolormesh(kx,ky,ϵ,cmap="bwr")
