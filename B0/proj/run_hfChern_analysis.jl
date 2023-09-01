@@ -6,14 +6,14 @@ include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 1
-flag = "random"
+flag = "kivc"
 twist_angle = 1.20
 _is_strain = "strain"
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-ν = -2.04
+ν = -2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 15
+lk = 13
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -29,11 +29,12 @@ println("HF convergence: ",load(hf_path,"iter_err")[end])
 kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(hf.latt.k1,:,1) .+ 1im*reshape(hf.latt.k2,1,:) 
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
-plot_contour_maps(kvec,ϵ0[2,:,:],points=ComplexF64[0+0im],contourlines=[hf.μ],limits=Float64[])
+# plot_contour_maps(kvec,ϵ0[1,:,:],points=ComplexF64[0+0im],contourlines=[hf.μ],limits=Float64[])
 iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
 kcut = real(kvec[:,iΓ])
-Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
+Ecut = [ϵ0[j,i,i] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
 plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+
 
 # ----------------- all the chemical potentials ---------------- # 
 νs = collect(-3.9:0.12:-2.64)

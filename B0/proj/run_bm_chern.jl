@@ -5,9 +5,9 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/BMChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-twist_angle = 1.20 #parse(Float64,ARGS[1])
-_is_strain = "strain" #ARGS[2]
-lk = 15 #parse(Int,ARGS[3])
+twist_angle = parse(Float64,ARGS[1])
+_is_strain = ARGS[2]
+lk = parse(Int,ARGS[3])
 
 foldername =@sprintf "%d_%s" round(Int,twist_angle*100) _is_strain 
 # ------------------ Specification ------------------ #

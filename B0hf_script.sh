@@ -1,12 +1,9 @@
 # #!/bin/bash -l 
 
-# julia B0/proj/run_bm_chern.jl 1.20 strain 15
+# julia B0/proj/run_bm_chern.jl 1.20 strain 13
 
 
-julia B0/proj/run_hfChern.jl $1 -2.00 random 1.20 strain 15 
-julia B0/proj/run_hfChern.jl $1 -1.00 random 1.20 strain 15 
-julia B0/proj/run_hfChern.jl $1 1.00 random 1.20 strain 15 
-julia B0/proj/run_hfChern.jl $1 2.00 random 1.20 strain 15 
+julia B0/proj/run_hfChern.jl $1 -2.00 kivc 1.20 strain 13 
 
 
 # julia B0/proj/run_hfChern.jl $1 -3.96 random 1.20 strain 15 
