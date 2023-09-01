@@ -6,15 +6,15 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
-foldername = "zeeman/$(twist_angle)_nostrain"
+twist_angle = 120
+foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 # flag = "random"
 # seed = 2
-p,q = 1,2
+p,q = 1,8
 νF = (-2)+(-2)*p/q
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -40,8 +40,8 @@ println("Convergence: ",load(metadata,"iter_err")[end])
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 # plot_spectra(metadata;savename="test.pdf")
-plot_density_matrix_bm_valley_spin(metadata,ik=1)
-# plot_density_matrix_bm(metadata,ik=1)
+# plot_density_matrix_bm_valley_spin(metadata,ik=1)
+plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 # plot_density_matrix_sublattice_full(metadata)
 
