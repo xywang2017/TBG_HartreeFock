@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 128
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -13,8 +13,10 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
-# ϕs = [1//12;1//10;1//8;1//6]
+# ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
+ϕs = ϕs[ϕs.<=0.5]
+ϕs = ϕs[2:end]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -121,6 +123,9 @@ for st in sts
     legend()
     xlabel(L"ϕ/ϕ_0")
     ylabel("Δ (meV)")
+    # axvline(3/8)
+    axvline(2/7)
+    # axvline(4/11)
     xlim([0,0.53])
     ylim([0,1.2*maximum(Δs)])
     tight_layout()
