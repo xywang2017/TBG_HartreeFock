@@ -67,20 +67,19 @@ for ϕ in ϕs
     fillings, gaps, μs = fillings[idx_sort],gaps[idx_sort], μs[idx_sort]
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps,μs = fillings[idx], gaps[idx],μs[idx]
-    ns = (fillings .+4)./8
-    for i in eachindex(μs)
-        c_ns = [1 - ns[i],0.5,0.5]
-        # ax.plot([ϕ,ϕ],[μs[i]-gaps[i]/2,μs[i]+gaps[i]/2],"o",c=c_ns,ms=4,markeredgecolor="none")
-        if gaps[i] < 2.0  # only draw gaples states
-            ax.plot([ϕ],[μs[i]],"o",c=c_ns,ms=4,markeredgecolor="none")
-        else # draw states above and below the gap
-            ax.plot([ϕ,ϕ],[μs[i]-gaps[i]/2,μs[i]+gaps[i]/2],"o",c=c_ns,ms=4,markeredgecolor="none")
-        end
-    end
+    ns = (fillings .+4)./4
+    ax.scatter(ones(length(μs))*ϕ,μs,c=ns,vmin=0,vmax=1,cmap="coolwarm",s=3)
+    # for i in eachindex(μs)
+    #     c_ns = 1 - ns[i]
+    #     # ax.plot([ϕ,ϕ],[μs[i]-gaps[i]/2,μs[i]+gaps[i]/2],"o",c=c_ns,ms=4,markeredgecolor="none")
+    #     if gaps[i] < 100.0  # only draw gaples states
+    #         ax.plot([ϕ],[μs[i]],"o",c=[c_ns,0.2,0.2],ms=4,markeredgecolor="none")
+    #     else # draw states above and below the gap
+    #         ax.plot([ϕ,ϕ],[μs[i]-gaps[i]/2,μs[i]+gaps[i]/2],"o",c=c_ns,ms=4,markeredgecolor="none")
+    #     end
+    # end
     # ax.scatter(ones(length(fillings))*ϕ,μs,s=gaps.^2/4,c="k",edgecolor="none")
 end
-# ax.set_facecolor("black")
-# xlim([-4.3,0.3])
 ax.set_xlim([0.0,0.55])
 ax.set_ylabel("E (meV)")
 ax.set_xlabel(L"ϕ/ϕ_0")
