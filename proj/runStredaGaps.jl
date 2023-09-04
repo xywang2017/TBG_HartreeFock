@@ -188,4 +188,4 @@ function plot_LL_spectrum(s::Int,t::Int,params::Params)
     return nothing
 end
 
-plot_LL_spectrum(-3,-1,params)
+plot_LL_spectrum(-2,-2,params)
