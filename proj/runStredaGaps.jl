@@ -24,23 +24,22 @@ for s in -3:3, t in -12:12
 end
 sts = unique(sts)
 
-for angle in [105,120,124,128,132,138]
-    for flag in ["strain","nostrain"]
-        foldername = "NonInt/$(angle)_$(flag)"
-        src = joinpath(fpath,"zeeman/$(angle)_$(flag)/B/data_w07")
-        for ϕ in ϕs 
-            p,q = numerator(ϕ), denominator(ϕ)
-            # rm(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
-            src_file = joinpath(src,"_$(p)_$(q)/_$(p)_$(q)_K_metadata.jld2")
-            dst_file = joinpath(foldername,"_$(p)_$(q)_K_metadata.jld2")
-            if isfile(src_file)
-                mv(src_file,dst_file,force=true)
-            else 
-                println("No file: $src_file")
-            end
-        end
-    end
-end
+# for angle in [105,120,124,128,132,138]
+#     for flag in ["strain","nostrain"]
+#         src = joinpath(fpath,"nozeeman/$(angle)_$(flag)/B/data_w07")
+#         dst = joinpath(fpath,"nozeeman/$(angle)_$(flag)")
+#         for ϕ in ϕs 
+#             p,q = numerator(ϕ), denominator(ϕ)
+#             src_file = joinpath(src,"_$(p)_$(q)")
+#             dst_file = joinpath(dst,"_$(p)_$(q)")
+#             if isdir(src_file)
+#                 mv(src_file,dst_file)
+#             else 
+#                 println("No file: $src_file")
+#             end
+#         end
+#     end
+# end
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -56,15 +55,15 @@ for ϕ in ϕs
         s,t = st[1], st[2]
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4 && (s+t*p/q) <=0
-            metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 push!(fillings,s+t*p/q)
                 E = load(metadata,"iter_energy")[end]
                 for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10 
-                    metadata0 = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                    metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
                         if E0<=E 
@@ -110,14 +109,14 @@ for st in sts
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
-            metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 E = load(metadata,"iter_energy")[end]
                 for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10
-                    metadata0 = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                    metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
                         if E0<=E 
@@ -162,14 +161,14 @@ function plot_LL_spectrum(s::Int,t::Int,params::Params)
     for ϕ in ϕs
         p, q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
-        metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
         if !isfile(metadata)
-            metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
         end
         if isfile(metadata)
             E = load(metadata,"iter_energy")[end]
             for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10
-                metadata0 = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                 if isfile(metadata0)
                     E0 = load(metadata0,"iter_energy")[end]
                     if E0<=E 
@@ -184,7 +183,7 @@ function plot_LL_spectrum(s::Int,t::Int,params::Params)
         titlestr = ["K↑" "K↓";"K'↑" "K'↓"]
         for iη in 1:2, is in 1:2
             str = strs[iη]
-            fname0 = joinpath(fpath,"$(foldername0)/B/data_w07/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+            fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
             for i2 in 1:hf.nq, i1 in 1:hf.nq, iq in 1:hf.q
                 weights[:,i1,i2] = real(diag(P[:,iη,is,:,iη,is,i1,iq,i2])) .+0.5

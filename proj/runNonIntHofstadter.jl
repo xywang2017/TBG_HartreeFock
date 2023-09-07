@@ -15,7 +15,7 @@ w0str = "07"
 
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "zeeman/138_strain"
+    fname = "NonInt/Hofstadter/138_strain"
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
@@ -40,7 +40,7 @@ for ϕ in ϕs
     end
 end
 
-fname = joinpath(fpath,"zeeman/138_strain/B/K_NonIntHofstadter_metadata.jld2")
+fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/B/K_NonIntHofstadter_metadata.jld2")
 jldopen(fname, "w") do file
     file["hoftstadter_data"] = data
 end
@@ -48,9 +48,9 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"zeeman/138_strain/B/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter//138_strain/B/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fname1 = joinpath(fpath,"zeeman/138_strain/B/Kprime_NonIntHofstadter_metadata.jld2")
+    fname1 = joinpath(fpath,"NonInt/Hofstadter//138_strain/B/Kprime_NonIntHofstadter_metadata.jld2")
     data1 = load(fname1,"hoftstadter_data");
     fig = figure(figsize=(4,3))
     ϕmin = 1//12
@@ -75,7 +75,7 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/B/NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))

@@ -40,15 +40,15 @@ for ϕ in ϕs
         s,t = st[1], st[2]
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4 && (s+t*p/q) <=0
-            metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 push!(fillings,s+t*p/q)
                 E = load(metadata,"iter_energy")[end]
                 for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10 
-                    metadata0 = joinpath(fpath,"$(foldername)/B/data_w07/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                    metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
                         if E0<=E 

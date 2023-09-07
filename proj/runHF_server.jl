@@ -17,7 +17,11 @@ twist_angle = parse(Float64,ARGS[7])
 _is_strain = ARGS[8]
 
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-savename = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
+    mkpath(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
+end
+
+savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 ϕ = p//q 
 if isequal(flag,"flavor")
     _Init = "Flavor U(4)"
@@ -45,10 +49,10 @@ initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="$(foldername)/B/data_w$(w0)/_$(p)_$(q)/",_Init=_Init,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
-    savename0 = joinpath(fpath,"$(foldername)/B/data_w$(w0)/_$(p)_$(q)/$(seed)_random_init_HF_$(p)_$(q)_nu_0.jld2")
+    savename0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_random_init_HF_$(p)_$(q)_nu_0.jld2")
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="$(foldername)/B/data_w$(w0)/_$(p)_$(q)/",_Init=" ",H0=H0,P0=P0,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)
 end
