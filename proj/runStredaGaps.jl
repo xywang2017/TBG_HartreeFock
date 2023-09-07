@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 138
+twist_angle = 132
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -13,7 +13,7 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
+# ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 ϕs = ϕs[2:end]
@@ -24,6 +24,23 @@ for s in -3:3, t in -12:12
 end
 sts = unique(sts)
 
+for angle in [105,120,124,128,132,138]
+    for flag in ["strain","nostrain"]
+        foldername = "NonInt/$(angle)_$(flag)"
+        src = joinpath(fpath,"zeeman/$(angle)_$(flag)/B/data_w07")
+        for ϕ in ϕs 
+            p,q = numerator(ϕ), denominator(ϕ)
+            # rm(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
+            src_file = joinpath(src,"_$(p)_$(q)/_$(p)_$(q)_K_metadata.jld2")
+            dst_file = joinpath(foldername,"_$(p)_$(q)_K_metadata.jld2")
+            if isfile(src_file)
+                mv(src_file,dst_file,force=true)
+            else 
+                println("No file: $src_file")
+            end
+        end
+    end
+end
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]

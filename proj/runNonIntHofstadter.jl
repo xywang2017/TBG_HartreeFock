@@ -5,25 +5,25 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 
 BLAS.set_num_threads(1)
 
-ϕmin = 1//40
+ϕmin = 1//12
 str = "K"
 w0 = 0.7
 w0str = "07"
 
-ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs .>= ϕmin]
 
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "138_nostrain"
+    fname = "zeeman/138_strain"
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 45÷denominator(ϕ) 
+    nq = 12÷denominator(ϕ) 
     println("p= ",p,", q= ",q,", nq= ",nq)
     # fname = joinpath(fpath,"$(fname)/B/_$(p)_$(q)_$(str)_metadata.jld2")
     fname = ""
-    params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
@@ -40,7 +40,7 @@ for ϕ in ϕs
     end
 end
 
-fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+fname = joinpath(fpath,"zeeman/138_strain/B/K_NonIntHofstadter_metadata.jld2")
 jldopen(fname, "w") do file
     file["hoftstadter_data"] = data
 end
@@ -48,20 +48,24 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"138_nostrain/B/NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"zeeman/138_strain/B/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
+    fname1 = joinpath(fpath,"zeeman/138_strain/B/Kprime_NonIntHofstadter_metadata.jld2")
+    data1 = load(fname1,"hoftstadter_data");
     fig = figure(figsize=(4,3))
-    ϕmin = 1//40
-    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕmin = 1//12
+    ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
     ϕs = ϕs[ϕs .>= ϕmin]
     for ϕ in ϕs
         energies = data["$(ϕ)"]
-        plot(ones(length(energies))*ϕ,energies,"k.",ms=1,markeredgecolor="none")
+        plot(ones(length(energies))*ϕ,energies,"m.",ms=4,markeredgecolor="none")
+        energies1 = data1["$(ϕ)"]
+        plot(ones(length(energies1))*ϕ,energies1,"b.",ms=4,markeredgecolor="none")
     end
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    savefig("BMLL_138_nostrain.png",dpi=600)
+    # savefig("BMLL_138_nostrain.png",dpi=600)
     display(fig)
     close(fig)
     return nothing
