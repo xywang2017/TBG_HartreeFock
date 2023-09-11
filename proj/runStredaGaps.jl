@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 132
+twist_angle = 128
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -43,9 +43,9 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(5,4))
+fig = figure(figsize=(3,3))
 for lines in -4:4
-    axvline(lines,ls=":",c="gray")
+    axvline(lines,ls=":",c="gray",lw=0.5)
 end
 for ϕ in ϕs 
     p,q = numerator(ϕ), denominator(ϕ)
@@ -82,7 +82,7 @@ for ϕ in ϕs
     idx = unique(z -> fillings[z], 1:length(fillings))
     fillings,gaps = fillings[idx], gaps[idx]
     
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/5,c="k",edgecolor="none")
+    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
     # for t in 1:4 
     #     s = -4 
     #     νtest = round(s + (p/q)*t,digits=8)
