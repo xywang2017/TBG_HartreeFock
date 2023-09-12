@@ -23,23 +23,6 @@ for s in -3:3, t in -12:12
     push!(sts,[-s,-t])
 end
 sts = unique(sts)
-
-# for angle in [105,120,124,128,132,138]
-#     for flag in ["strain","nostrain"]
-#         src = joinpath(fpath,"nozeeman/$(angle)_$(flag)/B/data_w07")
-#         dst = joinpath(fpath,"nozeeman/$(angle)_$(flag)")
-#         for ϕ in ϕs 
-#             p,q = numerator(ϕ), denominator(ϕ)
-#             src_file = joinpath(src,"_$(p)_$(q)")
-#             dst_file = joinpath(dst,"_$(p)_$(q)")
-#             if isdir(src_file)
-#                 mv(src_file,dst_file)
-#             else 
-#                 println("No file: $src_file")
-#             end
-#         end
-#     end
-# end
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -141,6 +124,7 @@ for st in sts
     ylabel("Δ (meV)")
     # axvline(3/8)
     axvline(2/7)
+    axvline(3/7)
     # axvline(4/11)
     xlim([0,0.53])
     ylim([0,1.2*maximum(Δs)])
@@ -155,7 +139,7 @@ end
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(s::Int,t::Int,params::Params)
-    foldername0 = "$(twist_angle)_strain"
+    foldername0 = "NonInt/$(twist_angle)_strain"
     fig,ax = subplots(2,2,sharex=true,sharey=true,figsize=(4,4))
     strs = ["K","Kprime"]
     for ϕ in ϕs
@@ -178,12 +162,12 @@ function plot_LL_spectrum(s::Int,t::Int,params::Params)
             end
         end
         hf = load(metadata,"hf");
-        P = reshape(hf.P,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,hf.nq,hf.q,hf.nq)
+        P = reshape(hf.P,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,hf.q,hf.nq,hf.nq)
         weights = zeros(Float64,2hf.q,hf.nq,hf.nq)
         titlestr = ["K↑" "K↓";"K'↑" "K'↓"]
         for iη in 1:2, is in 1:2
             str = strs[iη]
-            fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)/_$(p)_$(q)_$(str)_metadata.jld2")
+            fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
             for i2 in 1:hf.nq, i1 in 1:hf.nq, iq in 1:hf.q
                 weights[:,i1,i2] = real(diag(P[:,iη,is,:,iη,is,i1,iq,i2])) .+0.5

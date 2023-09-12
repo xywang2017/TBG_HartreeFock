@@ -179,10 +179,11 @@ function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1)
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
     P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
+    # P0 = reshape(reshape(sum(hf.P[:,:,13:end],dims=3),8hf.q,8hf.q)/size(hf.P,3)*2+0.5I,2hf.q,4,2hf.q,4);
     fig,ax = subplots(2,2,figsize=(6,6))
     states = ["K↑","K'↑","K↓","K'↓"]
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),vmin=0,vmax=1,origin="lower")
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),vmin=0,vmax=1,origin="lower",cmap="hot")
         colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         ax[r,c].set_title(states[r+2(c-1)])
     end
@@ -192,6 +193,75 @@ function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1)
     close(fig)
     return nothing
 end
+
+
+function plot_density_matrix_global_order_parameters(fname::String)
+    hf = load(fname,"hf");
+    
+    P = reshape(hf.P,8hf.q,8hf.q,hf.q,hf.nq,hf.nq)
+    P = reshape(permutedims(P,(1,2,4,3,5)),8hf.q,8hf.q,:)
+    PP = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
+    s0 = ComplexF64[1 0;0 1]
+    sx = ComplexF64[0 1;1 0]
+    sy = ComplexF64[0 -1im;1im 0]
+    sz = ComplexF64[1 0;0 -1]
+    Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
+    # Iq = diagm([(-1)^i for i in 1:(2hf.q)])
+    Os = kron(sz,kron(s0,Iq))
+    Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),hf.nq*hf.q,hf.nq) ./(hf.q)
+    # println(sum(Sk)/length(Sk))
+    fig = figure(figsize=(8,2))
+    avgval = sum(real(Sk)) / length(Sk)
+    δval = maximum(abs.(real(Sk).-avgval)) 
+    println(δval)
+    pl=imshow(real(Sk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="bwr",vmin=avgval-δval,vmax=avgval+δval)
+    colorbar(pl)
+    xlabel(L"k_1")
+    ylabel(L"k_2")
+    title(L"s_z")
+    tight_layout()
+    savefig("tmp.png",dpi=500,transparent=true)
+    display(fig)
+    close(fig)
+
+    return nothing
+end
+
+# plot_density_matrix_global_order_parameters(metadata)
+
+
+
+function plot_density_matrix_valley_spin_density_tL2(fname::String)
+    hf = load(fname,"hf");
+    P = reshape(hf.P,8hf.q,8hf.q,hf.q,hf.nq,hf.nq)
+    P = reshape(permutedims(P,(1,2,4,3,5)),8hf.q,8hf.q,:)
+    P = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
+    P = reshape(P,2hf.q,4,2hf.q,4,:)
+    Iq = reshape(Array{ComplexF64}(I,2hf.q,2hf.q),2hf.q,2hf.q,1)
+    strs = ["K↑","K'↑","K↓","K'↓"]
+    fig, ax = subplots(4,1,figsize=(6,4))
+    for i in 1:4 
+        nk = reshape( sum(P[:,i,:,i,:].*Iq,dims=(1,2)) ./(hf.q), hf.q*hf.nq,hf.nq)
+        pl=ax[i].imshow(real(nk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="Reds",vmin=0,vmax=1.0)
+        # colorbar(pl,ax=ax[i])
+    end
+    for i in 1:4
+        ax[4].set_xlabel(L"k_1")
+        if i!=4 
+            ax[i].set_xticklabels([])
+        end
+        ax[i].set_ylabel(strs[i])
+    end
+    tight_layout()
+    subplots_adjust(hspace=-0.1,wspace=0)
+    savefig("tmp_$(hf.p)_$(hf.q).png",dpi=500,transparent=true)
+    display(fig)
+    close(fig)
+
+    return nothing
+end
+
+# plot_density_matrix_valley_spin_density_tL2(metadata)
 
 ### strong coupling basis 
 function plot_density_matrix_strong_coupling(fname::String,fname0::String)
@@ -244,34 +314,6 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
     return nothing 
 end
 
-function plot_density_matrix_global_order_parameters(fname::String)
-    hf = load(fname,"hf");
-    P = reshape(hf.P,8hf.q,8hf.q,:)
-    PP = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
-    s0 = ComplexF64[1 0;0 1]
-    sx = ComplexF64[0 1;1 0]
-    sy = ComplexF64[0 -1im;1im 0]
-    sz = ComplexF64[1 0;0 -1]
-    Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
-
-    Os = kron(sz,kron(s0,Iq))
-    Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),hf.nq*hf.q,hf.nq) ./(hf.q)
-    # println(sum(Sk)/length(Sk))
-    fig = figure(figsize=(8,2))
-    pl=imshow(real(Sk)',origin="lower",extent=(0,1,0,1/hf.q))
-    colorbar()
-    xlabel(L"k_1")
-    ylabel(L"k_2")
-    title(L"s_z")
-    tight_layout()
-    savefig("tmp.png",dpi=500,transparent=true)
-    display(fig)
-    close(fig)
-
-    return nothing
-end
-
-# plot_density_matrix_global_order_parameters(metadata)
 
 ### strong coupling basis  valley spin
 function plot_density_matrix_sublattice(fname::String)

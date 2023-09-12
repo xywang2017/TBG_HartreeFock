@@ -92,6 +92,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     elseif q ==2 
         hf.nq = 6
     end
+    hf.nq = 12÷hf.q
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     hf.lk = hf.q*hf.nq^2
@@ -357,7 +358,6 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     hf.P .= λ*P_new + (1-λ)*hf.P
     return norm_convergence,λ
 end
-
 
 function calculate_norm_convergence(P2::Array{ComplexF64,3},P1::Array{ComplexF64,3})
     # vals1 = zeros(Float64,size(P1,1),size(P1,3))
