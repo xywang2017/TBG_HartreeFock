@@ -93,8 +93,8 @@ function initParamsWithStrain(params::Params)
     params.Kb = params.Kb - (params.A[1]+1im*params.A[2])/2 + (params.S[1,1]+1im*params.S[2,1])*2π/3
     
     # make Γ inversion symmetric point 
-    params.Kt -= params.g1/2 
-    params.Kb += params.g1/2
+    params.Kt = params.Kt - params.g1/2  #+ (params.g1+params.g2)/2
+    params.Kb = params.Kb + params.g1/2 # + (params.g1+params.g2)/2
 
     return nothing 
 

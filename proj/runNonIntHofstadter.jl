@@ -1,12 +1,12 @@
 using PyPlot
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/bmLL.jl"))
+include(joinpath(fpath,"libs/bmLL_inversion_symmetric.jl"))
 
 BLAS.set_num_threads(1)
 
 ϕmin = 1//12
-str = "K"
+str = "Kprime"
 w0 = 0.7
 w0str = "07"
 
@@ -16,17 +16,21 @@ w0str = "07"
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/138_strain"
+    if !isdir(fname)
+        mkpath(fname)
+    end
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 12÷denominator(ϕ) 
+    # nq = 12÷denominator(ϕ) 
+    nq = 1
     println("p= ",p,", q= ",q,", nq= ",nq)
-    # fname = joinpath(fpath,"$(fname)/B/_$(p)_$(q)_$(str)_metadata.jld2")
-    fname = ""
+    fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
+    # fname = ""
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
     return bm.spectrum
 end
 
@@ -40,7 +44,7 @@ for ϕ in ϕs
     end
 end
 
-fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/B/K_NonIntHofstadter_metadata.jld2")
+fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/$(str)_NonIntHofstadter_metadata.jld2")
 jldopen(fname, "w") do file
     file["hoftstadter_data"] = data
 end
@@ -48,9 +52,9 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter//138_strain/B/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fname1 = joinpath(fpath,"NonInt/Hofstadter//138_strain/B/Kprime_NonIntHofstadter_metadata.jld2")
+    fname1 = joinpath(fpath,"NonInt/Hofstadter/138_strain/Kprime_NonIntHofstadter_metadata.jld2")
     data1 = load(fname1,"hoftstadter_data");
     fig = figure(figsize=(4,3))
     ϕmin = 1//12
