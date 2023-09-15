@@ -1,7 +1,7 @@
 using PyPlot
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/bmLL_inversion_symmetric.jl"))
+include(joinpath(fpath,"libs/bmLL.jl"))
 
 BLAS.set_num_threads(1)
 
@@ -22,8 +22,8 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    # nq = 12÷denominator(ϕ) 
-    nq = 1
+    nq = 12÷denominator(ϕ) 
+    # nq = 1
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     # fname = ""
@@ -56,15 +56,15 @@ function plot_LL_spectrum()
     data = load(fname,"hoftstadter_data");
     fname1 = joinpath(fpath,"NonInt/Hofstadter/138_strain/Kprime_NonIntHofstadter_metadata.jld2")
     data1 = load(fname1,"hoftstadter_data");
-    fig = figure(figsize=(4,3))
+    fig = figure(figsize=(8,6))
     ϕmin = 1//12
     ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
     ϕs = ϕs[ϕs .>= ϕmin]
     for ϕ in ϕs
         energies = data["$(ϕ)"]
-        plot(ones(length(energies))*ϕ,energies,".",c="k",ms=4,markeredgecolor="none")
+        plot(ones(length(energies))*ϕ,energies,"b.",ms=4,markeredgecolor="none")
         energies1 = data1["$(ϕ)"]
-        plot(ones(length(energies1))*ϕ,-energies1,"r.",ms=4,markeredgecolor="none")
+        plot(ones(length(energies1))*ϕ,energies1,"r.",ms=4,markeredgecolor="none")
     end
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
