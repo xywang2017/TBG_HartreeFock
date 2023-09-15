@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/bmLL_inversion_symmetric.jl"))
 BLAS.set_num_threads(1)
 
 ϕmin = 1//12
-str = "Kprime"
+str = "K"
 w0 = 0.7
 w0str = "07"
 
@@ -62,9 +62,9 @@ function plot_LL_spectrum()
     ϕs = ϕs[ϕs .>= ϕmin]
     for ϕ in ϕs
         energies = data["$(ϕ)"]
-        plot(ones(length(energies))*ϕ,energies,"m.",ms=4,markeredgecolor="none")
+        plot(ones(length(energies))*ϕ,energies,".",c="k",ms=4,markeredgecolor="none")
         energies1 = data1["$(ϕ)"]
-        plot(ones(length(energies1))*ϕ,energies1,"b.",ms=4,markeredgecolor="none")
+        plot(ones(length(energies1))*ϕ,-energies1,"r.",ms=4,markeredgecolor="none")
     end
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")

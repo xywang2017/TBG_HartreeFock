@@ -154,7 +154,7 @@ end
 function constructOffDiagonals(A::bmLL)
     r2 = 0
     _q = 0.0 + 0.0im
-    θ_strain = angle(A.params.a2) - π/2
+    θ_strain = ( angle(A.params.a2) - π/2)
     T12 = zeros(ComplexF64,A.nH,A.nH)
     for j in eachindex(A.qjs)
         if (j==1)
@@ -179,18 +179,18 @@ function constructOffDiagonals(A::bmLL)
         #     T12[iH1,iH2] = _tLL(_Tj,_q,n1,γ1,n2,γ2,A.lB,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
         #     # T12[iH1,iH2] = _tLL(_Tj,_q,n1,γ1,n2,γ2,A.lB,θ_strain,θ_strain,true)
         # end
-        Kl = isequal(A._valley,"K") ? A.params.Kb : A.params.Kt
-        Kr = isequal(A._valley,"K") ? A.params.Kt : A.params.Kb
+        Kl = isequal(A._valley,"K") ? A.params.Kb : - A.params.Kb
+        Kr = isequal(A._valley,"K") ? A.params.Kt : - A.params.Kt
         for ik2 in 1:A.nq, r1 in 0:(A.p-1)
-            # k2l = projector_para(A.params.g2,A.params.a2) * A.latt.k2[r1*A.nq+ik2] - projector_para(Kl,A.params.a2)
-            k2l = projector_para(A.params.g2,A.params.a2) * (A.latt.k2[ik2]+(r1-(A.p-1)/2)/A.q ) - projector_para(Kl,A.params.a2)
+            k2l = projector_para(A.params.g2,A.params.a2) * A.latt.k2[r1*A.nq+ik2] - projector_para(Kl,A.params.a2)
+            # k2l = projector_para(A.params.g2,A.params.a2) * (A.latt.k2[ik2]+(r1-(A.p-1)/2)/A.q ) - projector_para(Kl,A.params.a2)
             r2 = mod(r1 + A.q * imag(A.qjs[j]),A.p)
             s = - ((r1 + A.q * imag(A.qjs[j])) - r2 )÷A.p
-            # p2 = A.latt.k2[r2*A.nq+ik2]
-            p2 = A.latt.k2[ik2]+(r2-(A.p-1)/2)/A.q
+            p2 = A.latt.k2[r2*A.nq+ik2]
+            # p2 = A.latt.k2[ik2]+(r2-(A.p-1)/2)/A.q
             for ik1 in 1:A.nq
                 expfactor = exp(1im * 2π * s * (A.latt.k1[ik1]-p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
-                            exp(1im *s*(s-1)/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
+                            exp(1im *s*(s)/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
                             exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) * 
                             exp(1im * real(_q)*k2l*A.lB^2) * exp(1im * real(_q) * imag(_q) * A.lB^2 / 2)
                 A.H[:,r1+1,1,:,r2+1,2,ik1,ik2] .+=  expfactor * T12

@@ -21,8 +21,8 @@
 
     # coordinates for special points (Γ is at origin)
     Γ::ComplexF64 = 0.0im
-    # Kt::ComplexF64 = kb * exp(1im * 5π/6)
-    # Kb::ComplexF64 = kb * exp(- 1im * 5π/6)
+    # Kt::ComplexF64 = 4π/3 + kb/2 * exp(1im*π/2)
+    # Kb::ComplexF64 = 4π/3 - kb/2 * exp(1im*π/2)
     Kt::ComplexF64 = kb/2 * exp(1im*π/2)
     Kb::ComplexF64 = -Kt
 
