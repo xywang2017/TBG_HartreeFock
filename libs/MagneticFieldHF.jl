@@ -92,7 +92,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     elseif q ==2 
         hf.nq = 6
     end
-    hf.nq = 12÷hf.q
+    hf.nq = 10÷hf.q
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     hf.lk = hf.q*hf.nq^2
