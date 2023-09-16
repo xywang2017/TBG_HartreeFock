@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 124
+twist_angle = 120
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -14,15 +14,15 @@ initParamsWithStrain(params)
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 # flag = "random"
 # seed = 2
-for sts in [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-    s,t = sts[1], sts[2]
-    s,t = -3,-1
-    p,q = 1,5
+# for sts in [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
+    # s,t = sts[1], sts[2]
+    s,t = -2,-2
+    p,q = 1,7
     νF = (s)+(t)*p/q
     νstr = round(Int,1000*νF)
     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     if !isfile(metadata)
-        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     end
     if isfile(metadata)
         E = load(metadata,"iter_energy")[end]
@@ -44,7 +44,7 @@ for sts in [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
     # -----------------------------------Density matrix analysis ------------------------------------------- # 
     # plot_spectra(metadata;savename="test.pdf")
     plot_density_matrix_bm_valley_spinv2(metadata,ik=1,savename="124_DensityMat_HFM_$(s)_$(t).png")
-end
+# end
 # plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 # plot_density_matrix_sublattice_full(metadata)

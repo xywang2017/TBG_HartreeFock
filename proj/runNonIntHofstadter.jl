@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 BLAS.set_num_threads(1)
 
 ϕmin = 1//12
-str = "K"
+str = "Kprime"
 w0 = 0.7
 w0str = "07"
 
@@ -27,7 +27,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     # fname = ""
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.38π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
