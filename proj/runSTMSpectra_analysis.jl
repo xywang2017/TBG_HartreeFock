@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 138
+twist_angle = 128
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -13,7 +13,7 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕ = 1//8
+ϕ = 5//12
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -22,9 +22,9 @@ end
 sts = unique(sts)
 νs = sort(unique([sts[i][1]+sts[i][2]*ϕ*1.0 for i in eachindex(sts)]))
 νs = νs[abs.(νs) .<=4]
-# νs = νs[νs .<=1e-3]
+νs = νs[νs .<=1e-3]
 #
-fig = figure(figsize=(3,3))
+fig = figure(figsize=(3,2))
 ϵs = collect(range(-90,90,400))
 γ = 2
 dos = zeros(Float64,length(ϵs),length(νs))
@@ -57,13 +57,13 @@ for j in eachindex(νs)
         end
     end
 end
-pl = pcolormesh(ϵs,νs,dos',cmap="bwr")
-for sts in [[-1,-3],[-2,-2],[-3,-1],]
-    s,t = sts[1],sts[2]
-    axhline(s+t*ϕ,ls=":",c="k")
-end
+pl = pcolor(ϵs,νs,dos',cmap="bwr")
+# for sts in [[-1,-3],[-2,-2],[-3,-1],]
+#     s,t = sts[1],sts[2]
+#     axhline(s+t*ϕ,ls=":",c="k")
+# end
 
-axvline(0,ls=":",c="k")
+# axvline(0,ls=":",c="k")
 # colorbar(pl)
 ylabel(L"n/n_s")
 xlabel("E (meV)")

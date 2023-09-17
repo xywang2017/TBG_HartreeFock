@@ -226,7 +226,11 @@ end
 function plot_density_matrix_bm_valley_spinv2(fname::String;ik::Int=1,savename::String="test.png")
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
+    P0 = zeros(Float64,2hf.q,4,2hf.q,4)
+    for ik in 1:size(hf.P,3)
+        P0 .+= abs.(reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4));
+    end
+    P0 ./= size(hf.P,3)
     # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
     fig,ax = subplots(1,4,figsize=(8,2),sharex=true,sharey=true)
     states = ["K↑","K'↑","K↓","K'↓"]
