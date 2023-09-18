@@ -85,7 +85,7 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
-    fig = figure(figsize=(3,2.5))
+    fig = figure(figsize=(2.4,2.8))
     ϵFs = Float64[]
     Δs = Float64[]
     for j in eachindex(metadatas) 
@@ -101,7 +101,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         # plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"bo",markeredgecolor="none",markersize=2)
         # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
         if j == length(metadatas)
-            colorbar(pl,shrink=0.8)
+            # colorbar(pl,shrink=0.8)
         end
         plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
@@ -129,7 +129,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # title(titlestr)
     # xticks(collect(0.1:0.2:0.5))
     xlim([0,0.55])
-    ylim([-50,40])
+    ylim([-40,40])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
@@ -141,7 +141,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # xticks(ticklist,ticklistLabels)
     # title(titlestr)
     tight_layout()
-    savefig(savename,dpi=500,transparent=true)
+    savefig(savename,dpi=600,transparent=true)
     display(fig)
     close(fig)
 
@@ -189,16 +189,54 @@ end
 
 
 ### density matrix analysis 
+function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png")
+    # plot at a given k point, 2qx4 x 2qx4 matrix 
+    hf = load(fname,"hf");
+    P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
+    # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
+    fig,ax = subplots(1,figsize=(2.3,2))
+    # states = ["K↑","K'↑","K↓","K'↓"]
+    pl = 0
+    for r in 1:1, c in 1:1
+        pl=ax.imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Reds")
+        cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
+        cbar.set_ticks(collect(0:0.2:1))
+        # colorbar(pl,ax=ax)
+        # ax[r,c].set_title(states[r+2(c-1)])
+        # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
+        # ax.set_xticks([1,hf.q,2hf.q])
+        # ax.set_yticks([1,hf.q,2hf.q])
+        # ax.set_xticklabels(["1","q","2q"])
+        # ax.set_yticklabels(["1","q","2q"])
+        ax.set_xticks([])
+        ax.set_yticks([])
+        # ax[r,c].axis("equal")
+    end
+    tight_layout()
+    # subplots_adjust(hspace=0.02,wspace=0.05)
+    # cbar_ax = fig.add_axes([0.74, 0.15, 0.15, 0.7])
+    # cbar_ax.axis(false)
+    # fig.colorbar(pl, ax=cbar_ax)
+    
+    savefig(savename,dpi=600,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+
+### density matrix analysis 
 function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1,savename::String="test.png")
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    # P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
-    P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
+    P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
+    # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
     fig,ax = subplots(2,2,figsize=(3.2,3.2))
     states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="hot")
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Blues")
         # colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         # ax[r,c].set_title(states[r+2(c-1)])
         ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
@@ -227,10 +265,11 @@ function plot_density_matrix_bm_valley_spinv2(fname::String;ik::Int=1,savename::
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
     P0 = zeros(Float64,2hf.q,4,2hf.q,4)
-    for ik in 1:size(hf.P,3)
-        P0 .+= abs.(reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4));
+    # for ik in 1:size(hf.P,3)
+    for i in ik:ik
+        P0 .+= abs.(reshape(view(hf.P,:,:,i)+0.5I,2hf.q,4,2hf.q,4));
     end
-    P0 ./= size(hf.P,3)
+    P0 ./= 1 #size(hf.P,3)
     # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
     fig,ax = subplots(1,4,figsize=(8,2),sharex=true,sharey=true)
     states = ["K↑","K'↑","K↓","K'↓"]

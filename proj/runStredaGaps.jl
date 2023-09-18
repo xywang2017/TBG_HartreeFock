@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 128
+twist_angle = 105
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -78,14 +78,14 @@ ylim([0.0,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
-savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=500)
+savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-sts = [[-3,-1]]
+sts = [[0,0],[0,-3],[0,-2],[0,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -109,7 +109,7 @@ for st in sts
                     end
                 end
                 if load(metadata,"iter_err")[end] > 1e-6
-                    println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
+                    # println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
                 end
                 # println(metadata)
                 push!(metadatas,metadata)
@@ -120,24 +120,27 @@ for st in sts
     push!(Δss,Δs)
 end
 
-fig = figure(figsize=(3,2.5))
-sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
+fig = figure(figsize=(6,4))
+sts = [[0,0],[0,-3],[0,-2],[0,-1]]
+# ϕc = [-1,2//5,1//3,1//3] # 132 degrees critical field
+# ϕc = [-1,1//6,1//11,1//11] # 132 degrees critical field
+colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for i in eachindex(Δss)
     s, t = sts[i][1], sts[i][2]
-    plot(ϕs,Δss[i],"o-",ms=4,markeredgecolor="none",label="($(s),$(t))")
+    plot(ϕs,Δss[i],"-o",c=colors[i],ms=4,markeredgecolor="none",label="($(s),$(t))")
 end
-legend(fontsize=8)
+legend(fontsize=6,loc="upper left")
 xlabel(L"ϕ/ϕ_0")
 ylabel("Δ (meV)")
 # axvline(3/8)
 # axvline(2/7)
 # axvline(3/7)
 # axvline(4/11)
-xticks([0.1,0.2,0.3,0.4,0.5])
-xlim([0,0.55])
-# ylim([0,1.2*maximum(Δs)])
+# xticks([0.1,0.2,0.3,0.4,0.5])
+xlim([-0.1,0.55])
+ylim([0,24])
 tight_layout()
-savefig("tmp_128.png",transparent=true,dpi=500)
+savefig("tmp_128.png",transparent=false,dpi=600)
 display(fig)
 close(fig)
 
@@ -145,56 +148,32 @@ close(fig)
 # plot spectrum 
 function plot_LL_spectrum(s::Int,t::Int,params::Params)
     foldername0 = "NonInt/$(twist_angle)_strain"
-    fig,ax = subplots(4,1,sharex=true,sharey=true,figsize=(2.5,5))
+    fig,ax = subplots(figsize=(2.5,3))
     strs = ["K","Kprime"]
+    pl = 0
     for ϕ in ϕs
         p, q = numerator(ϕ), denominator(ϕ)
-        νstr = round(Int,1000*(s+t*p/q))
-        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        if !isfile(metadata)
-            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        end
-        if isfile(metadata)
-            E = load(metadata,"iter_energy")[end]
-            for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10
-                metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-                if isfile(metadata0)
-                    E0 = load(metadata0,"iter_energy")[end]
-                    if E0<=E 
-                        E, metadata = E0, metadata0 
-                    end
-                end
-            end
-        end
-        hf = load(metadata,"hf");
-        P = reshape(hf.P,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,hf.q,hf.nq,hf.nq)
-        weights = zeros(Float64,2hf.q,hf.nq,hf.nq)
-        titlestr = ["K↑" "K↓";"K'↑" "K'↓"]
+        strs = ["K","Kprime"]
         for iη in 1:2, is in 1:2
-            r = (is-1)*2+iη
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
-            for i2 in 1:hf.nq, i1 in 1:hf.nq, iq in 1:hf.q
-                weights[:,i1,i2] = real(diag(P[:,iη,is,:,iη,is,iq,i1,i2])) .+0.5
+            Σz = load(fname0,"PΣz");
+            weights = zeros(Float64,2q,size(energies,2),size(energies,3))
+            for i2 in 1:size(energies,3), i1 in 1:size(energies,2)
+                weights[:,i1,i2] = real(diag(Σz[:,:,i1,i2]))
             end
             energies = reshape(energies,2q,:)
-            ax[r].scatter(ones(length(energies[1:(q-p),:][:]))*ϕ,energies[1:(q-p),:][:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c="b",vmin=0,vmax=1,cmap="coolwarm")
-            ax[r].scatter(ones(length(energies[(q-p+1):(2q),:][:]))*ϕ,energies[(q-p+1):(2q),:][:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c="gray",vmin=0,vmax=1,cmap="coolwarm")
-            # ax[iη,is].set_title(titlestr[iη,is])
-            ax[r].text(0.02,0.0,titlestr[iη,is],rotation="vertical")
+            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c=weights*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
+        
     end
-    for j in 1:4
-        ax[j].set_ylabel("E (meV)")
-        if j==4
-            ax[j].set_xlabel(L"ϕ/ϕ_0")
-        end
-    end
-    ax[1,1].set_xlim([0,0.55])
-    tight_layout() 
-    subplots_adjust(hspace=0,wspace=0)
-    savefig("tmp_$(s)_$(t).png",dpi=500)
+    colorbar(pl,fraction=0.06, pad=0.05,location="top")
+    ax.set_ylabel("E (meV)")
+    ax.set_xlabel(L"ϕ/ϕ_0")
+    ax.set_xlim([0,0.55])
+    tight_layout()
+    savefig("tmp_$(s)_$(t).png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing

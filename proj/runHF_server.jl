@@ -17,11 +17,11 @@ twist_angle = parse(Float64,ARGS[7])
 _is_strain = ARGS[8]
 
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
-    mkpath(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
+if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
+    mkpath(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
 end
 
-savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 ϕ = p//q 
 if isequal(flag,"flavor")
     _Init = "Flavor U(4)"
