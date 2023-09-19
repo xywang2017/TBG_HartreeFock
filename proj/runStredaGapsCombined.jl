@@ -60,8 +60,8 @@ for i in eachindex(twist_angles)
         ax[r,c].scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="tab:blue",edgecolor="none")
     end
     if r==1 && c==1 
-        ax[r,c].scatter([-1.0],[0.56],s=20^2/10,c="tab:red",edgecolor="none")
-        ax[r,c].text(-0.9,0.55,"20 meV",size=11,c="tab:red")
+        ax[r,c].scatter([-1.0],[0.56],s=10^2/10,c="tab:red",edgecolor="none")
+        ax[r,c].text(-0.9,0.55,"10 meV",size=11,c="tab:red")
     end
 end
 

@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 105
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -16,11 +16,11 @@ initParamsWithStrain(params)
 # seed = 2
 # for sts in [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
 # for sts in [[0,-4]]
-for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
+# for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
 # for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
-    s,t = sts[1], sts[2]
-    s,t = 0,0
-    p,q = 5,12
+    # s,t = sts[1], sts[2]
+    s,t = -3, 0
+    p,q = 1,5
     νF = (s)+(t)*p/q
     νstr = round(Int,1000*νF)
     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -48,13 +48,14 @@ for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
     # plot_spectra(metadata;savename="test.pdf")
     # plot_density_matrix_bm_valley_spin(metadata,ik=1,savename="$(twist_angle)_DensityMat_HFM_$(s)_$(t).png")
     plot_density_matrix_bm(metadata,ik=1)
-end
+    plot_density_matrix_global_order_parameters(metadata)
+# end
 # plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 # plot_density_matrix_sublattice_full(metadata)
 
 # plot_density_matrix_global_order_parameters(metadata)
-plot_density_matrix_valley_spin_density_tL2(metadata)
+# plot_density_matrix_valley_spin_density_tL2(metadata)
 ## strong coupling basis at reference point defined by metadata0
 seed = 1
 flag  = "random"
