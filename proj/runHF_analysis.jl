@@ -19,9 +19,10 @@ initParamsWithStrain(params)
 # for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
 # for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
     # s,t = sts[1], sts[2]
-    s,t = -3, 0
-    p,q = 1,5
+    s,t = -0.5, -3
+    p,q = 1,6
     νF = (s)+(t)*p/q
+    println(νF)
     νstr = round(Int,1000*νF)
     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     if !isfile(metadata)

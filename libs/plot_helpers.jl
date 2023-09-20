@@ -352,7 +352,7 @@ function plot_density_matrix_global_order_parameters(fname::String)
     sy = ComplexF64[0 -1im;1im 0]
     sz = ComplexF64[1 0;0 -1]
     Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
-    # Iq = diagm([(-1)^i for i in 1:(2hf.q)])
+    Iq = diagm([(-1)^((hf.q-1)÷i) for i in 1:(2hf.q)])
     Os = kron(sz,kron(s0,Iq))
     Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),hf.nq*hf.q,hf.nq) ./(hf.q)
     # println(sum(Sk)/length(Sk))
