@@ -6,18 +6,22 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.05π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
-p, q = 2,7
-jldopen(joinpath(fpath,"NonInt/124_nostrain/_$(p)_$(q)_K_metadata.jld2")) do file 
-    m,n = 3,-3q
+p, q = 1,8
+jldopen(joinpath(fpath,"NonInt/124_strain/_$(p)_$(q)_K_metadata.jld2")) do file 
+    m,n = 1,-3
+    r1 = 4
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
     pl=imshow(abs.(Λ),origin="lower")
     G = abs(params.g1*m+params.g2*n/q)
-    println(G)
     colorbar(pl)
     axis("equal")
     display(fig)
     close(fig)
+
+    tmp = reshape(Λ,2q,q,2q,q);
+    lol = tmp[:,4+r1,:,2+r1] ./ (tmp[:,4,:,2]*exp(-1im*2π*r1*n/q))
+    # println(sum(real(lol))/(2q)^2)
 end
 
 q = 3
