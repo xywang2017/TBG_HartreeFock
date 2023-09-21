@@ -26,11 +26,23 @@ end
 
 for m in -3:3, n in -24:24
     Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v1.jld2"),"$(m)_$(n)");
-    Λ2 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v2.jld2"),"$(m)_$(n)");
+    Λ2 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2"),"$(m)_$(n)");
 
-    if norm(Λ1 .- Λ2) > 1e-6
-        println(norm(Λ1 .- Λ2))
+    Λ1 = reshape(Λ1,2q,q,2q,q)
+    Λ2 = reshape(Λ2,2q,q,2q,q)
+
+    for j in 1:2q, i in 1:2q
+        tmp = (Λ1[i,:,j,:])./ (Λ2[end-i+1,:,end-j+1,:])
+        for ii in 1:q 
+            tmp[ii,ii] = tmp[1,2]
+        end
+        tmp ./= tmp[1,2]
+        if norm(tmp .-1.0)> 1e-6
+            println(m," ",n," ",i," ",j," error with C2P: ",norm(tmp .-1.0))
+            # println(m," ",n)
+        end
     end
+    # display("text/plain",abs.(Λ1[1,:,3,:]./ Λ2[end,:,end-2,:])
 end
 
 
