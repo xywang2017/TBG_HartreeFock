@@ -83,7 +83,7 @@ function constructbmLL(A::bmLL,params::Params;
     # computeSpectrum_remote(A)
 
     A.fname = fname 
-    fnameKprime = replace(fname,"_K_"=>"_Kprime_test_")
+    fnameKprime = replace(fname,"_K_"=>"_Kprime_")
     # write energies and wavefunctions
     jldopen(fname, "w") do file
         file["E"] = A.spectrum 
