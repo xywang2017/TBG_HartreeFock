@@ -357,7 +357,7 @@ function computeCoulombOverlap(A::bmLL,m::Int,n::Int)
                     θl = (2layer-3)*A.params.dθ/2
                     k2l = projector_para(A.params.g2,A.params.a2) * _k2 - projector_para(Kl,A.params.a2)
                     expfactor = exp(1im * 2π * s * (_p1-_p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
-                                    exp(1im *s*(s-1)/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
+                                    exp(1im *s*s/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
                                     exp(-1im * s * projector_norm(Kl,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) * 
                                     exp(1im * real(_q)*k2l*A.lB^2) * exp(1im * real(_q) * imag(_q) * A.lB^2 / 2)
 
@@ -388,7 +388,7 @@ function computeCoulombOverlap(A::bmLL,m::Int,n::Int)
                     θl = (2layer-3)*A.params.dθ/2
                     k2l = projector_para(A.params.g2,A.params.a2) * _k2 - projector_para(Kl,A.params.a2)
                     expfactor = exp(1im * 2π * s * (_p1-_p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
-                                    exp(1im *s*(s-1)/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
+                                    exp(1im *s*s/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
                                     exp(-1im * s * projector_norm(Kl,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) * 
                                     exp(1im * real(_q)*k2l*A.lB^2) * exp(1im * real(_q) * imag(_q) * A.lB^2 / 2)
 
@@ -401,12 +401,15 @@ function computeCoulombOverlap(A::bmLL,m::Int,n::Int)
             end
             tmpΛ[:,rk1+1,ik1,ik2,:,rp1+1,ip1,ip2] = view(A.vec,:,:,rk1+1,ik1,ik2)' * ΛΨ * view(A.vec,:,:,rp1+1,ip1,ip2)
         end
-        indices = circshift(collect(1:A.q),A.p)
-        for ip1 in 1:(A.q-1), ik1 in 1:(A.q-1)
-            if (rp1>rk1) #upper triangle
-                tmpΛ[:,rk1+1,:,:,:,rp1+1,:,:] = tmpΛ[:,1,:,:,:,rp1-rk1+1,:,:] * exp(-1im*2π*(rk1*n)/hf.q)
+        ips = zeros(Int,A.q)  # p1 + ip /q 
+        for rp1 in 0:(A.q-1) # p1 + rp1*p/q 
+            ips[rp1+1] = mod(rp1 * A.p,A.q)
+        end
+        for rp1 in 1:(A.q-1), rk1 in 1:(A.q-1)
+            if (ips[rp1+1]>ips[rk1+1]) #upper triangle
+                tmpΛ[:,ips[rk1+1]+1,:,:,:,ips[rp1+1]+1,:,:] = tmpΛ[:,1,:,:,:,ips[rp1+1]-ips[rk1+1]+1,:,:] * exp(-1im*2π*(rk1*n)/A.q)
             else #lower triangle
-                tmpΛ[:,rk1+1,:,:,:,rp1+1,:,:] = tmpΛ[:,rk1-rp1+1,:,:,:,1,:,:] * exp(-1im*2π*(rp1*n)/hf.q)
+                tmpΛ[:,ips[rk1+1]+1,:,:,:,ips[rp1+1]+1,:,:] = tmpΛ[:,ips[rk1+1]-ips[rp1+1]+1,:,:,:,1,:,:] * exp(-1im*2π*(rp1*n)/A.q)
             end
         end
     end
