@@ -6,14 +6,14 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
-p, q = 3,8
-jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2")) do file 
-    m,n = 3,1
+p, q = 1,5
+jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_test_metadata_v1.jld2")) do file 
+    m,n = 1,2
     r1 = 3
-    # Λ = file["$(m)_$(n)"]
-    Λ = file["PΣz"]
+    Λ = file["$(m)_$(n)"]
+    # Λ = file["PΣz"]
     fig = figure(figsize=(5,4))
-    pl=imshow(abs.(Λ[:,:,1,1]),origin="lower")
+    pl=imshow(abs.(Λ),origin="lower")
     G = abs(params.g1*m+params.g2*n/q)
     colorbar(pl)
     axis("equal")
@@ -21,22 +21,22 @@ jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2")) 
     close(fig)
 end
 
-for m in -3:3, n in -24:24
+for m in -3:3, n in -15:15
     Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_test_metadata_v1.jld2"),"$(m)_$(n)");
     Λ2 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2"),"$(m)_$(n)");
-
-    Λ1 = reshape(Λ1,2q,q,2q,q)
-    Λ2 = reshape(Λ2,2q,q,2q,q)
+    
+    Λ1 = reshape(Λ1,2q,q,4,2q,q,4)[:,:,2,:,:,1]
+    Λ2 = reshape(Λ2,2q,q,4,2q,q,4)[:,:,2,:,:,1]
 
     for j in 1:2q, i in 1:2q
         θ = Λ1[i,3,j,2] / Λ2[i,3,j,2]
         tmp = Λ1[i,:,j,:] -  Λ2[i,:,j,:]*θ
-        if norm(tmp .-1.0)> 1e-6
-            println(m," ",n," ",i," ",j," error with C2P: ",norm(tmp .-1.0))
+        if norm(tmp)> 1e-6
+            println(m," ",n," ",i," ",j," error with C2P: ",norm(tmp))
             # println(m," ",n)
         end
     end
-    # display("text/plain",abs.(Λ1[1,:,3,:]./ Λ2[end,:,end-2,:])
+    # display("text/plain",Λ1[1,:,5,:]./ Λ2[1,:,5,:])
 end
 
 

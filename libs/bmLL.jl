@@ -93,7 +93,7 @@ function constructbmLL(A::bmLL,params::Params;
     if isequal(A._valley,"K")
         # write energies and wavefunctions
         jldopen(fnameKprime, "w") do file
-            file["E"] = A.spectrum 
+            file["E"] = -reverse(A.spectrum,dims=1) 
             file["Vec"] = reverse(A.vec,dims=2)
             file["PΣz"] = -reverse(A.PΣz,dims=(1,2))
         end
