@@ -7,36 +7,30 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
 p, q = 3,8
-jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v2.jld2")) do file 
+jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2")) do file 
     m,n = 3,1
     r1 = 3
-    Λ = file["$(m)_$(n)"]
+    # Λ = file["$(m)_$(n)"]
+    Λ = file["PΣz"]
     fig = figure(figsize=(5,4))
-    pl=imshow(abs.(Λ),origin="lower",vmin=0,vmax=1)
+    pl=imshow(abs.(Λ[:,:,1,1]),origin="lower")
     G = abs(params.g1*m+params.g2*n/q)
     colorbar(pl)
     axis("equal")
     display(fig)
     close(fig)
-
-    tmp = reshape(Λ,2q,q,2q,q);
-    lol = tmp[:,1+r1,:,2+r1] ./ (tmp[:,1,:,2]*exp(-1im*2π*n/q))
-    println(sum(real(lol))/(2q)^2)
 end
 
 for m in -3:3, n in -24:24
-    Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v1.jld2"),"$(m)_$(n)");
+    Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_test_metadata_v1.jld2"),"$(m)_$(n)");
     Λ2 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata_v1.jld2"),"$(m)_$(n)");
 
     Λ1 = reshape(Λ1,2q,q,2q,q)
     Λ2 = reshape(Λ2,2q,q,2q,q)
 
     for j in 1:2q, i in 1:2q
-        tmp = (Λ1[i,:,j,:])./ (Λ2[end-i+1,:,end-j+1,:])
-        for ii in 1:q 
-            tmp[ii,ii] = tmp[1,2]
-        end
-        tmp ./= tmp[1,2]
+        θ = Λ1[i,3,j,2] / Λ2[i,3,j,2]
+        tmp = Λ1[i,:,j,:] -  Λ2[i,:,j,:]*θ
         if norm(tmp .-1.0)> 1e-6
             println(m," ",n," ",i," ",j," error with C2P: ",norm(tmp .-1.0))
             # println(m," ",n)
