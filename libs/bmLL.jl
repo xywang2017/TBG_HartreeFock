@@ -101,9 +101,12 @@ function constructbmLL(A::bmLL,params::Params;
 
     ng = 3
     A.gvec = reshape(collect(-ng:ng),:,1)*A.params.g1 .+ reshape(collect(-ng*A.q:ng*A.q),1,:)*A.params.g2 ./A.q
-    A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
 
     if _calculate_overlap
+        A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
+        Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
+        tmpΛ = reshape(Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
+        tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
         # for m in -ng:ng, n in -ng*A.q:ng*A.q 
         for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
             println("m:",m," n:",n)
@@ -112,9 +115,6 @@ function constructbmLL(A::bmLL,params::Params;
                 file["$(m)_$(n)"] = A.Λ
             end
             if isequal(A._valley,"K")
-                Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
-                tmpΛ = reshape(Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
-                tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
                 tmpΛ .= reverse(tmpΛ0,dims=(1,3))
                 jldopen(fnameKprime, "a") do file
                     file["$(m)_$(n)"] = Λ
