@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 120
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -20,7 +20,7 @@ initParamsWithStrain(params)
 # for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
     # s,t = sts[1], sts[2]
     s,t = -3, -1
-    p,q = 1,10
+    p,q = 2,7
     νF = (s)+(t)*p/q
     println(νF)
     νstr = round(Int,1000*νF)
@@ -30,7 +30,7 @@ initParamsWithStrain(params)
     end
     if isfile(metadata)
         E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","chern","random","bm","strong","bm_cascade"], seed in 1:10
+        for flag in ["flavor","chern","random","bm","strong","bm_cascade"], seed in 1:1
             metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if isfile(metadata0)
                 E0 = load(metadata0,"iter_energy")[end]
@@ -50,6 +50,9 @@ initParamsWithStrain(params)
     # plot_density_matrix_bm_valley_spin(metadata,ik=1,savename="$(twist_angle)_DensityMat_HFM_$(s)_$(t).png")
     plot_density_matrix_bm(metadata,ik=1)
     plot_density_matrix_global_order_parameters(metadata)
+
+    P1 = load(metadata,"hf").P;
+    P2 = load(metadata,"hf").P;
 # end
 # plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)

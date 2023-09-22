@@ -109,7 +109,9 @@ function constructbmLL(A::bmLL,params::Params;
         tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
         # for m in -ng:ng, n in -ng*A.q:ng*A.q 
         for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
-            println("m:",m," n:",n)
+            if mod(n,A.q) == 0
+                println("m:",m," n:",n÷A.q)
+            end
             computeCoulombOverlap_v2(A,m,n)  # q^2/(2q-1) times faster than computeCoulombOverlap(A,m,n)!
             jldopen(fname, "a") do file
                 file["$(m)_$(n)"] = A.Λ
