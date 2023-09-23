@@ -35,7 +35,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     end
     nq = 12÷q
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata_v2.jld2")
     println(fname)
     if isequal(_is_strain,"nostrain")
         params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)

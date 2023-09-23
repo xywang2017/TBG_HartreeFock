@@ -6,20 +6,31 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
-p, q = 2,7
-jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_metadata.jld2")) do file 
-    m,n = 3,-3q
-    r1 = 3
-    Λ = file["$(m)_$(n)"]
+p, q = 1,4
+Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v1.jld2"),"bmLL").Λ;
+jldopen(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_K_metadata_v2.jld2")) do file 
+    for m in -3:3, n in -12:12 
+        jm, jn = m +4, n + 3q + 1
+        tmp = reshape(Λ1[:,:,:,jm,jn],2q,9,2q,9,:)[:,2,:,3,:]
+        Λ = reshape(file["$(m)_$(n)"],2q,q,9,2q,q,9)[:,:,2,:,:,3]
+        for i1 in 0:3, i2 in 0:3
+            i21 = i2-i1 
+            α = Λ[1,i1+1,3,i2+1] / tmp[1,3,i21+q]
+            if (norm(Λ[:,i1+1,:,i2+1] .- tmp[:,:,i21+q]*α)) > 1e-6
+                println(norm(Λ[:,i1+1,:,i2+1] .- tmp[:,:,i21+q]*α))
+            end
+        end
+    end
     # Λ = file["PΣz"]
-    fig = figure(figsize=(5,4))
-    pl=imshow(abs.(Λ),origin="lower")
-    G = abs(params.g1*m+params.g2*n/q)
-    colorbar(pl)
-    axis("equal")
-    display(fig)
-    close(fig)
+    # fig = figure(figsize=(5,4))
+    # pl=imshow(abs.(Λ),origin="lower")
+    # G = abs(params.g1*m+params.g2*n/q)
+    # colorbar(pl)
+    # axis("equal")
+    # display(fig)
+    # close(fig)
 end
+
 
 for m in -3:3, n in -15:15
     Λ1 = load(joinpath(fpath,"NonInt/120_strain/_$(p)_$(q)_Kprime_test_metadata_v1.jld2"),"$(m)_$(n)");
