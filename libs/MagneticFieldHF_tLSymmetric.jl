@@ -138,7 +138,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     # strong coupling 
     # hf.H0 .= 0.0
     while norm_convergence > hf.precision
-        # @time begin 
+        @time begin 
             hf.H .= hf.H0 * 1.0
             add_HartreeFock(hf;β=1.0)
             Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P,hf.ν)
@@ -164,7 +164,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
             println("Running HF energy (per moire u.c.): ",Etot)
             println("Running norm convergence: ",norm_convergence)
             println("Running ODA paramter λ: ",λ)
-        # end
+        end
     end
 
     return iter_err, iter_energy
@@ -215,29 +215,24 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
         G = m*hf.params.g1+n/hf.q*hf.params.g2
         if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6)) # this leads to a shell expansion up to 3g1+3g2
-
-        
             for iη in 1:2
                 jldopen(hf.metadata[iη]) do file 
-                    @time begin
-                        metadata .= file["$(m)_$(n)"]
-                    end
-                    # metadata .= files[iη]["$(m)_$(n)"]
-                    @time begin  # this is the most time consuming part ! 
-                        for is in 1:2
-                            tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
-                        end
+                    metadata .= file["$(m)_$(n)"]
+                    for is in 1:2
+                        tmpΛ[:,iη,is,:,:,iη,is,:] = tmp_metadata 
                     end
                 end
             end
             # --------------------------------------- Hartree ------------------------------- #
-            trPG = 0.0+0.0im
-            for ik in 1:size(hf.P,3)
-                trPG += tr(view(hf.P,:,:,ik)*conj(view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])))
-            end
+            if mod(n,hf.q)==0
+                trPG = 0.0+0.0im
+                for ik in 1:size(hf.P,3)
+                    trPG += tr(view(hf.P,:,:,ik)*conj(view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])))
+                end
 
-            for ik in 1:size(hf.P,3) 
-                hf.H[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG * hf.q) * view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])
+                for ik in 1:size(hf.P,3) 
+                    hf.H[:,:,ik] += ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG * hf.q) * view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])
+                end
             end
             # --------------------------------------- Fock ------------------------------- #
             for ik in 1:size(hf.P,3) 
@@ -246,7 +241,7 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
                     tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
                                 ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*transpose(view(hf.P,:,:,ip))*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
                 end
-                hf.H[:,:,ik] .-= tmp_Fock
+                hf.H[:,:,ik] -= tmp_Fock
             end
         end
     end
@@ -263,15 +258,14 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     vals = zeros(Float64,size(hf.H,1),size(hf.H,3))
     for ik in 1:size(hf.H,3)
         # check_Hermitian(hf.H[:,:,ik])
-        hf.ϵk[:,ik] = eigvals(Hermitian(view(hf.H,:,:,ik)))
-        vals[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)-Δ*(conj.(view(hf.P,:,:,ik))+0.5*I)) )
+        vals[:,ik],vecs[:,:,ik] = eigen(Hermitian(view(hf.H,:,:,ik)) )
         for iq in 1:size(hf.H,1)
             hf.σzτz[iq,ik] = real(view(vecs,:,iq,ik)'*view(hf.Σz0,:,:,ik)*view(vecs,:,iq,ik))
         end
         # check_Unitary(vecs[:,:,ik])
     end
     # plot_spectra(hf)
-
+    hf.ϵk.=vals
     hf.μ = find_chemicalpotential(hf.ϵk[:],νnorm/(size(hf.H,1)*size(hf.H,3)))
     hf.Δ .= calculate_valley_spin_band_order_parameters(hf)
 
@@ -280,7 +274,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     iband_occupied = (iϵ_occupied .-1) .% size(vals,1) .+1
     ik_occupied = (iϵ_occupied .-1) .÷ size(vals,1) .+1
 
-    P_new = zeros(ComplexF64,size(hf.P,1),size(hf.P,2),size(hf.P,3))
+    P_new = zeros(ComplexF64,size(hf.P))
     for ik in 1:size(hf.P,3)
         occupied_vecs = vecs[:,iband_occupied[ik_occupied.==ik],ik]
         P_new[:,:,ik] = conj(occupied_vecs)*transpose(occupied_vecs) - 0.5*I
@@ -304,7 +298,7 @@ function calculate_norm_convergence(P2::Array{ComplexF64,3},P1::Array{ComplexF64
     #     vals2[:,ik] .= eigvals(Hermitian(view(P2,:,:,ik))) 
     # end
     # return norm(vals2 .-vals1) / norm(vals2)
-    return norm(P1 .- P2) ./ norm(P2)
+    return norm(P1 - P2) ./ norm(P2)
 end
 
 function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::Array{ComplexF64,3},ν::Float64)
@@ -329,36 +323,40 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
 
     metadata = zeros(ComplexF64,2hf.q^2*hf.lk,2hf.q^2*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.q*hf.lk,2hf.q,hf.q*hf.lk)
+    G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
     # files = [load(hf.metadata[1]),load(hf.metadata[2])]
     # change of Hartree-Fock due to a small δP
     δH = zeros(ComplexF64,size(δP))
     for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
         G = m*hf.params.g1+n/hf.q*hf.params.g2
-        for iη in 1:2
-            jldopen(hf.metadata[iη]) do file 
-                metadata .= file["$(m)_$(n)"]
-                # metadata .= files[iη]["$(m)_$(n)"]
-                for is in 1:2
-                    tmpΛ[:,iη,is,:,:,iη,is,:] .= tmp_metadata 
+        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6))
+            for iη in 1:2
+                jldopen(hf.metadata[iη]) do file 
+                    metadata .= file["$(m)_$(n)"]
+                    # metadata .= files[iη]["$(m)_$(n)"]
+                    for is in 1:2
+                        tmpΛ[:,iη,is,:,:,iη,is,:] = tmp_metadata 
+                    end
                 end
             end
-        end
-        G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
-        if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6))
-            trPG = 0.0+0.0im
-            for ik in 1:size(δH,3) 
-                trPG += tr(view(δP,:,:,ik)*conj(view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])))
+            # --------------------------------------- Hartree ------------------------------- #
+            if mod(n,hf.q) == 0
+                trPG = 0.0+0.0im
+                for ik in 1:size(δH,3) 
+                    trPG += tr(view(δP,:,:,ik)*conj(view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])))
+                end
+                for ik in 1:size(δH,3) 
+                    δH[:,:,ik] += ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG*hf.q) * view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])
+                end
             end
-            for ik in 1:size(δH,3) 
-                δH[:,:,ik] .+= ( β/hf.latt.nk*hf.V0*V(G,Lm) * trPG*hf.q) * view(hf.Λ,:,Indices[1,ik],:,Indices[1,ik])
-            end
+            # --------------------------------------- Fock ------------------------------- #
             for ik in 1:size(δH,3) 
                 tmp_Fock .= 0.0 + 0.0im
                 for ip in 1:size(δH,3), rp1 in 1:hf.q
                     tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
                                 ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*transpose(view(δP,:,:,ip))*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
                 end
-                δH[:,:,ik] .-= tmp_Fock
+                δH[:,:,ik] -= tmp_Fock
             end
         end
     end

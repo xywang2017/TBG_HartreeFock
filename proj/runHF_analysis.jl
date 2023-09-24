@@ -20,7 +20,7 @@ initParamsWithStrain(params)
 # for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
     # s,t = sts[1], sts[2]
     s,t = -3, -1
-    p,q = 2,7
+    p,q = 1,11
     νF = (s)+(t)*p/q
     println(νF)
     νstr = round(Int,1000*νF)
@@ -30,7 +30,7 @@ initParamsWithStrain(params)
     end
     if isfile(metadata)
         E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","chern","random","bm","strong","bm_cascade"], seed in 1:1
+        for flag in ["flavor","chern","random","bm","strong","bm_cascade"], seed in 2:2
             metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if isfile(metadata0)
                 E0 = load(metadata0,"iter_energy")[end]
