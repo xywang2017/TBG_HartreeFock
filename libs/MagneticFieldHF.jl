@@ -93,6 +93,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
         hf.nq = 6
     end
     hf.nq = 12÷hf.q
+    if hf.q==7 
+        hf.nq = 2
+    end
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
     hf.lk = hf.q*hf.nq^2
@@ -138,7 +141,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     # strong coupling 
     # hf.H0 .= 0.0
     while norm_convergence > hf.precision
-        @time begin 
+        # @time begin 
             hf.H .= hf.H0 * 1.0
             # add_Hartree(hf;β=1.0)
             # add_Fock(hf;β=1.0)
@@ -161,18 +164,18 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
                 save(hf.savename,"hf",hf,
                         "iter_err",iter_err,"iter_energy",iter_energy,"iter_oda",iter_oda)
                 hf.Λ = zeros(ComplexF64,hf.nt,hf.lk,hf.nt,hf.lk)
+                println("Iter: ",iter)
+                println("Running HF energy (per moire u.c.): ",Etot)
+                println("Running norm convergence: ",norm_convergence)
+                println("Running ODA paramter λ: ",λ)
             end
 
             iter +=1
             
-            if iter > 150 || λ < 1e-3
+            if iter > 300 || λ < 1e-3
                 break 
             end
-            println("Iter: ",iter)
-            println("Running HF energy (per moire u.c.): ",Etot)
-            println("Running norm convergence: ",norm_convergence)
-            println("Running ODA paramter λ: ",λ)
-        end
+        # end
     end
 
     return iter_err, iter_energy

@@ -29,7 +29,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    # init_P_valley_rotation(hf;α=1.0)
+    init_P_valley_spin_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -99,7 +99,7 @@ function init_P_bm_cascade(hf::HartreeFock)
 end
 
 function init_P_valley_spin_rotation(hf::HartreeFock;α::Float64=0.2)
-    P0 = reshape(hf.P,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,hf.q*hf.nq^2)
+    P0 = reshape(hf.P,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,:)
     vecs = zeros(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)
     for ik in 1:size(hf.P,3), iband in 1:size(P0,1)
         vecs .= eigvecs(Hermitian(rand(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)))
@@ -109,7 +109,7 @@ function init_P_valley_spin_rotation(hf::HartreeFock;α::Float64=0.2)
 end
 
 function init_P_valley_rotation(hf::HartreeFock;α::Float64=0.2)
-    P0 = reshape(hf.P,hf.nb*hf.q*hf.nη,hf.ns,hf.nb*hf.q*hf.nη,hf.ns,hf.q*hf.nq^2)
+    P0 = reshape(hf.P,hf.nb*hf.q*hf.nη,hf.ns,hf.nb*hf.q*hf.nη,hf.ns,:)
     vecs = zeros(ComplexF64,hf.nb*hf.q*hf.nη,hf.nb*hf.q*hf.nη)
     for ik in 1:size(hf.P,3), is in 1:hf.ns
         vecs .= eigvecs(Hermitian(rand(ComplexF64,size(vecs))))

@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 120
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -146,15 +146,16 @@ close(fig)
 
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
-function plot_LL_spectrum(s::Int,t::Int,params::Params)
+function plot_LL_spectrum(params::Params)
     foldername0 = "NonInt/$(twist_angle)_strain"
-    fig,ax = subplots(figsize=(2.5,3))
+    fig,ax = subplots(figsize=(2.8,2.5))
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
         p, q = numerator(ϕ), denominator(ϕ)
         strs = ["K","Kprime"]
-        for iη in 1:2, is in 1:2
+        colors = ["b","r"]
+        for iη in 1:1
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
@@ -164,20 +165,22 @@ function plot_LL_spectrum(s::Int,t::Int,params::Params)
                 weights[:,i1,i2] = real(diag(Σz[:,:,i1,i2]))
             end
             energies = reshape(energies,2q,:)
-            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c=weights*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
+            # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c=weights,vmin=-1,vmax=1,cmap="coolwarm")
+            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
         
     end
-    colorbar(pl,fraction=0.06, pad=0.05,location="top")
+    colorbar(pl,fraction=0.06, pad=0.05)
     ax.set_ylabel("E (meV)")
     ax.set_xlabel(L"ϕ/ϕ_0")
     ax.set_xlim([0,0.55])
+    ax.set_ylim([-39,39])
     tight_layout()
-    savefig("tmp_$(s)_$(t).png",dpi=600,transparent=true)
+    savefig("tmp_120.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
 end
 
-plot_LL_spectrum(-1,-3,params)
+plot_LL_spectrum(params)
 

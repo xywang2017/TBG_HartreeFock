@@ -19,14 +19,14 @@ initParamsWithStrain(params)
 # for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
 # for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
     # s,t = sts[1], sts[2]
-    s,t = -3, -1
-    p,q = 1,11
+    s,t = -2, -2
+    p,q = 1,10
     νF = (s)+(t)*p/q
     println(νF)
     νstr = round(Int,1000*νF)
     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     if !isfile(metadata)
-        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/2_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     end
     if isfile(metadata)
         E = load(metadata,"iter_energy")[end]
@@ -47,8 +47,9 @@ initParamsWithStrain(params)
 
     # -----------------------------------Density matrix analysis ------------------------------------------- # 
     # plot_spectra(metadata;savename="test.pdf")
-    # plot_density_matrix_bm_valley_spin(metadata,ik=1,savename="$(twist_angle)_DensityMat_HFM_$(s)_$(t).png")
+    # plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="$(twist_angle)_DensityMat_HFM_$(s)_$(t).png")
     plot_density_matrix_bm(metadata,ik=1)
+    # plot_density_matrix_bm_half(metadata,ik=1)
     plot_density_matrix_global_order_parameters(metadata)
 
     P1 = load(metadata,"hf").P;

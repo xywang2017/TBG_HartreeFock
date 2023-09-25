@@ -173,20 +173,41 @@ function plot_hf_iterations(fname::String)
 end
 
 ### density matrix analysis 
-function plot_density_matrix_bm(fname::String;ik::Int=3)
+function plot_density_matrix_bm_half(fname::String;ik::Int=1,savename::String="test.png")
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    fig = figure(figsize=(6,6))
-    P0 = view(hf.P,:,:,ik) + 0.5I
-    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower")
+    fig = figure(figsize=(4.6,4))
+    P0 = view(hf.P,(4hf.q+1):(8hf.q),(4hf.q+1):(8hf.q),ik) + 0.5I
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,4hf.q+1,1,4hf.q+1).-0.5)
+    xticks([])
+    yticks([])
+    axhline(2hf.q+0.5,ls=":",c="gray")
+    axvline(2hf.q+0.5,ls=":",c="gray")
     # colorbar(pl)
     tight_layout()
-    savefig("test.pdf")
+    savefig(savename,dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
 end
 
+function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.png")
+    # plot at a given k point, 2qx4 x 2qx4 matrix 
+    hf = load(fname,"hf");
+    fig = figure(figsize=(4.6,4))
+    P0 = view(hf.P,:,:,ik) + 0.5I
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    xticks([])
+    yticks([])
+    # axhline(2hf.q+0.5,ls=":",c="gray")
+    # axvline(2hf.q+0.5,ls=":",c="gray")
+    # colorbar(pl)
+    tight_layout()
+    savefig(savename,dpi=600,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
 
 ### density matrix analysis 
 function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png")
@@ -197,8 +218,8 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     fig,ax = subplots(1,figsize=(2.3,2))
     # states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
-    for r in 1:1, c in 1:1
-        pl=ax.imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Reds")
+    for r in 1:1, c in 2:2
+        pl=ax.imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
         cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
         cbar.set_ticks(collect(0:0.2:1))
         # colorbar(pl,ax=ax)
@@ -236,19 +257,19 @@ function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1,savename::St
     states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Blues")
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
         # colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         # ax[r,c].set_title(states[r+2(c-1)])
-        ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
+        # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
         ax[r,c].set_xticks([1,hf.q,2hf.q])
         ax[r,c].set_yticks([1,hf.q,2hf.q])
         ax[r,c].set_xticklabels(["1","q","2q"])
         ax[r,c].set_yticklabels(["1","q","2q"])
-        # ax[r,c].axis("equal")
+        ax[r,c].axis("off")
     end
     
     tight_layout()
-    # subplots_adjust(hspace=0.02,wspace=0.05)
+    subplots_adjust(hspace=0.02,wspace=0.05)
     # cbar_ax = fig.add_axes([0.74, 0.15, 0.15, 0.7])
     # cbar_ax.axis(false)
     # fig.colorbar(pl, ax=cbar_ax)
@@ -280,7 +301,7 @@ function plot_density_matrix_bm_valley_spinv2(fname::String;ik::Int=1,savename::
             colorbar(pl,ax=ax[i],fraction=0.046, pad=0.04)
         end
         # ax[r,c].set_title(states[r+2(c-1)])
-        ax[i].text(hf.q*0.94,2hf.q*0.9,states[i],fontsize=14,color="w")
+        # ax[i].text(hf.q*0.94,2hf.q*0.9,states[i],fontsize=14,color="w")
     end
     ax[1].set_xticks([1,hf.q,2hf.q])
     ax[1].set_yticks([1,hf.q,2hf.q])
