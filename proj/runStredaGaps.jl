@@ -155,7 +155,7 @@ function plot_LL_spectrum(params::Params)
         p, q = numerator(ϕ), denominator(ϕ)
         strs = ["K","Kprime"]
         colors = ["b","r"]
-        for iη in 1:1
+        for iη in 1:2
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
