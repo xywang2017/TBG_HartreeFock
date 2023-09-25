@@ -1,8 +1,8 @@
 using JLD2
 using Printf
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
-# include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+# include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
 #

@@ -365,7 +365,7 @@ end
 function plot_density_matrix_global_order_parameters(fname::String)
     hf = load(fname,"hf");
     
-    P = reshape(hf.P,8hf.q,8hf.q,hf.q,hf.nq,hf.nq)
+    P = reshape(hf.P,8hf.q,8hf.q,:,hf.nq,hf.nq)
     P = reshape(permutedims(P,(1,2,4,3,5)),8hf.q,8hf.q,:)
     PP = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
     s0 = ComplexF64[1 0;0 1]
