@@ -24,7 +24,7 @@ for i in eachindex(twist_angles)
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = "zeeman/$(twist_angle)_strain"
+    foldername = "zeeman/$(twist_angle)_nostrain"
     # for lines in -4:0
     #     ax[r,c].axvline(lines,ls=":",c="gray",lw=0.5)
     # end
