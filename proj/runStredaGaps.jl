@@ -148,13 +148,15 @@ close(fig)
 # plot spectrum 
 function plot_LL_spectrum(params::Params)
     foldername0 = "NonInt/$(twist_angle)_strain"
-    fig,ax = subplots(figsize=(2.8,2.5))
+    # fig,ax = subplots(figsize=(2.8,2.5))
+    fig,ax = subplots(figsize=(6,4))
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
         p, q = numerator(ϕ), denominator(ϕ)
         strs = ["K","Kprime"]
         colors = ["b","r"]
+        tmp = []
         for iη in 1:2
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
@@ -165,8 +167,12 @@ function plot_LL_spectrum(params::Params)
                 weights[:,i1,i2] = real(diag(Σz[:,:,i1,i2]))
             end
             energies = reshape(energies,2q,:)
-            # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:].+(3-2is)*p/q*ZeemanUnit(params),marker="o",s=3,edgecolor="none",c=weights,vmin=-1,vmax=1,cmap="coolwarm")
-            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
+            push!(tmp,energies[:,1,1])
+            pl = ax.scatter(ones(length(energies[:,1,1]))*ϕ,energies[:,1,1],marker="o",s=3,edgecolor="none",c=colors[iη],vmin=-1,vmax=1,cmap="coolwarm")
+            # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
+        end
+        if norm(tmp[1]-tmp[2]) >1e-5
+            println("ϕ/ϕ0= ",ϕ," ",norm(tmp[1]-tmp[2]))
         end
         
     end
@@ -176,7 +182,7 @@ function plot_LL_spectrum(params::Params)
     ax.set_xlim([0,0.55])
     ax.set_ylim([-39,39])
     tight_layout()
-    savefig("tmp_120.png",dpi=600,transparent=true)
+    savefig("tmp_132.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing

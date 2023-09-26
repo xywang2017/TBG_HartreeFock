@@ -34,6 +34,9 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
         nq = 6
     end
     nq = 12÷q
+    if q==7 
+        nq = 2 
+    end
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata.jld2")
     println(fname)

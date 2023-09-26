@@ -47,6 +47,8 @@ elseif isequal(flag,"bm")
     _Init = "bm"
 elseif isequal(flag,"bm_cascade")
     _Init = "bm_cascade"
+elseif isequal(flag,"vssymmetric")
+    _Init = "vssymmetric"
 elseif isequal(flag,"strong")
     _Init = " "
 end

@@ -12,47 +12,38 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-# flag = "random"
-# seed = 2
-# for sts in [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-# for sts in [[0,-4]]
-# for sts in [[0,-3],[0,-2],[0,-1],[0,0]]
-# for sts in -[[4,-4],[4,-3],[4,-2],[4,-1]]
-    # s,t = sts[1], sts[2]
-    s,t = -3.5, 0
-    p,q = 1,10
-    νF = (s)+(t)*p/q
-    println(νF)
-    νstr = round(Int,1000*νF)
-    metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    if !isfile(metadata)
-        metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    end
-    if isfile(metadata)
-        E = load(metadata,"iter_energy")[end]
-        for flag in ["flavor","chern","random","bm","strong","bm_cascade"], seed in 1:12
-            metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            if isfile(metadata0)
-                E0 = load(metadata0,"iter_energy")[end]
-                if E0<=E 
-                    E, metadata = E0, metadata0 
-                end
+s,t = -3,-1
+p,q = 2,5
+νF = (s)+(t)*p/q
+println(νF)
+νstr = round(Int,1000*νF)
+metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+if !isfile(metadata)
+    metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+end
+if isfile(metadata)
+    E = load(metadata,"iter_energy")[end]
+    for flag in ["flavor","chern","random","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:12
+        metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+        if isfile(metadata0)
+            E0 = load(metadata0,"iter_energy")[end]
+            if E0<=E 
+                E, metadata = E0, metadata0 
             end
         end
-        println(metadata)
     end
-    println("HF energy: ",load(metadata,"iter_energy")[end])
-    println("Convergence: ",load(metadata,"iter_err")[end])
+    println(metadata)
+end
+println("HF energy: ",load(metadata,"iter_energy")[end])
+println("Convergence: ",load(metadata,"iter_err")[end])
 
+# -----------------------------------Density matrix analysis ------------------------------------------- # 
+# plot_spectra(metadata;savename="test.png")
+plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="tmp4.png",jj=4)
+plot_density_matrix_bm(metadata,ik=1)
+# plot_density_matrix_bm_half(metadata,ik=1)
+plot_density_matrix_global_order_parameters(metadata)
 
-    # -----------------------------------Density matrix analysis ------------------------------------------- # 
-    # plot_spectra(metadata;savename="test.png")
-    # plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="$(twist_angle)_DensityMat_HFM_$(s)_$(t).png")
-    plot_density_matrix_bm(metadata,ik=1)
-    # plot_density_matrix_bm_half(metadata,ik=1)
-    plot_density_matrix_global_order_parameters(metadata)
-
-# end
 # plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 # plot_density_matrix_sublattice_full(metadata)

@@ -210,7 +210,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
 end
 
 ### density matrix analysis 
-function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png")
+function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png",jj::Int=1)
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
     P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
@@ -218,21 +218,20 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     fig,ax = subplots(1,figsize=(2.3,2))
     # states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
-    for r in 1:1, c in 2:2
-        pl=ax.imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
-        cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
-        cbar.set_ticks(collect(0:0.2:1))
-        # colorbar(pl,ax=ax)
-        # ax[r,c].set_title(states[r+2(c-1)])
-        # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
-        # ax.set_xticks([1,hf.q,2hf.q])
-        # ax.set_yticks([1,hf.q,2hf.q])
-        # ax.set_xticklabels(["1","q","2q"])
-        # ax.set_yticklabels(["1","q","2q"])
-        ax.set_xticks([])
-        ax.set_yticks([])
-        # ax[r,c].axis("equal")
-    end
+    
+    pl=ax.imshow(abs.(P0[:,jj,:,jj]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
+    cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
+    cbar.set_ticks(collect(0:0.2:1))
+    # colorbar(pl,ax=ax)
+    # ax[r,c].set_title(states[r+2(c-1)])
+    # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
+    # ax.set_xticks([1,hf.q,2hf.q])
+    # ax.set_yticks([1,hf.q,2hf.q])
+    # ax.set_xticklabels(["1","q","2q"])
+    # ax.set_yticklabels(["1","q","2q"])
+    ax.set_xticks([])
+    ax.set_yticks([])
+    # ax[r,c].axis("equal")
     tight_layout()
     # subplots_adjust(hspace=0.02,wspace=0.05)
     # cbar_ax = fig.add_axes([0.74, 0.15, 0.15, 0.7])
@@ -329,7 +328,7 @@ function plot_density_matrix_bm_valley_spinv3(fname::String;ik::Int=1,savename::
     fig = figure(figsize=(5,4))
     ax = fig.add_subplot(projection="3d")
     states = ["K↑","K'↑","K↓","K'↓"]
-    cmaps = ["Blues","Reds","Greens","Purples"]
+    cmaps = ["Blues","Reds","Purples","Purples"]
     pl = 0
     for i in 1:4
         coords = collect(1:2hf.q)
@@ -376,7 +375,7 @@ function plot_density_matrix_global_order_parameters(fname::String)
     # Iq = diagm([(-1)^((hf.q-1)÷i) for i in 1:(2hf.q)])
     Iq = diagm([(-1)^(i) for i in 1:(2hf.q)])
     Os = kron(s0,kron(sz,Iq))
-    Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),hf.nq*hf.q,hf.nq) ./(hf.q)
+    Sk = reshape( sum(P.*reshape(Os,8hf.q,8hf.q,1),dims=(1,2)),:,hf.nq) ./(hf.q)
     # println(sum(Sk)/length(Sk))
     fig = figure(figsize=(8,2))
     avgval = sum(real(Sk)) / length(Sk)
