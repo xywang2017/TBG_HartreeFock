@@ -1,8 +1,9 @@
 using JLD2
 using Printf
+using LinearAlgebra
 fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+# include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
 #
@@ -16,13 +17,25 @@ w0 = ARGS[5]
 seed = ARGS[6]
 twist_angle = parse(Float64,ARGS[7])
 _is_strain = ARGS[8]
+_is_symmetric = ARGS[9]
+
+if isequal(_is_symmetric,"symmetric")
+    include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
+else
+    include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+end
 
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
 if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
     mkpath(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
 end
 
-savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+if isequal(_is_symmetric,"symmetric")
+    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+else
+    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+end
+
 ϕ = p//q 
 if isequal(flag,"flavor")
     _Init = "Flavor U(4)"

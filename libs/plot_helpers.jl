@@ -78,7 +78,7 @@ function computegap(metadata::String;savename::String="tmp.pdf")
         Δ = ϵsorted[i+1] - ϵsorted[i]
     else
         ϵF = ϵsorted[end]
-        Δ = 0 
+        Δ = 0
     end
     return Δ
 end
