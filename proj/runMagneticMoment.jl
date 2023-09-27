@@ -47,11 +47,10 @@ E0 = ħ^2/(2me*aa^2*params.area) /ee * 1000 # [meV]
 fig = figure(figsize=(4,3))
 ϕavg = (Φs[1:(end-1)].+Φs[2:end])/2
 navg = s .+ t*ϕavg
-α = -diff(Ws-μs[end-8]*Ns)./diff(Φs)
-plot(ϕavg,α /(2π*E0) ./navg,
-            "^-",c="b",ms=3,markeredgecolor="none")
+α = -diff(Ws -μs[end]*Ns)./diff(Φs)
+plot(ϕavg,α /(2π*E0), "^-",c="b",ms=3,markeredgecolor="none")
 xlabel(L"\rm ϕ/ϕ_0")
-ylabel(L"\rm {\bf M}\ (μ_B/e)")
+ylabel(L"\rm {\bf M}\ (μ_B/u.c.)")
 tight_layout()
 display(fig)
 close(fig)
