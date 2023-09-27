@@ -13,7 +13,7 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -3,-1
-p,q = 3,11
+p,q = 1,7
 νF = (s)+(t)*p/q
 println(νF)
 νstr = round(Int,1000*νF)
