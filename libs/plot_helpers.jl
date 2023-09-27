@@ -98,10 +98,10 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
         # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
-        if j<=8 || j== 11
+        if j<=11
             plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="green",markeredgecolor="none",markersize=2)
         else
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="b",markeredgecolor="none",markersize=2)
+            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
         end
         plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
         if j == length(metadatas)
@@ -182,7 +182,7 @@ function plot_density_matrix_bm_half(fname::String;ik::Int=1,savename::String="t
     hf = load(fname,"hf");
     fig = figure(figsize=(3.5,3.5))
     P0 = view(hf.P,(4hf.q+1):(8hf.q),(4hf.q+1):(8hf.q),ik) + 0.5I
-    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,4hf.q+1,1,4hf.q+1).-0.5)
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Greens",extent=(1,4hf.q+1,1,4hf.q+1).-0.5)
     xticks([])
     yticks([])
     axhline(2hf.q+0.5,ls=":",c="gray")
@@ -200,7 +200,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     hf = load(fname,"hf");
     fig = figure(figsize=(4.6,4))
     P0 = view(hf.P,:,:,ik) + 0.5I
-    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Greens",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
     # axhline(2hf.q+0.5,ls=":",c="gray")
@@ -223,7 +223,7 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     # states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     
-    pl=ax.imshow(abs.(P0[:,jj,:,jj]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
+    pl=ax.imshow(abs.(P0[:,jj,:,jj]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Reds")
     cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
     cbar.set_ticks(collect(0:0.2:1))
     # colorbar(pl,ax=ax)
@@ -260,7 +260,7 @@ function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1,savename::St
     states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Greens")
         # colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         # ax[r,c].set_title(states[r+2(c-1)])
         # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
@@ -332,7 +332,7 @@ function plot_density_matrix_bm_valley_spinv3(fname::String;ik::Int=1,savename::
     fig = figure(figsize=(5,4))
     ax = fig.add_subplot(projection="3d")
     states = ["K↑","K'↑","K↓","K'↓"]
-    cmaps = ["Blues","Reds","Purples","Purples"]
+    cmaps = ["Blues","Greens","Greens","Reds"]
     pl = 0
     for i in 1:4
         coords = collect(1:2hf.q)
@@ -413,7 +413,7 @@ function plot_density_matrix_valley_spin_density_tL2(fname::String)
     fig, ax = subplots(4,1,figsize=(6,4))
     for i in 1:4 
         nk = reshape( sum(P[:,i,:,i,:].*Iq,dims=(1,2)) ./(hf.q), hf.q*hf.nq,hf.nq)
-        pl=ax[i].imshow(real(nk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="Reds",vmin=0,vmax=1.0)
+        pl=ax[i].imshow(real(nk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="Greens",vmin=0,vmax=1.0)
         # colorbar(pl,ax=ax[i])
     end
     for i in 1:4

@@ -55,7 +55,7 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter/110_strain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/120_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(2.5,2.5))
     ϕmin = 1//12
@@ -65,13 +65,14 @@ function plot_LL_spectrum()
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="blue")
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
         plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
+    xlim([0,0.55])
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    savefig("BMLL_110_nostrain.png",dpi=600,transparent=true)
+    savefig("BMLL_120_nostrain.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
