@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 132
+twist_angle = 120
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -13,51 +13,45 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-# ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 ϕs = ϕs[2:end]
 s,t = -3, -1 
 
 # ------------------------------------------------------------------------------ # 
-
-metadatas = String[]
+Φs = Float64[]
+Ws = Float64[] 
+Ns = Float64[]
+μs = Float64[]
 for ϕ in ϕs 
     p,q = numerator(ϕ), denominator(ϕ)
     νstr = round(Int,1000*(s+t*p/q))
-    if abs(s+t*p/q) < 4
-        test_str = "nu_$(νstr)"
-        if isdir("$(foldername)/_$(p)_$(q)")
-            files = readdir("$(foldername)/_$(p)_$(q)")
-            f = String[]
-            for i in files 
-                if occursin(test_str,i)
-                    push!(f,"$(foldername)/_$(p)_$(q)"*"/"*i)
-                end
-            end
-            println(f)
-        end
-        # metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        # if !isfile(metadata)
-        #     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        # end
-        # if isfile(metadata)
-        #     E = load(metadata,"iter_energy")[end]
-        #     for flag in ["flavor","random","chern","bm","strong","bm_cascade_tL"], seed in 1:10
-        #         metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        #         if isfile(metadata0)
-        #             E0 = load(metadata0,"iter_energy")[end]
-        #             if E0<=E 
-        #                 E, metadata = E0, metadata0 
-        #             end
-        #         end
-        #     end
-        #     if load(metadata,"iter_err")[end] > 1e-6
-        #         # println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
-        #     end
-        #     # println(metadata)
-        #     push!(metadatas,metadata)
-        # end
+    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=false)
+    if !isempty(metadata)
+        push!(Ws,load(metadata,"iter_energy")[end])
+        push!(Φs,ϕ)
+        push!(Ns,(s+t*p/q))
+        push!(μs,load(metadata,"hf").μ)
     end
 end
-# Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))");
+
+
+# Bohr magneton is μB=eħ/2me [J/T]
+# E0 = ħ^2/2me area_moire
+aa = 2.46e-10
+ħ = 1.054571817e-34
+ee = 1.602176634e-19
+me = 9.1093837e-31
+E0 = ħ^2/(2me*aa^2*params.area) /ee * 1000 # [meV]
+
+fig = figure(figsize=(4,3))
+ϕavg = (Φs[1:(end-1)].+Φs[2:end])/2
+navg = s .+ t*ϕavg
+α = -diff(Ws-μs[end-8]*Ns)./diff(Φs)
+plot(ϕavg,α /(2π*E0) ./navg,
+            "^-",c="b",ms=3,markeredgecolor="none")
+xlabel(L"\rm ϕ/ϕ_0")
+ylabel(L"\rm {\bf M}\ (μ_B\ per\ e)")
+tight_layout()
+display(fig)
+close(fig)
