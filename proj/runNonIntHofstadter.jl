@@ -6,16 +6,17 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 BLAS.set_num_threads(1)
 
 ϕmin = 1//12
-str = "Kprime"
+str = "K"
 w0 = 0.7
 w0str = "07"
 
 ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
-ϕs = ϕs[ϕs .>= ϕmin]
+ϕs = ϕs[ϕs .> ϕmin]
+ϕs = ϕs[ϕs .<=0.5]
 
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "NonInt/Hofstadter/138_strain"
+    fname = "NonInt/Hofstadter/110_strain"
     if !isdir(fname)
         mkpath(fname)
     end
@@ -23,11 +24,13 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     q = denominator(ϕ)
     bm = bmLL()
     nq = 12÷denominator(ϕ) 
-    # nq = 1
+    if q ==7 
+        nq =2  
+    end
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     # fname = ""
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.10π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
@@ -44,7 +47,7 @@ for ϕ in ϕs
     end
 end
 
-fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/$(str)_NonIntHofstadter_metadata.jld2")
+fname = joinpath(fpath,"NonInt/Hofstadter/110_strain/$(str)_NonIntHofstadter_metadata.jld2")
 jldopen(fname, "w") do file
     file["hoftstadter_data"] = data
 end
@@ -52,24 +55,23 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/110_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fname1 = joinpath(fpath,"NonInt/Hofstadter/138_strain/Kprime_NonIntHofstadter_metadata.jld2")
-    data1 = load(fname1,"hoftstadter_data");
-    fig = figure(figsize=(8,6))
+    fig = figure(figsize=(2.5,2.5))
     ϕmin = 1//12
     ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
-    ϕs = ϕs[ϕs .>= ϕmin]
+    ϕs = ϕs[ϕs .> ϕmin]
+    ϕs = ϕs[ϕs .<=0.5]
     for ϕ in ϕs
-        energies = data["$(ϕ)"]
-        plot(ones(length(energies))*ϕ,energies,"b.",ms=4,markeredgecolor="none")
-        energies1 = data1["$(ϕ)"]
-        plot(ones(length(energies1))*ϕ,energies1,"r.",ms=4,markeredgecolor="none")
+        p,q = numerator(ϕ), denominator(ϕ)
+        energies = reshape(data["$(ϕ)"],2q,:)
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="blue")
+        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    # savefig("BMLL_138_nostrain.png",dpi=600)
+    savefig("BMLL_110_nostrain.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -79,7 +81,7 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(fpath,"NonInt/Hofstadter/138_strain/B/NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/132_strain/B/NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
@@ -118,4 +120,4 @@ function plot_wannier(flag=false)
     return nothing
 end
 
-plot_wannier(true)
+plot_wannier(false)

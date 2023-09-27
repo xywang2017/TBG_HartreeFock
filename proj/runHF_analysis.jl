@@ -6,24 +6,24 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 132
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -3,-1
-p,q = 2,5
+p,q = 3,11
 νF = (s)+(t)*p/q
 println(νF)
 νstr = round(Int,1000*νF)
 metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 if !isfile(metadata)
-    metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
 end
 if isfile(metadata)
     E = load(metadata,"iter_energy")[end]
-    for flag in ["flavor","chern","random","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:12
+    for flag in ["flavor","random","random_tL","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:12
         metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
         if isfile(metadata0)
             E0 = load(metadata0,"iter_energy")[end]
@@ -39,9 +39,9 @@ println("Convergence: ",load(metadata,"iter_err")[end])
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 # plot_spectra(metadata;savename="test.png")
-plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="tmp4.png",jj=4)
+# plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="tmp3.png",jj=3)
 plot_density_matrix_bm(metadata,ik=1)
-# plot_density_matrix_bm_half(metadata,ik=1)
+plot_density_matrix_bm_half(metadata,ik=1)
 plot_density_matrix_global_order_parameters(metadata)
 
 # plot_density_matrix_bm(metadata,ik=1)

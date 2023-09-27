@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 132
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -40,12 +40,12 @@ for ϕ in ϕs
         if abs(s+t*p/q) < 4 && (s+t*p/q) <=0
             metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 push!(fillings,s+t*p/q)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10 
+                for flag in ["flavor","random","chern","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:10 
                     metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
@@ -85,7 +85,8 @@ close(fig)
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-sts = [[0,0],[0,-3],[0,-2],[0,-1]]
+# sts = [[0,0],[0,-3],[0,-2],[0,-1]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -93,13 +94,13 @@ for st in sts
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
-            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_flavor_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong","bm_cascade"], seed in 1:10
+                for flag in ["flavor","random","chern","bm","strong","bm_cascade_tL"], seed in 1:10
                     metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
@@ -111,7 +112,7 @@ for st in sts
                 if load(metadata,"iter_err")[end] > 1e-6
                     # println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
                 end
-                # println(metadata)
+                println(metadata)
                 push!(metadatas,metadata)
             end
         end
@@ -121,7 +122,7 @@ for st in sts
 end
 
 fig = figure(figsize=(6,4))
-sts = [[0,0],[0,-3],[0,-2],[0,-1]]
+# sts = [[0,0],[0,-3],[0,-2],[0,-1]]
 # ϕc = [-1,2//5,1//3,1//3] # 132 degrees critical field
 # ϕc = [-1,1//6,1//11,1//11] # 132 degrees critical field
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
