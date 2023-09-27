@@ -33,45 +33,20 @@ end
 for ϕ in ϕs 
     p,q = numerator(ϕ), denominator(ϕ)
     gaps = Float64[]
-    fillings = Float64[]
-    for st in sts 
-        s,t = st[1], st[2]
+    fillings = sort([st[1]+st[2]*p/q for st in sts])
+    fillings = unique(round.(fillings,digits=10))
+    fillings = fillings[fillings .<1e-5]
+    ns = Float64[]
+    for ν in fillings 
         νstr = round(Int,1000*(s+t*p/q))
-        if abs(s+t*p/q) < 4 && (s+t*p/q) <=0
-            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            end
-            if isfile(metadata)
-                push!(fillings,s+t*p/q)
-                E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:10 
-                    metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-                    if isfile(metadata0)
-                        E0 = load(metadata0,"iter_energy")[end]
-                        if E0<=E 
-                            E, metadata = E0, metadata0 
-                        end
-                    end
-                end 
-                Δ=computegap(metadata;savename="test.pdf")
-                push!(gaps,Δ)
-            end
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+        if !isempty(metadata)
+            push!(ns,ν)
+            Δ=computegap(metadata;savename="test.png")
+            push!(gaps,Δ)
         end
     end
-    fillings = round.(fillings,digits=8)
-    idx_sort = sortperm(fillings)
-    fillings, gaps = fillings[idx_sort],gaps[idx_sort]
-    idx = unique(z -> fillings[z], 1:length(fillings))
-    fillings,gaps = fillings[idx], gaps[idx]
-    
     scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
-    # for t in 1:4 
-    #     s = -4 
-    #     νtest = round(s + (p/q)*t,digits=8)
-    #     idx = fillings .==νtest
-    #     scatter(fillings[idx],ones(length(fillings[idx]))*ϕ,s=gaps[idx].^2/5,c="b",edgecolor="none")
-    # end
 end
 xlim([-4.3,0.3])
 ylim([0.0,0.55])
@@ -94,25 +69,8 @@ for st in sts
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
-            metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            end
-            if isfile(metadata)
-                E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","chern","bm","strong","bm_cascade_tL"], seed in 1:10
-                    metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-                    if isfile(metadata0)
-                        E0 = load(metadata0,"iter_energy")[end]
-                        if E0<=E 
-                            E, metadata = E0, metadata0 
-                        end
-                    end
-                end
-                if load(metadata,"iter_err")[end] > 1e-6
-                    # println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
-                end
-                # println(metadata)
+            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+            if !isempty(metadata)
                 push!(metadatas,metadata)
             end
         end

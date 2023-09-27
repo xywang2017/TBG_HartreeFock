@@ -17,25 +17,7 @@ p,q = 1,7
 νF = (s)+(t)*p/q
 println(νF)
 νstr = round(Int,1000*νF)
-metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-if !isfile(metadata)
-    metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-end
-if isfile(metadata)
-    E = load(metadata,"iter_energy")[end]
-    for flag in ["flavor","random","random_tL","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:12
-        metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-        if isfile(metadata0)
-            E0 = load(metadata0,"iter_energy")[end]
-            if E0<=E 
-                E, metadata = E0, metadata0 
-            end
-        end
-    end
-    println(metadata)
-end
-println("HF energy: ",load(metadata,"iter_energy")[end])
-println("Convergence: ",load(metadata,"iter_err")[end])
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 # plot_spectra(metadata;savename="test.png")
