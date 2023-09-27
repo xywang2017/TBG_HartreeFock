@@ -106,7 +106,7 @@ close(fig)
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(params::Params)
-    foldername0 = "NonInt/120_nostrain"
+    foldername0 = "NonInt/105_nostrain"
     # fig,ax = subplots(figsize=(2.8,2.5))
     fig,ax = subplots(figsize=(6,4))
     strs = ["K","Kprime"]
@@ -126,8 +126,8 @@ function plot_LL_spectrum(params::Params)
                 weights[:,i1,i2] = real(diag(Σz[:,:,i1,i2]))
             end
             energies = reshape(energies,2q,:)
-            push!(tmp,energies[:,1,1])
-            pl = ax.scatter(ones(length(energies[:,1,1]))*ϕ,energies[:,1,1],marker="o",s=3,edgecolor="none",c=colors[iη],vmin=-1,vmax=1,cmap="coolwarm")
+            push!(tmp,energies[:,1])
+            pl = ax.scatter(ones(length(energies[:,1]))*ϕ,energies[:,1],marker="o",s=3,edgecolor="none",c=colors[iη],vmin=-1,vmax=1,cmap="coolwarm")
             # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
         if norm(tmp[1]-tmp[2]) >1e-6
