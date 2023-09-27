@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
-foldername = "zeeman/$(twist_angle)_strain"
+foldername = "zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -48,9 +48,15 @@ fig = figure(figsize=(4,3))
 ϕavg = (Φs[1:(end-1)].+Φs[2:end])/2
 navg = s .+ t*ϕavg
 α = -diff(Ws -μs[end]*Ns)./diff(Φs)
-plot(ϕavg,α /(2π*E0), "^-",c="b",ms=3,markeredgecolor="none")
+# plot(ϕavg,α /(2π*E0), "^-",c="b",ms=3,markeredgecolor="none")
+plot(Φs,Ws-μs[end-10]*Ns, "^-",c="b",ms=3,markeredgecolor="none")
+plot(Φs,-66 .- 20Φs, ":",c="k",ms=3,markeredgecolor="none")
 xlabel(L"\rm ϕ/ϕ_0")
-ylabel(L"\rm {\bf M}\ (μ_B/u.c.)")
+# ylabel(L"\rm {\bf M}\ (μ_B/u.c.)")
+ylabel(L"\rm W\ (meV/u.c.)")
 tight_layout()
 display(fig)
 close(fig)
+
+
+20/(2π*E0)
