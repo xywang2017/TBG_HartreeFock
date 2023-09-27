@@ -43,25 +43,6 @@ for i in eachindex(twist_angles)
                 Δ=computegap(metadata;savename="test.png")
                 push!(gaps,Δ)
             end
-            # metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            # if !isfile(metadata)
-            #     metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            # end
-            # if isfile(metadata)
-            #     push!(ns,ν)
-            #     E = load(metadata,"iter_energy")[end]
-            #     for flag in ["flavor","random","random_tL","chern","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:10 
-            #         metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-            #         if isfile(metadata0)
-            #             E0 = load(metadata0,"iter_energy")[end]
-            #             if E0<=E 
-            #                 E, metadata = E0, metadata0 
-            #             end
-            #         end
-            #     end 
-            #     Δ=computegap(metadata;savename="test.png")
-            #     push!(gaps,Δ)
-            # end
         end
         ax[r,c].scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
     end

@@ -7,7 +7,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 132
-foldername = "zeeman/$(twist_angle)_strain"
+foldername = "zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -15,9 +15,8 @@ initParamsWithStrain(params)
 s,t = -3,-1
 p,q = 1,7
 νF = (s)+(t)*p/q
-println(νF)
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
 
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 # plot_spectra(metadata;savename="test.png")
@@ -26,12 +25,10 @@ metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$
 plot_density_matrix_bm_half(metadata,ik=1)
 plot_density_matrix_global_order_parameters(metadata)
 
-# plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_sublattice(metadata)
 # plot_density_matrix_sublattice_full(metadata)
-
-# plot_density_matrix_global_order_parameters(metadata)
 # plot_density_matrix_valley_spin_density_tL2(metadata)
+
 ## strong coupling basis at reference point defined by metadata0
 seed = 1
 flag  = "random"

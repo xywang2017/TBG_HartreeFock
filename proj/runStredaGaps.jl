@@ -6,7 +6,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 132
-foldername = "zeeman/$(twist_angle)_strain"
+foldername = "zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -38,7 +38,7 @@ for ϕ in ϕs
     fillings = fillings[fillings .<1e-5]
     ns = Float64[]
     for ν in fillings 
-        νstr = round(Int,1000*(s+t*p/q))
+        νstr = round(Int,1000*ν)
         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
         if !isempty(metadata)
             push!(ns,ν)
@@ -46,7 +46,7 @@ for ϕ in ϕs
             push!(gaps,Δ)
         end
     end
-    scatter(fillings,ones(length(fillings))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
 end
 xlim([-4.3,0.3])
 ylim([0.0,0.55])
