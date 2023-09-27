@@ -148,7 +148,7 @@ close(fig)
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(params::Params)
-    foldername0 = "NonInt/$(twist_angle)_strain"
+    foldername0 = "NonInt/120_nostrain"
     # fig,ax = subplots(figsize=(2.8,2.5))
     fig,ax = subplots(figsize=(6,4))
     strs = ["K","Kprime"]

@@ -42,12 +42,12 @@ for i in eachindex(twist_angles)
             νstr = round(Int,1000*ν)
             metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_random_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             if !isfile(metadata)
-                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/4_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+                metadata = joinpath(fpath,"$(foldername)/_$(p)_$(q)/1_bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
             end
             if isfile(metadata)
                 push!(ns,ν)
                 E = load(metadata,"iter_energy")[end]
-                for flag in ["flavor","random","random_tL","chern","bm","strong","bm_cascade"], seed in 1:10 
+                for flag in ["flavor","random","random_tL","chern","bm","strong","bm_cascade","bm_cascade_tL"], seed in 1:10 
                     metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
                     if isfile(metadata0)
                         E0 = load(metadata0,"iter_energy")[end]
@@ -56,7 +56,7 @@ for i in eachindex(twist_angles)
                         end
                     end
                 end 
-                Δ=computegap(metadata;savename="test.pdf")
+                Δ=computegap(metadata;savename="test.png")
                 push!(gaps,Δ)
             end
         end
