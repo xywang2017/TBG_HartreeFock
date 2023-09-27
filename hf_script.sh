@@ -1,11 +1,11 @@
 #!/bin/bash -l 
 
-# for flag in {K,}
-# do 
-#     julia proj/runBMLL.jl $flag 07 1 8 1.20 strain
-# done
+for flag in {K,}
+do 
+    julia proj/runBMLL.jl $flag 07 2 5 1.20 nostrain
+done
 
-julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric
+# julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric
 
 # julia proj/runHF_server.jl 1 8 -2.25 ${2} 07 ${1} 1.20 strain symmetric
 

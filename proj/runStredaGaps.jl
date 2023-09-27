@@ -172,7 +172,7 @@ function plot_LL_spectrum(params::Params)
             pl = ax.scatter(ones(length(energies[:,1,1]))*ϕ,energies[:,1,1],marker="o",s=3,edgecolor="none",c=colors[iη],vmin=-1,vmax=1,cmap="coolwarm")
             # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
-        if norm(tmp[1]-tmp[2]) >1e-5
+        if norm(tmp[1]-tmp[2]) >1e-6
             println("ϕ/ϕ0= ",ϕ," ",norm(tmp[1]-tmp[2]))
         end
         
@@ -181,9 +181,9 @@ function plot_LL_spectrum(params::Params)
     ax.set_ylabel("E (meV)")
     ax.set_xlabel(L"ϕ/ϕ_0")
     ax.set_xlim([0,0.55])
-    ax.set_ylim([-39,39])
+    # ax.set_ylim([-39,39])
     tight_layout()
-    savefig("tmp_132.png",dpi=600,transparent=true)
+    # savefig("tmp_120.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing

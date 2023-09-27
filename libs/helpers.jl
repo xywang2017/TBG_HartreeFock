@@ -278,7 +278,6 @@ function _tLL_v1_valleyKprime(T::Matrix{ComplexF64}, q::ComplexF64, nLL::Int, nH
                 println("Error with _tLL σrotation false")
             end
         end
-        # oLL[iH1, iH2] *= (-1)^(n1+n2)
     end
     # oLL *= exp(1im * real(q) * imag(q) * lB^2 / 2)
     return oLL
