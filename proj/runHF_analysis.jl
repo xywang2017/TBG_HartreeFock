@@ -13,7 +13,7 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -3,-1
-p,q = 2,7
+p,q = 3,11
 νF = (s)+(t)*p/q
 println(νF)
 νstr = round(Int,1000*νF)
@@ -40,7 +40,7 @@ println("Convergence: ",load(metadata,"iter_err")[end])
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 # plot_spectra(metadata;savename="test.png")
 # plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="tmp3.png",jj=3)
-plot_density_matrix_bm(metadata,ik=1)
+# plot_density_matrix_bm(metadata,ik=1)
 plot_density_matrix_bm_half(metadata,ik=1)
 plot_density_matrix_global_order_parameters(metadata)
 

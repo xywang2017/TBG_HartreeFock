@@ -112,7 +112,7 @@ for st in sts
                 if load(metadata,"iter_err")[end] > 1e-6
                     # println("s= ",s," t=",t," p=",p," q=",q," Iter err: ",load(metadata,"iter_err")[end])
                 end
-                println(metadata)
+                # println(metadata)
                 push!(metadatas,metadata)
             end
         end
