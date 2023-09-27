@@ -51,7 +51,7 @@ navg = s .+ t*ϕavg
 plot(ϕavg,α /(2π*E0) ./navg,
             "^-",c="b",ms=3,markeredgecolor="none")
 xlabel(L"\rm ϕ/ϕ_0")
-ylabel(L"\rm {\bf M}\ (μ_B\ per\ e)")
+ylabel(L"\rm {\bf M}\ (μ_B/e)")
 tight_layout()
 display(fig)
 close(fig)
