@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 132
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -63,7 +63,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 # sts = [[0,0],[0,-3],[0,-2],[0,-1]]
-sts = [[0,-4]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]

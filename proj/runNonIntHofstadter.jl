@@ -55,7 +55,7 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter/120_strain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/132_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(2.5,2.5))
     ϕmin = 1//12
@@ -69,10 +69,11 @@ function plot_LL_spectrum()
         plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
     xlim([0,0.55])
+    ylim([-45,45])
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    savefig("BMLL_120_nostrain.png",dpi=600,transparent=true)
+    savefig("BMLL_132_nostrain.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -114,7 +115,7 @@ function plot_wannier(flag=false)
     tight_layout()
     display(fig)
     if (flag ==true)
-        fname = joinpath(fpath,"Wannier_138_nostrain.png")
+        fname = joinpath(fpath,"Wannier_132_nostrain.png")
         savefig(fname,dpi=500,transparent=false)
     end
     close(fig)
