@@ -70,7 +70,7 @@ for st in sts
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
-        println(ϕ)
+        # println(ϕ)
         if abs(s+t*p/q) < 4
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
             if !isempty(metadata)
