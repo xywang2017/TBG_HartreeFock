@@ -2,12 +2,12 @@
 
 # julia proj/runHF_server.jl 1 2 -1.0 ${2} 07 ${1} ${3} strain symmetric
 # julia proj/runHF_server.jl 5 11 -0.909 ${2} 07 ${1} ${3} strain symmetric
-julia proj/runHF_server.jl 4 9 -0.889 ${2} 07 ${1} ${3} strain symmetric
+julia proj/runHF_server.jl 4 9 -0.889 ${2} 07 ${1} ${3} strain nosymmetric
 # julia proj/runHF_server.jl 3 7 -0.857 ${2} 07 ${1} ${3} strain symmetric
-julia proj/runHF_server.jl 5 12 -0.833 ${2} 07 ${1} ${3} strain symmetric
+julia proj/runHF_server.jl 5 12 -0.833 ${2} 07 ${1} ${3} strain nosymmetric
 # julia proj/runHF_server.jl 2 5 -0.8 ${2} 07 ${1} ${3} strain symmetric
 # julia proj/runHF_server.jl 3 8 -0.75 ${2} 07 ${1} ${3} strain symmetric
-julia proj/runHF_server.jl 4 11 -0.727 ${2} 07 ${1} ${3} strain symmetric
+julia proj/runHF_server.jl 4 11 -0.727 ${2} 07 ${1} ${3} strain nosymmetric
 # julia proj/runHF_server.jl 1 3 -0.667 ${2} 07 ${1} ${3} strain symmetric
 # julia proj/runHF_server.jl 3 10 -0.6 ${2} 07 ${1} ${3} strain symmetric
 # julia proj/runHF_server.jl 2 7 -0.571 ${2} 07 ${1} ${3} strain symmetric

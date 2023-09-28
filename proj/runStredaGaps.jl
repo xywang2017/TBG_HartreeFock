@@ -75,7 +75,7 @@ for st in sts
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
             if !isempty(metadata)
                 push!(metadatas,metadata)
-                # println(metadata)
+                println(load(metadata,"iter_energy")[end])
             end
         end
     end
