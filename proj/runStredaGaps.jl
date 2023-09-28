@@ -24,7 +24,7 @@ for s in -3:3, t in -12:12
 end
 sts = unique(sts)
 
-ns = round.(-2.0*ϕs,digits=3)
+ns = round.(-2 .-2.0*ϕs,digits=3)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -70,6 +70,7 @@ for st in sts
     for ϕ in ϕs 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
+        println(ϕ)
         if abs(s+t*p/q) < 4
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
             if !isempty(metadata)
