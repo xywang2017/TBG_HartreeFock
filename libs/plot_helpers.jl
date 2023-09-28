@@ -401,6 +401,19 @@ end
 # plot_density_matrix_global_order_parameters(metadata)
 
 
+function test_tL2_breaking(fname::String)
+    hf = load(fname,"hf");
+    P = reshape(hf.P,8hf.q,8hf.q,:,hf.nq^2)
+    fluctP = P .- reshape(sum(P,dims=3),(8hf.q,8hf.q,1,:))/size(P,3)
+    normfluctP = norm(fluctP)/length(fluctP)
+    if normfluctP > 1e-4 
+        println(normfluctP)
+    else 
+        println("tL2 preserved with resolution: ",normfluctP)
+    end
+    return nothing
+end
+
 
 function plot_density_matrix_valley_spin_density_tL2(fname::String)
     hf = load(fname,"hf");
