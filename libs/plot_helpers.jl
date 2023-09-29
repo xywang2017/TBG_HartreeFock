@@ -86,7 +86,8 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
-    fig = figure(figsize=(2.5,2.5))
+    # fig = figure(figsize=(2.5,2.5))
+    fig = figure(figsize=(6,4))
     ϵFs = Float64[]
     Δs = Float64[]
     for j in eachindex(metadatas) 
@@ -98,16 +99,16 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
-        if j<=11
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="green",markeredgecolor="none",markersize=2)
-        else
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
-        end
-        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
-        if j == length(metadatas)
-            # colorbar(pl,shrink=0.8)
-        end
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
+        # if j<=11
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="green",markeredgecolor="none",markersize=2)
+        # else
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
+        # end
+        # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
+        # if j == length(metadatas)
+        #     # colorbar(pl,shrink=0.8)
+        # end
         # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)

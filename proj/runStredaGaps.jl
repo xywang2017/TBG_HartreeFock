@@ -61,7 +61,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 # sts = [[0,0],[0,-3],[0,-2],[0,-1]]
-sts = [[-4,1]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -109,8 +109,8 @@ close(fig)
 # plot spectrum 
 function plot_LL_spectrum(params::Params;angle::Int=120)
     foldername0 = "NonInt/$(angle)_strain"
-    fig,ax = subplots(figsize=(2.8,2.5))
-    # fig,ax = subplots(figsize=(6,4))
+    # fig,ax = subplots(figsize=(2.8,2.5))
+    fig,ax = subplots(figsize=(6,4))
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
@@ -130,7 +130,7 @@ function plot_LL_spectrum(params::Params;angle::Int=120)
             energies = reshape(energies,2q,:)
             push!(tmp,energies[:,1])
             # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=3,edgecolor="none",c=colors[iη])
-            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=2,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
+            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=6,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
         
     end

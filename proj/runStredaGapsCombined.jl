@@ -130,12 +130,12 @@ for i in eachindex(twist_angles)
     end
 end
 
-fig = figure(figsize=(4,3))
-plot(twist_angles.*0.01,real(Pzs_nostrain_bounds),":",c="r")
+fig = figure(figsize=(6,6))
+plot(twist_angles.*0.01,real(Pzs_nostrain_bounds),":x",c="r")
 plot(twist_angles.*0.01,imag(Pzs_nostrain_bounds),":",c="r")
 plot(twist_angles.*0.01,Pzs_nostrain,"r-v",label="($s,$t) no strain")
 
-plot(twist_angles.*0.01,real(Pzs_strain_bounds),":",c="b")
+plot(twist_angles.*0.01,real(Pzs_strain_bounds),":x",c="b")
 plot(twist_angles.*0.01,imag(Pzs_strain_bounds),":",c="b")
 plot(twist_angles.*0.01,Pzs_strain,"b-^",label="($s,$t) strain")
 legend(loc="upper right")
@@ -148,21 +148,59 @@ close(fig)
 
 
 
-foldername0 = "NonInt/105_strain/_2_5_K_metadata.jld2"
-PΣz = reshape(load(foldername0,"PΣz"),2q,2q,:);
-σzlower = 0.0 
-for i in 1:(q-p)
-    σzlower += sum(PΣz[i,i,:])
-end
-σzlower /= ( size(PΣz,3)*(q-p) )
-σzupper = 0.0
-for i in 1:size(PΣz,3)
-    vals = eigvals(Hermitian(PΣz[:,:,i]))
-    σzupper += sum(vals[(q+p+1):(2q)])
-    if i==4
-        fig = figure()
-        plot(vals,"bo")
-        display(fig)
-        close(fig) 
+# ------------------------------- sublattice polarization analysis versus angle for a given flux --------------------------- 
+twist_angles = [138,132,128,124,120,105]
+ϕ, s, t = 2//5, -3, -1
+
+# Pzs_strain = Float64[]
+# Pzs_strain_bounds = ComplexF64[]
+Pzs = Float64[]
+Pzs_diag = Float64[]
+Pzs_offdiag = Float64[]
+
+for i in eachindex(twist_angles)
+    twist_angle = twist_angles[i]
+    p,q = numerator(ϕ), denominator(ϕ)
+    ν = s + t*ϕ
+    νstr = round(Int,1000*ν)
+    foldername = "zeeman/$(twist_angle)_strain"
+    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+    hf = load(metadata,"hf");
+    P = reshape(hf.P,8q,8q,:);
+    Σz = reshape(hf.Σz0,8q,8q,:);
+    nmax = round(Int,(ν+4)/8 *size(P,1)*size(P,3))
+
+    σz = 0.0 
+    for ik in 1:size(hf.P,3)
+        tmpP =  P[:,:,ik]+0.5I 
+        tmpP = Diagonal(tmpP)
+        σz += tr(transpose(tmpP) * view(Σz,:,:,ik)) / nmax 
     end
+    push!(Pzs_diag,real(σz))
+
+    σz = 0.0 
+    for ik in 1:size(hf.P,3)
+        tmpP =  P[:,:,ik]+0.5I 
+        tmpP .= tmpP .- Diagonal(tmpP)
+        σz += tr(transpose(tmpP) * view(Σz,:,:,ik)) / nmax 
+    end
+    push!(Pzs_offdiag,real(σz))
+
+    σzmid = sum([tr(( transpose(view(P,:,:,ik))+0.5I ) * view(Σz,:,:,ik)) /nmax for ik in 1:size(P,3) ] ) 
+    push!(Pzs,real(σzmid)) 
 end
+
+
+fig = figure(figsize=(6,6))
+plot(twist_angles.*0.01,Pzs,"r-o",label="($s,$t) strain")
+plot(twist_angles.*0.01,Pzs_diag,"b:^",label="diag")
+plot(twist_angles.*0.01,Pzs_offdiag,"g:v",label="offdiag")
+
+legend(loc="upper right")
+xlabel("θ")
+ylabel(L"\rm ⟨σ_zτ_z⟩")
+tight_layout()
+savefig("Pz_s_$(s)_t_$(t).png",dpi=600,transparent=true)
+display(fig)
+close(fig)
+
