@@ -2,7 +2,7 @@
 
 for flag in {K,}
 do 
-    julia proj/runBMLL.jl $flag 07 2 5 1.20 nostrain
+    julia proj/runBMLL.jl $flag 07 2 5 ${1} nostrain
 done
 
 # julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric

@@ -80,7 +80,8 @@ function computegap(metadata::String;savename::String="tmp.pdf")
         ϵF = ϵsorted[end]
         Δ = 0
     end
-    return Δ
+    Pz = sum(chern[1:i])/ i
+    return Δ,Pz 
 end
 
 ## plot Hartree Fock spectra collectively

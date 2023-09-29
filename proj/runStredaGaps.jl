@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 132
+twist_angle = 120
 foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -23,8 +23,6 @@ for s in -3:3, t in -12:12
     push!(sts,[-s,-t])
 end
 sts = unique(sts)
-
-ns = round.(-2 .-2.0*ϕs,digits=3)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -44,7 +42,7 @@ for ϕ in ϕs
         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
         if !isempty(metadata)
             push!(ns,ν)
-            Δ=computegap(metadata;savename="test.png")
+            Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
         end
     end
@@ -63,7 +61,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 # sts = [[0,0],[0,-3],[0,-2],[0,-1]]
-sts = [[-3,-1]]
+sts = [[-4,1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]

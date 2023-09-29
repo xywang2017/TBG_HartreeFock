@@ -12,8 +12,8 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = 0, -2
-p,q = 4,9
+s,t = -4, 4
+p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
