@@ -7,12 +7,12 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
-foldername = "zeeman/$(twist_angle)_nostrain"
+foldername = "zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -3, 0
+s,t = -1, -2
 p,q = 1,6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)

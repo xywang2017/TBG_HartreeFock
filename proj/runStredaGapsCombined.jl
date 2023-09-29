@@ -42,6 +42,9 @@ for i in eachindex(twist_angles)
                 push!(ns,ν)
                 Δ,_=computegap(metadata;savename="test.png")
                 push!(gaps,Δ)
+                # if occursin("_tL_",metadata)
+                #     println(metadata)
+                # end
             end
         end
         ax[r,c].scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
