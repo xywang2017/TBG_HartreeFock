@@ -1,13 +1,23 @@
 #!/bin/bash -l 
 
-for angle in {1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.22,1.26,1.30,1.34,1.36}
+# for angle in {1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.22,1.26,1.30,1.34,1.36}
+# for angle in {1.05,1.20,1.24,1.28,1.32,1.38}
+#     do 
+#         for flag in {K,}
+#         do 
+#             for flag1 in {strain,nostrain}
+#             do
+#                 julia proj/runBMLL.jl $flag 07 2 5 $angle $flag1 
+#             done
+#         done
+# done
+
+
+for angle in {1.05,1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.20,1.22,1.24,1.26,1.28,1.30,1.32,1.34,1.36,1.38}
     do 
-        for flag in {K,}
-        do 
-            for flag1 in {strain,nostrain}
-            do
-                julia proj/runBMLL.jl $flag 07 2 5 $angle $flag1 
-            done
+        for flag1 in {strain,nostrain}
+        do
+            julia proj/runHF_server.jl 2 5 -3.4 bm_cascade 07 1 $angle $flag1 symmetric
         done
 done
 # julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric

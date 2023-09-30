@@ -52,6 +52,7 @@ end
     res = 1e-6
     ϵr = 15.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
+    # return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*26)
 end
 
 function CoulombUnit(params::Params)

@@ -70,89 +70,8 @@ display(fig)
 close(fig)
 
 
-
 # ------------------------------- sublattice polarization analysis versus angle for a given flux --------------------------- 
-twist_angles = [138,132,128,124,120,105]
-ϕ, s, t = 2//5, -3, -1
-Pzs_strain = Float64[]
-Pzs_strain_bounds = ComplexF64[]
-Pzs_nostrain = Float64[]
-Pzs_nostrain_bounds = ComplexF64[]
-
-for i in eachindex(twist_angles)
-    twist_angle = twist_angles[i]
-    p,q = numerator(ϕ), denominator(ϕ)
-    ν = s + t*ϕ
-    νstr = round(Int,1000*ν)
-
-    foldername0 = "NonInt/$(twist_angle)_nostrain/_$(p)_$(q)_K_metadata.jld2"
-    PΣz = reshape(load(foldername0,"PΣz"),2q,2q,:);
-    σzlower = 0.0 
-    for i in 1:(q-p)
-        σzlower += sum(PΣz[i,i,:])
-    end
-    σzlower /= ( size(PΣz,3)*(q-p) )
-    σzupper = 0.0
-    for i in 1:size(PΣz,3)
-        vals = eigvals(Hermitian(PΣz[:,:,i]))
-        σzupper += sum(vals[(q+p+1):(2q)])
-    end
-    σzupper /=( size(PΣz,3)*(q-p) )
-    push!(Pzs_nostrain_bounds,σzlower+1im*σzupper)
-
-    foldername = "zeeman/$(twist_angle)_nostrain"
-    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
-
-    if !isempty(metadata)
-        Δ,Pz=computegap(metadata;savename="test.png")
-        push!(Pzs_nostrain,Pz)
-    end
-
-
-    foldername0 = "NonInt/$(twist_angle)_strain/_$(p)_$(q)_K_metadata.jld2"
-    PΣz = reshape(load(foldername0,"PΣz"),2q,2q,:);
-    σzlower = 0.0 
-    for i in 1:(q-p)
-        σzlower += sum(PΣz[i,i,:])
-    end
-    σzlower /= ( size(PΣz,3)*(q-p) )
-    σzupper = 0.0
-    for i in 1:size(PΣz,3)
-        vals = eigvals(Hermitian(PΣz[:,:,i]))
-        σzupper += sum(vals[(q+p+1):(2q)])
-    end
-    σzupper /=( size(PΣz,3)*(q-p) )
-    push!(Pzs_strain_bounds,σzlower+1im*σzupper)
-    
-
-    foldername = "zeeman/$(twist_angle)_strain"
-    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
-    if !isempty(metadata)
-        Δ,Pz=computegap(metadata;savename="test.png")
-        push!(Pzs_strain,Pz)
-    end
-end
-
-fig = figure(figsize=(6,6))
-plot(twist_angles.*0.01,real(Pzs_nostrain_bounds),":x",c="r")
-plot(twist_angles.*0.01,imag(Pzs_nostrain_bounds),":",c="r")
-plot(twist_angles.*0.01,Pzs_nostrain,"r-v",label="($s,$t) no strain")
-
-plot(twist_angles.*0.01,real(Pzs_strain_bounds),":x",c="b")
-plot(twist_angles.*0.01,imag(Pzs_strain_bounds),":",c="b")
-plot(twist_angles.*0.01,Pzs_strain,"b-^",label="($s,$t) strain")
-legend(loc="upper right")
-xlabel("θ")
-ylabel(L"\rm ⟨σ_zτ_z⟩")
-tight_layout()
-savefig("Pz_s_$(s)_t_$(t).png",dpi=600,transparent=true)
-display(fig)
-close(fig)
-
-
-
-# ------------------------------- sublattice polarization analysis versus angle for a given flux --------------------------- 
-twist_angles = [138,132,128,124,120,105]
+twist_angles = [105; collect(106:2:138)]
 ϕ, s, t = 2//5, -3, -1
 
 # Pzs_strain = Float64[]
@@ -166,7 +85,7 @@ for i in eachindex(twist_angles)
     p,q = numerator(ϕ), denominator(ϕ)
     ν = s + t*ϕ
     νstr = round(Int,1000*ν)
-    foldername = "zeeman/$(twist_angle)_strain"
+    foldername = "zeeman/$(twist_angle)_nostrain"
     metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
     hf = load(metadata,"hf");
     P = reshape(hf.P,8q,8q,:);
@@ -195,7 +114,7 @@ end
 
 
 fig = figure(figsize=(6,6))
-plot(twist_angles.*0.01,Pzs,"r-o",label="($s,$t) strain")
+plot(twist_angles.*0.01,Pzs,"r-o",label="($s,$t) no strain")
 plot(twist_angles.*0.01,Pzs_diag,"b:^",label="diag")
 plot(twist_angles.*0.01,Pzs_offdiag,"g:v",label="offdiag")
 
@@ -203,7 +122,7 @@ legend(loc="upper right")
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩")
 tight_layout()
-savefig("Pz_s_$(s)_t_$(t).png",dpi=600,transparent=true)
+savefig("nostrain_Pz_s_$(s)_t_$(t).png",dpi=600,transparent=false)
 display(fig)
 close(fig)
 

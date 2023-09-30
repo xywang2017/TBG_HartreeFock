@@ -217,12 +217,12 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
 end
 
 ### density matrix analysis 
-function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png",jj::Int=1)
+function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::String="test.png",jj::Int=1,titlestr::String="")
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
     P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
     # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
-    fig,ax = subplots(1,figsize=(2.3,2))
+    fig,ax = subplots(1,figsize=(3,2.8))
     # states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     
@@ -238,6 +238,7 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     # ax.set_yticklabels(["1","q","2q"])
     ax.set_xticks([])
     ax.set_yticks([])
+    ax.set_title(titlestr)
     # ax[r,c].axis("equal")
     tight_layout()
     # subplots_adjust(hspace=0.02,wspace=0.05)
@@ -245,7 +246,7 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     # cbar_ax.axis(false)
     # fig.colorbar(pl, ax=cbar_ax)
     
-    savefig(savename,dpi=600,transparent=true)
+    savefig(savename,dpi=600,transparent=false)
     display(fig)
     close(fig)
     return nothing
@@ -502,6 +503,34 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
 end
 
 
+plot_density_matrix_sublattice_v0(metadata;titlestr="$(twist_angle)")
+### strong coupling basis  valley spin
+function plot_density_matrix_sublattice_v0(fname::String;titlestr::String="")
+    ik = 1
+    hf = load(fname,"hf");
+    H0 = hf.Σz0
+    P = hf.P 
+    tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
+    Pstrong = zeros(ComplexF64,2hf.q,2hf.q,4)
+    for iηs in 1:4
+        F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
+        vec = F.vectors
+        Pstrong[:,:,iηs] = transpose(vec) * P0[:,iηs,:,iηs] * conj.(vec) 
+        # Pstrong[:,:,iηs] = vec' * P0[:,iηs,:,iηs] * vec
+    end 
+    fig,ax = subplots(figsize=(3,2.8))
+    pl=ax.imshow(abs.(Pstrong[:,:,3]),vmin=0,vmax=1,origin="lower",cmap="Reds")
+    colorbar(pl,ax=ax,fraction=0.046, pad=0.04)
+    ax.set_title(titlestr)
+    tight_layout()
+    savefig("figures/test_$(titlestr).png",dpi=500)
+    display(fig)
+    close(fig)
+    return nothing 
+end
+
+
 ### strong coupling basis  valley spin
 function plot_density_matrix_sublattice(fname::String)
     ik = 1
@@ -515,6 +544,7 @@ function plot_density_matrix_sublattice(fname::String)
         F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
         vec = F.vectors
         Pstrong[:,:,iηs] = transpose(vec) * P0[:,iηs,:,iηs] * conj.(vec) 
+        # Pstrong[:,:,iηs] = vec' * P0[:,iηs,:,iηs] * vec
     end 
     fig,ax = subplots(2,2,figsize=(6,6))
     states = ["K↑","K'↑","K↓","K'↓"]
