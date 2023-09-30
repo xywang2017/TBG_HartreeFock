@@ -503,7 +503,6 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
 end
 
 
-plot_density_matrix_sublattice_v0(metadata;titlestr="$(twist_angle)")
 ### strong coupling basis  valley spin
 function plot_density_matrix_sublattice_v0(fname::String;titlestr::String="")
     ik = 1
