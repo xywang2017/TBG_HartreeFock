@@ -1,10 +1,15 @@
 #!/bin/bash -l 
 
-for flag in {K,}
-do 
-    julia proj/runBMLL.jl $flag 07 2 5 ${1} nostrain
+for angle in {1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.22,1.26,1.30,1.34,1.36}
+    do 
+        for flag in {K,}
+        do 
+            for flag1 in {strain,nostrain}
+            do
+                julia proj/runBMLL.jl $flag 07 2 5 $angle $flag1 
+            done
+        done
 done
-
 # julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric
 
 # julia proj/runHF_server.jl 1 8 -2.25 ${2} 07 ${1} 1.20 strain symmetric
