@@ -37,12 +37,20 @@ plot_density_matrix_bm(metadata,ik=1)
 # plot_density_matrix_valley_spin_density_tL2(metadata)
 
 ## strong coupling basis at reference point defined by metadata0
-seed = 1
-flag  = "random"
-νF0 = 0+ (0)*p/q
-νstr0 = round(Int,1000*νF0)
-metadata0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr0).jld2")
-# plot_density_matrix_strong_coupling(metadata,metadata0)
-# plot_density_matrix_strong_coupling_valley_spin(metadata,metadata0)
+s,t = 0,-4
+p,q = 2,5
+νF = (s)+(t)*p/q
+νstr = round(Int,1000*νF)
+
+metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
+
+s,t = -3,-1
+νF = (s)+(t)*p/q
+νstr = round(Int,1000*νF)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
+
+
+plot_density_matrix_strong_coupling(metadata,metadata0)
+plot_density_matrix_strong_coupling_valley_spin(metadata,metadata0)
 # 
 # plot_order_parameters(metadata)
