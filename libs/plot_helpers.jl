@@ -86,8 +86,8 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
-    # fig = figure(figsize=(2.5,2.5))
-    fig = figure(figsize=(6,4))
+    fig = figure(figsize=(2.5,2.5))
+    # fig = figure(figsize=(6,4))
     ϵFs = Float64[]
     Δs = Float64[]
     for j in eachindex(metadatas) 
@@ -99,16 +99,16 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
-        # if j<=11
-        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="green",markeredgecolor="none",markersize=2)
-        # else
-        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
-        # end
-        # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
-        # if j == length(metadatas)
-        #     # colorbar(pl,shrink=0.8)
-        # end
+        # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
+        if j<=3
+            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="purple",markeredgecolor="none",markersize=2)
+        else
+            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
+        end
+        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
+        if j == length(metadatas)
+            # colorbar(pl,shrink=0.8)
+        end
         # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
@@ -501,6 +501,35 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
     close(fig)
     return nothing 
 end
+
+
+### strong coupling basis  valley spin
+function plot_density_matrix_strong_coupling_valley_spin_v1(fname::String,fname0::String)
+    ik = 1
+    hf = load(fname,"hf");
+    hf0 = load(fname0,"hf");
+    H0 = hf0.H
+    P = hf.P 
+    tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
+    Pstrong = zeros(ComplexF64,2hf.q,4,2hf.q,4)
+    vec = zeros(ComplexF64,2hf.q,2hf.q,4)
+    for iηs in 1:4
+        F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
+        vec[:,:,iηs] = F.vectors
+    end 
+    for iη1 in 1:4, iη2 in 1:4 
+        Pstrong[:,iη1,:,iη2] = transpose(vec[:,:,iη1]) * P0[:,iη1,:,iη2] * conj.(vec[:,:,iη2]) 
+    end
+    fig = figure(figsize=(6,6))
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,:)),vmin=0,vmax=1,origin="lower")
+    colorbar(pl,fraction=0.046, pad=0.04)
+    tight_layout()
+    display(fig)
+    close(fig)
+    return nothing 
+end
+
 
 
 ### strong coupling basis  valley spin

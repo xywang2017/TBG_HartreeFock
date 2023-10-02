@@ -3,10 +3,11 @@ fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
-foldername = "zeeman/$(twist_angle)_strain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -26,41 +27,41 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(3,3))
-for lines in -4:4
-    axvline(lines,ls=":",c="gray",lw=0.5)
-end
-for ϕ in ϕs 
-    p,q = numerator(ϕ), denominator(ϕ)
-    gaps = Float64[]
-    fillings = sort([st[1]+st[2]*p/q for st in sts])
-    fillings = unique(round.(fillings,digits=10))
-    fillings = fillings[fillings .<1e-5]
-    ns = Float64[]
-    for ν in fillings 
-        νstr = round(Int,1000*ν)
-        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
-        if !isempty(metadata)
-            push!(ns,ν)
-            Δ,Pz=computegap(metadata;savename="test.png")
-            push!(gaps,Δ)
-        end
-    end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
-end
-xlim([-4.3,0.3])
-ylim([0.0,0.55])
-xlabel(L"n/n_s")
-ylabel(L"ϕ/ϕ_0")
-tight_layout()
-savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
-display(fig)
-close(fig)
+# fig = figure(figsize=(3,3))
+# for lines in -4:4
+#     axvline(lines,ls=":",c="gray",lw=0.5)
+# end
+# for ϕ in ϕs 
+#     p,q = numerator(ϕ), denominator(ϕ)
+#     gaps = Float64[]
+#     fillings = sort([st[1]+st[2]*p/q for st in sts])
+#     fillings = unique(round.(fillings,digits=10))
+#     fillings = fillings[fillings .<1e-5]
+#     ns = Float64[]
+#     for ν in fillings 
+#         νstr = round(Int,1000*ν)
+#         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+#         if !isempty(metadata)
+#             push!(ns,ν)
+#             Δ,Pz=computegap(metadata;savename="test.png")
+#             push!(gaps,Δ)
+#         end
+#     end
+#     scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
+# end
+# xlim([-4.3,0.3])
+# ylim([0.0,0.55])
+# xlabel(L"n/n_s")
+# ylabel(L"ϕ/ϕ_0")
+# tight_layout()
+# savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+# display(fig)
+# close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-# sts = [[0,0],[0,-3],[0,-2],[0,-1]]
+# sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
@@ -81,16 +82,16 @@ for st in sts
     push!(Δss,Δs)
 end
 
-fig = figure(figsize=(6,4))
+fig = figure(figsize=(2.5,2.5))
 # sts = [[0,0],[0,-3],[0,-2],[0,-1]]
 # ϕc = [-1,2//5,1//3,1//3] # 132 degrees critical field
 # ϕc = [-1,1//6,1//11,1//11] # 132 degrees critical field
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for i in eachindex(Δss)
     s, t = sts[i][1], sts[i][2]
-    plot(ϕs,Δss[i],"-o",c=colors[i],ms=4,markeredgecolor="none",label="($(s),$(t))")
+    plot(ϕs,Δss[i],"o",c=colors[i],ms=4,markeredgecolor="none",label="($(s),$(t))")
 end
-legend(fontsize=6,loc="upper left")
+legend(fontsize=8,loc="upper left")
 xlabel(L"ϕ/ϕ_0")
 ylabel("Δ (meV)")
 # axvline(3/8)
@@ -101,7 +102,7 @@ ylabel("Δ (meV)")
 xlim([-0.1,0.55])
 ylim([0,24])
 tight_layout()
-savefig("tmp_128.png",transparent=false,dpi=600)
+savefig("tmp_$(twist_angle).png",transparent=true,dpi=600)
 display(fig)
 close(fig)
 

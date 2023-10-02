@@ -31,7 +31,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    # init_P_valley_spin_rotation(hf;α=1.0)
+    init_P_valley_spin_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -62,9 +62,9 @@ function init_P_vs_symmetric(hf::HartreeFock)
     # random initialization of density matrix for one flavor
     # this is problematic for some p/q sequences, as this does not reside along the integer filling line
     νmax = round(Int,(hf.ν+4)/8 * size(hf.P,1)/4)
-    tmpP = reshape(hf.P,2hf.q,4,2hf.q,4,:)
+    tmpP = reshape(hf.P,hf.nb*hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,:)
     
-    states_to_populate = randperm(2hf.q)[1:νmax]
+    states_to_populate = randperm(hf.nb*hf.q)[1:νmax]
     for ip in states_to_populate, iηs in 1:4
         tmpP[ip,iηs,ip,iηs,:] .= 1.0 
     end
@@ -94,7 +94,7 @@ function init_P_bm_cascade(hf::HartreeFock)
             ϵ0[i,j] = hf.H0[i,i,j]
         end
         indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
-        if s<=-0.01
+        if s<=1e-3
             for ifl in [3,4,1,2][1:(4-abs(s))], ib in 1:(hf.q-hf.p)
             # for ifl in [1,4], ib in 1:(hf.q-hf.p)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
