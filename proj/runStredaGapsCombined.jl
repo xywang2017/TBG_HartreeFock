@@ -76,15 +76,15 @@ twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
 ϕ = 1//8
+p,q = numerator(ϕ), denominator(ϕ)
 _is_strain = "nostrain"
 # ϕ, s, t =1//8, -1,-3
 
-fig = figure(figsize=(3,3))
+fig = figure(figsize=(6,6))
 
 Pzs_bounds = ComplexF64[]
 for i in eachindex(twist_angles)
     twist_angle = twist_angles[i]
-    p,q = numerator(ϕ), denominator(ϕ)
     foldername = dir*"zeeman/$(twist_angle)_"*_is_strain
     s, t = 0,-4
     ν = s + t*ϕ
@@ -119,10 +119,10 @@ for st in sts
 
     for i in eachindex(twist_angles)
         twist_angle = twist_angles[i]
-        p,q = numerator(ϕ), denominator(ϕ)
         ν = s + t*ϕ
         νstr = round(Int,1000*ν)
         foldername = dir*"zeeman/$(twist_angle)_"*_is_strain
+        # println(s," ",t," ",foldername)
         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
         hf = load(metadata,"hf");
         P = reshape(hf.P,8q,8q,:);
@@ -136,12 +136,12 @@ for st in sts
     plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
 end
 
-
+ylim([-0.06,0.66])
 legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩")
 tight_layout()
-savefig("nostrain_1_8.png",dpi=600,transparent=true)
+savefig("$(_is_strain)_$(p)_$(q).png",dpi=600,transparent=true)
 display(fig)
 close(fig)
 
