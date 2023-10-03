@@ -498,7 +498,7 @@ end
 function find_lowest_energy_datafile(dir::String;test_str::String="null",_printinfo::Bool=false)
     metadata = ""
     if ! ispath(dir)
-        println("Hartree-Fock not run for the directory: ",dir)
+        # println("Hartree-Fock not run for the directory: ",dir)
     else 
         metadatas = String[]
         files = readdir(dir)
@@ -508,7 +508,7 @@ function find_lowest_energy_datafile(dir::String;test_str::String="null",_printi
             end
         end
         if isempty(metadatas)
-            println("Hartree-Fock not run for the parameterization")
+            # println("Hartree-Fock not run for the parameterization")
         else
             E = load(metadatas[1],"iter_energy")[end]
             metadata = metadatas[1]

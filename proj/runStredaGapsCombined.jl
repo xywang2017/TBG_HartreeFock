@@ -74,38 +74,19 @@ close(fig)
 # ------------------------------- sublattice polarization analysis versus angle for a given flux --------------------------- 
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
-ϕ, s, t =1//8, -1,-3
+sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
+ϕ = 1//8
+_is_strain = "nostrain"
+# ϕ, s, t =1//8, -1,-3
 
-# Pzs_strain = Float64[]
+fig = figure(figsize=(3,3))
+
 Pzs_bounds = ComplexF64[]
-Pzs_symmetric = Float64[]
-Pzs = Float64[]
-Pzs_diag = Float64[]
-Pzs_offdiag = Float64[]
-
 for i in eachindex(twist_angles)
     twist_angle = twist_angles[i]
     p,q = numerator(ϕ), denominator(ϕ)
-    foldername = dir*"zeeman/$(twist_angle)_nostrain"
-    ν = 0 + (-4)*ϕ
-    νstr = round(Int,1000*ν)
-    # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr)")
-    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="$(p)_$(q)_nu_$(νstr)")
-    hf = load(metadata,"hf");
-    H = reshape(hf.H,8q,8q,:);
-    Σz = reshape(hf.Σz0,8q,8q,:);
-    nmax = round(Int,(ν+4)/8 *size(H,1)*size(H,3))
-    σz = 0.0 
-    for ik in 1:size(H,3)
-        for i in 1:4
-            vals, vec = eigen(Hermitian(H[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik]))
-            σzτz = vec' * Σz[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik] * vec 
-            σz  += sum(diag(σzτz)[1:(q-p)])
-        end
-    end
-    push!(Pzs_symmetric,real(σz)/((q-p)*size(H,3)*4))
-
-    
+    foldername = dir*"zeeman/$(twist_angle)_"*_is_strain
+    s, t = 0,-4
     ν = s + t*ϕ
     νstr = round(Int,1000*ν)
     metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
@@ -126,40 +107,41 @@ for i in eachindex(twist_angles)
         σz_lower += sum(tmpΣz[1:(q-p)])
     end
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
-
-    # σz = 0.0 
-    # for ik in 1:size(hf.P,3)
-    #     tmpP =  P[:,:,ik]+0.5I 
-    #     tmpP = Diagonal(tmpP)
-    #     σz += tr(transpose(tmpP) * view(Σz,:,:,ik)) / nmax 
-    # end
-    # push!(Pzs_diag,real(σz))
-
-    # σz = 0.0 
-    # for ik in 1:size(hf.P,3)
-    #     tmpP =  P[:,:,ik]+0.5I 
-    #     tmpP .= tmpP .- Diagonal(tmpP)
-    #     σz += tr(transpose(tmpP) * view(Σz,:,:,ik)) / nmax 
-    # end
-    # push!(Pzs_offdiag,real(σz))
-
-    σzmid = sum([tr(( transpose(view(P,:,:,ik))+0.5I ) * view(Σz,:,:,ik)) /nmax for ik in 1:size(P,3) ] ) 
-    push!(Pzs,real(σzmid)) 
 end
 
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="full Chern pol.")
+plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="BM valence")
 
-fig = figure(figsize=(3,2.5))
-# fig = figure(figsize=(10,6))
-plot(twist_angles.*0.01,Pzs,"bo",ms=3,label="($(s),$(t))")
-plot(twist_angles.*0.01,real(Pzs_bounds),":",label="full Chern pol.")
-plot(twist_angles.*0.01,imag(Pzs_bounds),":",label="BM valence")
-plot(twist_angles.*0.01,Pzs_symmetric,":",label="(0,-4) symm.")
+
+for st in sts
+    s,t = st[1], st[2]
+    Pzs = Float64[]
+
+    for i in eachindex(twist_angles)
+        twist_angle = twist_angles[i]
+        p,q = numerator(ϕ), denominator(ϕ)
+        ν = s + t*ϕ
+        νstr = round(Int,1000*ν)
+        foldername = dir*"zeeman/$(twist_angle)_"*_is_strain
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+        hf = load(metadata,"hf");
+        P = reshape(hf.P,8q,8q,:);
+        Σz = reshape(hf.Σz0,8q,8q,:);
+        nmax = round(Int,(ν+4)/8 *size(P,1)*size(P,3))
+
+        σzmid = sum([tr(( transpose(view(P,:,:,ik))+0.5I ) * view(Σz,:,:,ik)) /nmax for ik in 1:size(P,3) ] ) 
+        push!(Pzs,real(σzmid)) 
+    end
+
+    plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
+end
+
 
 legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩")
 tight_layout()
-savefig("nostrain_Pz_s_$(s)_t_$(t).png",dpi=600,transparent=true)
+savefig("strain_1_8.png",dpi=600,transparent=true)
 display(fig)
 close(fig)
 
