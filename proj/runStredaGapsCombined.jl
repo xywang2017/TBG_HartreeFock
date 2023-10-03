@@ -74,7 +74,7 @@ close(fig)
 # ------------------------------- sublattice polarization analysis versus angle for a given flux --------------------------- 
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
-ϕ, s, t =1//8, -3, -1
+ϕ, s, t =1//8, -1,-3
 
 # Pzs_strain = Float64[]
 Pzs_bounds = ComplexF64[]
@@ -86,24 +86,24 @@ Pzs_offdiag = Float64[]
 for i in eachindex(twist_angles)
     twist_angle = twist_angles[i]
     p,q = numerator(ϕ), denominator(ϕ)
-    foldername = dir*"zeeman/$(twist_angle)_strain"
-    # ν = 0 + (-4)*ϕ
-    # νstr = round(Int,1000*ν)
-    # # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr)")
-    # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="$(p)_$(q)_nu_$(νstr)")
-    # hf = load(metadata,"hf");
-    # H = reshape(hf.H,8q,8q,:);
-    # Σz = reshape(hf.Σz0,8q,8q,:);
-    # nmax = round(Int,(ν+4)/8 *size(H,1)*size(H,3))
-    # σz = 0.0 
-    # for ik in 1:size(H,3)
-    #     for i in 1:4
-    #         vals, vec = eigen(Hermitian(H[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik]))
-    #         σzτz = vec' * Σz[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik] * vec 
-    #         σz  += sum(diag(σzτz)[1:(q-p)])
-    #     end
-    # end
-    # push!(Pzs_symmetric,real(σz)/((q-p)*size(H,3)*4))
+    foldername = dir*"zeeman/$(twist_angle)_nostrain"
+    ν = 0 + (-4)*ϕ
+    νstr = round(Int,1000*ν)
+    # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr)")
+    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="$(p)_$(q)_nu_$(νstr)")
+    hf = load(metadata,"hf");
+    H = reshape(hf.H,8q,8q,:);
+    Σz = reshape(hf.Σz0,8q,8q,:);
+    nmax = round(Int,(ν+4)/8 *size(H,1)*size(H,3))
+    σz = 0.0 
+    for ik in 1:size(H,3)
+        for i in 1:4
+            vals, vec = eigen(Hermitian(H[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik]))
+            σzτz = vec' * Σz[((i-1)*(2q)+1):(i*(2q)),((i-1)*(2q)+1):(i*(2q)),ik] * vec 
+            σz  += sum(diag(σzτz)[1:(q-p)])
+        end
+    end
+    push!(Pzs_symmetric,real(σz)/((q-p)*size(H,3)*4))
 
     
     ν = s + t*ϕ
@@ -153,7 +153,7 @@ fig = figure(figsize=(3,2.5))
 plot(twist_angles.*0.01,Pzs,"bo",ms=3,label="($(s),$(t))")
 plot(twist_angles.*0.01,real(Pzs_bounds),":",label="full Chern pol.")
 plot(twist_angles.*0.01,imag(Pzs_bounds),":",label="BM valence")
-# plot(twist_angles.*0.01,Pzs_symmetric,":",label="(0,-4) symm.")
+plot(twist_angles.*0.01,Pzs_symmetric,":",label="(0,-4) symm.")
 
 legend(loc="upper right",fontsize=8)
 xlabel("θ")
