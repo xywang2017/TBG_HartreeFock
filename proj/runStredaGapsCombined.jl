@@ -141,7 +141,7 @@ legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩")
 tight_layout()
-savefig("strain_1_8.png",dpi=600,transparent=true)
+savefig("nostrain_1_8.png",dpi=600,transparent=true)
 display(fig)
 close(fig)
 

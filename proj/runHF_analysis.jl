@@ -8,15 +8,15 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 110
+twist_angle = 106
 # for twist_angle in twist_angles
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-foldername = dir*"zeeman/$(twist_angle)_strain"
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -3,-1
+s,t = -2,-2
 p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
