@@ -3,8 +3,8 @@ fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
-# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -138,7 +138,8 @@ for st in sts
 end
 
 # ylim([-0.06,0.66])
-legend(loc="upper right",fontsize=8)
+yticks(collect(0:0.2:0.6))
+# legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩")
 tight_layout()
