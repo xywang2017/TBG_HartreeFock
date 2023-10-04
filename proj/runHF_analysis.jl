@@ -8,9 +8,10 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 108
+twist_angle = 116
 # for twist_angle in twist_angles
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -32,7 +33,7 @@ str = @sprintf "θ=%.2f" 0.01*twist_angle
 plot_density_matrix_bm(metadata,ik=1)
 # end
 # plot_density_matrix_bm_half(metadata,ik=1)
-# test_tL2_breaking(metadata)
+test_tL2_breaking(metadata)
 # plot_density_matrix_global_order_parameters(metadata)
 
 # plot_density_matrix_sublattice(metadata)
