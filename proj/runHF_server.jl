@@ -6,6 +6,8 @@ fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
+dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -65,7 +67,7 @@ initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix="NonInt/$(foldername)/",_Init=_Init,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
     savename0 = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_random_init_HF_$(p)_$(q)_nu_0.jld2")
     hf0 = load(savename0,"hf")

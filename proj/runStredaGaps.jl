@@ -4,6 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
@@ -109,9 +110,9 @@ close(fig)
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(params::Params;angle::Int=120)
-    foldername0 = "NonInt/$(angle)_strain"
-    # fig,ax = subplots(figsize=(2.8,2.5))
-    fig,ax = subplots(figsize=(6,4))
+    foldername0 =dir*"NonInt/$(angle)_strain"
+    fig,ax = subplots(figsize=(2.8,2.5))
+    # fig,ax = subplots(figsize=(6,4))
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
@@ -119,7 +120,7 @@ function plot_LL_spectrum(params::Params;angle::Int=120)
         strs = ["K","Kprime"]
         colors = ["b","r"]
         tmp = []
-        for iη in 1:1
+        for iη in 1:2
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
@@ -130,8 +131,8 @@ function plot_LL_spectrum(params::Params;angle::Int=120)
             end
             energies = reshape(energies,2q,:)
             push!(tmp,energies[:,1])
-            # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=3,edgecolor="none",c=colors[iη])
-            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=6,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
+            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=3,edgecolor="none",c=colors[iη])
+            # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=6,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
         
     end

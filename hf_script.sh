@@ -16,9 +16,9 @@
 for angle in {1.05,1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.20,1.22,1.24,1.26,1.28,1.30,1.32,1.34,1.36,1.38}
 # for angle in {1.06,1.08,1.10,1.12,1.14,1.16,1.18,1.22,,1.26,1.30,1.34,1.36}
     do 
-        for flag1 in {strain,nostrain}
+        for flag1 in {nostrain,}
         do
-            julia proj/runHF_server.jl 2 5 ${2} ${1} 07 1 $angle $flag1 symmetric
+            julia proj/runHF_server.jl 1 8 ${1} ${2} 07 ${3} $angle $flag1 symmetric
         done
 done
 # julia proj/runHF_server.jl 3 11 -3.273 ${2} 07 ${1} 1.32 strain nosymmetric
