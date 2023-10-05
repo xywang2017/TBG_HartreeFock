@@ -4,11 +4,11 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"zeeman/$(twist_angle)_strain"
+twist_angle = 105
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -28,36 +28,36 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-# fig = figure(figsize=(3,3))
-# for lines in -4:4
-#     axvline(lines,ls=":",c="gray",lw=0.5)
-# end
-# for ϕ in ϕs 
-#     p,q = numerator(ϕ), denominator(ϕ)
-#     gaps = Float64[]
-#     fillings = sort([st[1]+st[2]*p/q for st in sts])
-#     fillings = unique(round.(fillings,digits=10))
-#     fillings = fillings[fillings .<1e-5]
-#     ns = Float64[]
-#     for ν in fillings 
-#         νstr = round(Int,1000*ν)
-#         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
-#         if !isempty(metadata)
-#             push!(ns,ν)
-#             Δ,Pz=computegap(metadata;savename="test.png")
-#             push!(gaps,Δ)
-#         end
-#     end
-#     scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
-# end
-# xlim([-4.3,0.3])
-# ylim([0.0,0.55])
-# xlabel(L"n/n_s")
-# ylabel(L"ϕ/ϕ_0")
-# tight_layout()
+fig = figure(figsize=(4,3))
+for lines in -4:4
+    axvline(lines,ls=":",c="gray",lw=0.5)
+end
+for ϕ in ϕs 
+    p,q = numerator(ϕ), denominator(ϕ)
+    gaps = Float64[]
+    fillings = sort([st[1]+st[2]*p/q for st in sts])
+    fillings = unique(round.(fillings,digits=10))
+    fillings = fillings[fillings .<1e-5]
+    ns = Float64[]
+    for ν in fillings 
+        νstr = round(Int,1000*ν)
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+        if !isempty(metadata)
+            push!(ns,ν)
+            Δ,Pz=computegap(metadata;savename="test.png")
+            push!(gaps,Δ)
+        end
+    end
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
+end
+xlim([-4.3,0.3])
+ylim([0.0,0.55])
+xlabel(L"n/n_s")
+ylabel(L"ϕ/ϕ_0")
+tight_layout()
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
-# display(fig)
-# close(fig)
+display(fig)
+close(fig)
 
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
@@ -110,9 +110,10 @@ close(fig)
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(params::Params;angle::Int=120)
-    foldername0 =dir*"NonInt/$(angle)_strain"
+    foldername0 =dir*"NonInt/$(angle)_nostrain"
     fig,ax = subplots(figsize=(2.8,2.5))
     # fig,ax = subplots(figsize=(6,4))
+    ϕs = [1//5]
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
