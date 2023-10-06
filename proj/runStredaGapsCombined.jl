@@ -10,7 +10,7 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-ϕs = ϕs[ϕs.>0.1]
+# ϕs = ϕs[ϕs.>0.1]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
