@@ -7,7 +7,8 @@ fpath = pwd()
 
 BLAS.set_num_threads(1)
 # dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = ""
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -33,9 +34,11 @@ if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
 end
 
 if isequal(_is_symmetric,"symmetric")
-    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
-    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 end
 
 ϕ = p//q 
@@ -69,7 +72,7 @@ hf = HartreeFock()
 if !isequal(flag,"strong")
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
-    savename0 = dir*"zeeman/112_$(_is_strain)/_$(p)_$(q)/1_random_tL_init_HF_1_8_nu_-1375.jld2"
+    savename0 = dir*"zeeman/105_$(_is_strain)/_$(p)_$(q)/1_random_tL_init_HF_3_10_nu_-1200.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)

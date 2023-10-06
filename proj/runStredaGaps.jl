@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
@@ -29,9 +29,9 @@ sts = unique(sts)
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
 fig = figure(figsize=(4,3))
-for lines in -4:4
-    axvline(lines,ls=":",c="gray",lw=0.5)
-end
+# for lines in -4:4
+#     axvline(lines,ls=":",c="gray",lw=0.5)
+# end
 for ϕ in ϕs 
     p,q = numerator(ϕ), denominator(ϕ)
     gaps = Float64[]
@@ -55,7 +55,7 @@ ylim([0.0,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
-savefig("105.png",transparent=false,dpi=600)
+# savefig("105.png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
