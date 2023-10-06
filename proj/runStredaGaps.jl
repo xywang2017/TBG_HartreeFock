@@ -51,7 +51,7 @@ for ϕ in ϕs
     scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
 end
 xlim([-4.3,0.3])
-ylim([0.0,0.55])
+ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
