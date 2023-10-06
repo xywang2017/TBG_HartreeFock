@@ -4,8 +4,8 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = ""
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -77,7 +77,7 @@ close(fig)
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-ϕ = 2//5
+ϕ = 1//8
 p,q = numerator(ϕ), denominator(ϕ)
 _is_strain = "nostrain"
 # ϕ, s, t =1//8, -1,-3
@@ -111,8 +111,8 @@ for i in eachindex(twist_angles)
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
 end
 
-plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="full Chern pol.")
-plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="BM valence")
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="strong coupl Chern")
+plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HFM")
 
 
 for st in sts
@@ -140,7 +140,7 @@ end
 
 # ylim([-0.06,0.66])
 yticks(collect(0:0.2:0.6))
-# legend(loc="upper right",fontsize=8)
+legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩\ per\ electron")
 tight_layout()

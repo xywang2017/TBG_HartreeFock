@@ -31,7 +31,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    init_P_valley_rotation(hf;α=1.0)
+    # init_P_valley_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -280,11 +280,11 @@ function init_P_sublattice_no_momentum(hf::HartreeFock)
     νmax = round(Int,(hf.ν+4)/8 * size(H0,1))
     states_to_populate = zeros(Int,νmax)
     # println(νmax," ",length(idx_chern_minus))
-    if νmax < length(idx_chern_minus)
-        states_to_populate .= shuffle(idx_chern_minus)[1:νmax]
+    if νmax < length(idx_chern_plus)
+        states_to_populate .= shuffle(idx_chern_plus)[1:νmax]
     else
-        states_to_populate[1:length(idx_chern_minus)] .= idx_chern_minus
-        states_to_populate[(length(idx_chern_minus)+1):end] .= shuffle(idx_chern_plus)[1:(νmax-length(idx_chern_minus))] 
+        states_to_populate[1:length(idx_chern_plus)] .= idx_chern_plus
+        states_to_populate[(length(idx_chern_plus)+1):end] .= shuffle(idx_chern_minus)[1:(νmax-length(idx_chern_plus))] 
         # id_running = length(idx_chern_minus)+1
         # for iplus in idx_chern_plus 
         #     if (iplus-1)÷(size(H0,1)÷4) +1 < 3
@@ -328,8 +328,8 @@ function init_P_flavor_polarization(hf::HartreeFock)
     num_full_flavors_to_populate = νmax ÷ n_per_valley_spin 
     num_part_flavors_to_populate = (νmax % n_per_valley_spin ==0) ? 0 : 1
     
-    flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
-    # flavors_to_populate = collect(1:hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    # flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    flavors_to_populate = [3,4,2,1][1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
 
     for iηs in flavors_to_populate[1:(end-num_part_flavors_to_populate)], iq in 1:size(tmpP,1)
         tmpP[iq,iηs,iq,iηs,:] .= 1.0 

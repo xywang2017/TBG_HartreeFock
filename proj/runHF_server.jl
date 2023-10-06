@@ -69,7 +69,7 @@ hf = HartreeFock()
 if !isequal(flag,"strong")
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
-    savename0 = joinpath(fpath,"zeeman/105_$(_is_strain)/_$(p)_$(q)/3_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename0 = dir*"zeeman/112_$(_is_strain)/_$(p)_$(q)/1_random_tL_init_HF_1_8_nu_-1375.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)
