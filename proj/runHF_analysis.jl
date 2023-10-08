@@ -8,18 +8,18 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 120
+twist_angle = 138
 # for twist_angle in twist_angles
-# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
-foldername = dir*"zeeman/$(twist_angle)_nostrain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2.5,-1
-p,q = 1,10
+s,t = 0,-3
+p,q = 1,2
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
@@ -35,10 +35,10 @@ plot_density_matrix_bm(metadata,ik=1)
 # end
 # plot_density_matrix_bm_half(metadata,ik=1)
 test_tL2_breaking(metadata)
-# plot_density_matrix_global_order_parameters(metadata)
+plot_density_matrix_global_order_parameters(metadata)
 
 # plot_density_matrix_sublattice(metadata)
-# plot_density_matrix_sublattice_full(metadata)
+plot_density_matrix_sublattice_full(metadata)
 # plot_density_matrix_valley_spin_density_tL2(metadata)
 
 ## strong coupling basis at reference point defined by metadata0
