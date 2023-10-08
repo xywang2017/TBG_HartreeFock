@@ -4,8 +4,8 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = "w0_w1_08/"
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -111,7 +111,7 @@ for i in eachindex(twist_angles)
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
 end
 
-plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="strong coupl Chern")
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="sCC")
 plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSM")
 
 
@@ -144,7 +144,7 @@ legend(loc="upper right",fontsize=8)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩\ per\ electron")
 tight_layout()
-# savefig("$(_is_strain)_$(p)_$(q).png",dpi=600,transparent=true)
+savefig("$(_is_strain)_$(p)_$(q).png",dpi=600,transparent=true)
 display(fig)
 close(fig)
 

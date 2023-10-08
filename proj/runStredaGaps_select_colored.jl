@@ -4,10 +4,11 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
-foldername = dir*"zeeman/$(twist_angle)_strain"
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -37,8 +38,8 @@ for ϕ in ϕs
         νstr = round(Int,1000*ν)
         metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
         purple = 0.5*[1,0,1]
-        red = [1,0,0]
-        green = [0,1,0]
+        red = [1,0,0] * 0.5
+        green = [0,1,0] *0.8
         if !isempty(metadata)
             push!(ns,ν)
             Δ,Pz=computegap(metadata;savename="test.png")
@@ -52,12 +53,12 @@ for ϕ in ϕs
             # else
             #     push!(colors,red)
             # end
-            if (ϕ<1//8) && abs(ν-(-3-ϕ))<1e-2
-                push!(colors,green)
-            elseif (ϕ<3//10) && abs(ν-(-2-2ϕ))<1e-2
-                push!(colors,green)
-            elseif (ϕ<2//5) && abs(ν-(-1-3ϕ))<1e-2
-                push!(colors,green)
+            if (ϕ<1//6) && abs(ν-(-3-ϕ))<1e-2
+                push!(colors,purple)
+            elseif (ϕ<1//10) && abs(ν-(-2-2ϕ))<1e-2
+                push!(colors,purple)
+            elseif (ϕ<1//10) && abs(ν-(-1-3ϕ))<1e-2
+                push!(colors,purple)
             else
                 push!(colors,red)
             end

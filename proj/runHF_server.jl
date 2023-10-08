@@ -6,8 +6,8 @@ fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
-# dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = ""
 #
 ## Hartree Fock related 
