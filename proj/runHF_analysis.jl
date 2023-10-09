@@ -13,21 +13,21 @@ twist_angle = 124
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
-foldername = dir*"zeeman/$(twist_angle)_nostrain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = 0,-3
-p,q = 1,4
+s,t = -3,-1
+p,q = 1,11
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 # metadata = "$(foldername)/_$(p)_$(q)/"*"2_random_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 # metadata = replace(metadata,"3_random"=>"1_bm_cascade_tL")
 # -----------------------------------Density matrix analysis ------------------------------------------- # 
 plot_spectra(metadata;savename="test.png")
-str = @sprintf "θ=%.2f" 0.01*twist_angle
+# str = @sprintf "θ=%.2f" 0.01*twist_angle
 # plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="$(str).png",jj=3,titlestr=str)
 # plot_density_matrix_sublattice_v0(metadata,titlestr=str)
 # end
@@ -38,18 +38,18 @@ test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
 
 # plot_density_matrix_sublattice(metadata)
-plot_density_matrix_sublattice_full(metadata)
+# plot_density_matrix_sublattice_full(metadata)
 # plot_density_matrix_valley_spin_density_tL2(metadata)
 
 ## strong coupling basis at reference point defined by metadata0
 s,t = 0,-4
-p,q = 2,5
+p,q = 1,6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 
 metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
 
-s,t = -1,-3
+s,t = -0.5,-3
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
