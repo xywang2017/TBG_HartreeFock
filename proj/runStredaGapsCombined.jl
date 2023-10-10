@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = "w0_w1_08/"
 
 w0 = "07"
@@ -27,7 +27,7 @@ for i in eachindex(twist_angles)
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = dir*"zeeman/$(twist_angle)_strain"
+    foldername = dir*"zeeman/$(twist_angle)_nostrain"
     # for lines in -4:0
     #     ax[r,c].axvline(lines,ls=":",c="gray",lw=0.5)
     # end
@@ -68,7 +68,7 @@ for r in 1:2
     ax[r,1].set_ylabel(L"ϕ/ϕ_0")
 end
 tight_layout()
-savefig(joinpath(fpath,"fig1_strain.png"),transparent=false,dpi=600)
+savefig(joinpath(fpath,"fig1_nostrain.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 

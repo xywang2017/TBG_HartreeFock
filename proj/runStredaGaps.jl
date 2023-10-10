@@ -3,8 +3,8 @@ fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
@@ -64,7 +64,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 # sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-1,-3]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
