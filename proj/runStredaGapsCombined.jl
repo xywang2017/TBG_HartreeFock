@@ -19,7 +19,7 @@ end
 sts = unique(sts)
 
 # -------------------------Streda Line Plot ---------------------------------- # 
-fig, ax = subplots(2,3,figsize=(12,6),sharex=true,sharey=true)
+fig, ax = subplots(2,3,figsize=(10,6),sharex=true,sharey=true)
 twist_angles = [138,132,128,124,120,105]
 ax[1,1].set_xlim([-4.1,0.1])
 ax[1,1].set_ylim([0.05,0.59])
@@ -29,7 +29,7 @@ for i in eachindex(twist_angles)
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = dir*"zeeman/$(twist_angle)_nostrain"
+    foldername = dir*"zeeman/$(twist_angle)_strain"
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
     initParamsWithStrain(params)
     # for lines in -4:0
@@ -60,13 +60,13 @@ for i in eachindex(twist_angles)
         ax[r,c].scatter([-1.0],[0.56],s=10^2/10,c="tab:red",edgecolor="none")
         ax[r,c].text(-0.9,0.55,"10 meV",size=11,c="tab:red")
     end
-    ax2 = ax[r,c].twinx()
-    mn, mx = ax[r,c].get_ylim()
-    ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
-    ax2.set_yticks([flux_conversion(0.1,params),flux_conversion(0.5,params)])
-    if c==3
-        ax2.set_ylabel("B (T)")
-    end
+    # ax2 = ax[r,c].twinx()
+    # mn, mx = ax[r,c].get_ylim()
+    # ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
+    # ax2.set_yticks([flux_conversion(0.1,params),flux_conversion(0.5,params)])
+    # if c==3
+    #     ax2.set_ylabel("B (T)")
+    # end
 end
 
 for c in 1:3 
@@ -78,7 +78,7 @@ end
 
 
 tight_layout()
-savefig(joinpath(fpath,"fig1_nostrain.png"),transparent=false,dpi=800)
+savefig(joinpath(fpath,"fig1_strain.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 

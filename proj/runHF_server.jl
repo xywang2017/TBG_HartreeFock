@@ -7,7 +7,7 @@ fpath = pwd()
 
 BLAS.set_num_threads(1)
 dir =  "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
-# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = ""
 #
 ## Hartree Fock related 
