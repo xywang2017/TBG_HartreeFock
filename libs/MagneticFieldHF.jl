@@ -529,5 +529,12 @@ function find_lowest_energy_datafile(dir::String;test_str::String="null",_printi
     return metadata
 end
 
+function flux_conversion(ϕ::Float64,params::Params)
+    ee = 1.602176634e-19
+    h = 6.62607015e-34
+    aa = 2.46e-10 
+    return h/(ee*params.area*aa^2) * ϕ
+end
+
 include("initP_helpers.jl")
 # include("plot_helpers.jl")

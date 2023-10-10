@@ -3,11 +3,11 @@ fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
-# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 132
 foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -63,8 +63,8 @@ close(fig)
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-# sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-3,-1]]
+sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
+# sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -80,41 +80,58 @@ for st in sts
             end
         end
     end
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))");
+    # idx = [collect(1:6);8;10]
+    idx = collect(1:14)
+    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 
-fig = figure(figsize=(2.5,2.5))
-# sts = [[0,0],[0,-3],[0,-2],[0,-1]]
-# ϕc = [-1,2//5,1//3,1//3] # 132 degrees critical field
-# ϕc = [-1,1//6,1//11,1//11] # 132 degrees critical field
+# fig = figure(figsize=(2.5,2.5))
+# colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+# for i in eachindex(Δss)
+#     s, t = sts[i][1], sts[i][2]
+#     plot(ϕs,Δss[i],"o",c=colors[i],ms=4,markeredgecolor="none",label="($(s),$(t))")
+# end
+# legend(fontsize=8,loc="upper left")
+# xlabel(L"ϕ/ϕ_0")
+# ylabel("Δ (meV)")
+# xlim([-0.1,0.55])
+# ylim([0,24])
+# tight_layout()
+# savefig("tmp_$(twist_angle).png",transparent=true,dpi=600)
+# display(fig)
+# close(fig)
+
+fig,ax = subplots(2,2,figsize=(3,3),sharex=true,sharey=true)
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for i in eachindex(Δss)
     s, t = sts[i][1], sts[i][2]
-    plot(ϕs,Δss[i],"o",c=colors[i],ms=4,markeredgecolor="none",label="($(s),$(t))")
+    ax[i].plot(ϕs,Δss[i],"o",c=colors[i],ms=3,markeredgecolor="none",label="($(s),$(t))")
+    ax[i].legend(fontsize=8,loc="upper left")
+    if (i-1)%2 +1 == 2 
+        ax[i].set_xlabel(L"\rm ϕ/ϕ_0")
+    end
+    if (i-1)÷2 +1 == 1
+        ax[i].set_ylabel("Δ (meV)")
+    end
 end
-legend(fontsize=8,loc="upper left")
-xlabel(L"ϕ/ϕ_0")
-ylabel("Δ (meV)")
-# axvline(3/8)
-# axvline(2/7)
-# axvline(3/7)
-# axvline(4/11)
-# xticks([0.1,0.2,0.3,0.4,0.5])
-xlim([-0.1,0.55])
-ylim([0,24])
-tight_layout()
-savefig("tmp_$(twist_angle).png",transparent=true,dpi=600)
+subplots_adjust(hspace=0,wspace=0)
+ax[1].set_xlim([0,0.55])
+ax[1].set_xticks([0.2,0.4])
+ax[1].set_ylim([0,24])
+# tight_layout()
+savefig("tmp_$(twist_angle).png",transparent=true,dpi=600,bbox_inches="tight")
 display(fig)
 close(fig)
+
 
 # ---------------- non interacting hofstadter spectrum weighted with a given Streda line density matrix
 # plot spectrum 
 function plot_LL_spectrum(params::Params;angle::Int=120)
-    foldername0 =dir*"NonInt/$(angle)_nostrain"
-    fig,ax = subplots(figsize=(2.8,2.5))
+    foldername0 =dir*"NonInt/$(angle)_strain"
+    fig,ax = subplots(figsize=(2.5,2.5))
     # fig,ax = subplots(figsize=(6,4))
-    ϕs = [1//5]
+    # ϕs = [1//5]
     strs = ["K","Kprime"]
     pl = 0
     for ϕ in ϕs
@@ -122,7 +139,7 @@ function plot_LL_spectrum(params::Params;angle::Int=120)
         strs = ["K","Kprime"]
         colors = ["b","r"]
         tmp = []
-        for iη in 1:2
+        for iη in 1:1
             str = strs[iη]
             fname0 = joinpath(fpath,"$(foldername0)/_$(p)_$(q)_$(str)_metadata.jld2")
             energies = load(fname0,"E");
@@ -132,23 +149,23 @@ function plot_LL_spectrum(params::Params;angle::Int=120)
                 weights[:,i1,i2] = real(diag(Σz[:,:,i1,i2]))
             end
             energies = reshape(energies,2q,:)
-            push!(tmp,energies[:,1])
-            pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=3,edgecolor="none",c=colors[iη])
+            pl = ax.scatter(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:],marker="o",s=1.5,edgecolor="none",c=[[0.8,0,0]])
+            pl = ax.scatter(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:],marker="o",s=1.5,edgecolor="none",c="gray")
             # pl = ax.scatter(ones(length(energies[:]))*ϕ,energies[:],marker="o",s=6,edgecolor="none",c=weights[:]*(3-2iη),vmin=-1,vmax=1,cmap="coolwarm")
         end
         
     end
-    colorbar(pl,fraction=0.06, pad=0.05)
+    # colorbar(pl,fraction=0.06, pad=0.05)
     ax.set_ylabel("E (meV)")
     ax.set_xlabel(L"ϕ/ϕ_0")
     ax.set_xlim([0,0.55])
-    # ax.set_ylim([-39,39])
+    ax.set_ylim([-45,45])
     tight_layout()
-    # savefig("tmp_$(angle).png",dpi=600,transparent=true)
+    savefig("tmp_$(angle).png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
 end
 
-plot_LL_spectrum(params,angle=120)
+plot_LL_spectrum(params,angle=132)
 

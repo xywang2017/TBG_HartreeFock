@@ -86,7 +86,7 @@ function computegap(metadata::String;savename::String="tmp.pdf")
 end
 
 ## plot Hartree Fock spectra collectively
-function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ")
+function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
     fig = figure(figsize=(2.5,2.5))
     # fig = figure(figsize=(6,4))
     ϵFs = Float64[]
@@ -101,12 +101,12 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
         # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
-        if j<=3
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="purple",markeredgecolor="none",markersize=2)
+        if j in indices
+            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
         else
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c="r",markeredgecolor="none",markersize=2)
+            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
         end
-        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=2)
+        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
         if j == length(metadatas)
             # colorbar(pl,shrink=0.8)
         end
@@ -186,12 +186,12 @@ function plot_density_matrix_bm_half(fname::String;ik::Int=1,savename::String="t
     hf = load(fname,"hf");
     fig = figure(figsize=(3.5,3.5))
     P0 = view(hf.P,(4hf.q+1):(8hf.q),(4hf.q+1):(8hf.q),ik) + 0.5I
-    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,4hf.q+1,1,4hf.q+1).-0.5)
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,4hf.q+1,1,4hf.q+1).-0.5)
     xticks([])
     yticks([])
     axhline(2hf.q+0.5,ls=":",c="gray")
     axvline(2hf.q+0.5,ls=":",c="gray")
-    # colorbar(pl)
+    colorbar(pl)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -204,7 +204,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     hf = load(fname,"hf");
     fig = figure(figsize=(4.6,4))
     P0 = view(hf.P,:,:,ik) + 0.5I
-    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Purples",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
     # axhline(2hf.q+0.5,ls=":",c="gray")
@@ -223,11 +223,11 @@ function plot_density_matrix_bm_valley_spinv0(fname::String;ik::Int=1,savename::
     hf = load(fname,"hf");
     P0 = reshape(view(hf.P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4);
     # P0 = reshape(reshape(sum(hf.P,dims=3),8hf.q,8hf.q)/size(hf.P,3)+0.5I,2hf.q,4,2hf.q,4);
-    fig,ax = subplots(1,figsize=(3,2.8))
+    fig,ax = subplots(1,figsize=(2.5,2.5))
     # states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     
-    pl=ax.imshow(abs.(P0[:,jj,:,jj]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Reds")
+    pl=ax.imshow(abs.(P0[:,jj,:,jj]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Blues")
     cbar = colorbar(pl,ax=ax,fraction=0.04, pad=0.1)
     cbar.set_ticks(collect(0:0.2:1))
     # colorbar(pl,ax=ax)
@@ -265,7 +265,7 @@ function plot_density_matrix_bm_valley_spin(fname::String;ik::Int=1,savename::St
     states = ["K↑","K'↑","K↓","K'↓"]
     pl = 0
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Purples")
+        pl=ax[r,c].imshow(abs.(P0[:,r+2(c-1),:,r+2(c-1)]),extent=(1,2hf.q+1,1,2hf.q+1).-0.5,vmin=0,vmax=1,origin="lower",cmap="Blues")
         # colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         # ax[r,c].set_title(states[r+2(c-1)])
         # ax[r,c].text(hf.q*0.94,2hf.q*0.9,states[r+2(c-1)],fontsize=12,color="k")
@@ -337,7 +337,7 @@ function plot_density_matrix_bm_valley_spinv3(fname::String;ik::Int=1,savename::
     fig = figure(figsize=(5,4))
     ax = fig.add_subplot(projection="3d")
     states = ["K↑","K'↑","K↓","K'↓"]
-    cmaps = ["Blues","Purples","Purples","Reds"]
+    cmaps = ["Blues","Blues","Blues","Reds"]
     pl = 0
     for i in 1:4
         coords = collect(1:2hf.q)
@@ -431,7 +431,7 @@ function plot_density_matrix_valley_spin_density_tL2(fname::String)
     fig, ax = subplots(4,1,figsize=(6,4))
     for i in 1:4 
         nk = reshape( sum(P[:,i,:,i,:].*Iq,dims=(1,2)) ./(hf.q), hf.q*hf.nq,hf.nq)
-        pl=ax[i].imshow(real(nk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="Purples",vmin=0,vmax=1.0)
+        pl=ax[i].imshow(real(nk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="Blues",vmin=0,vmax=1.0)
         # colorbar(pl,ax=ax[i])
     end
     for i in 1:4
