@@ -4,8 +4,8 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = "w0_w1_08/"
+dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+dir = "w0_w1_06/"
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -29,7 +29,7 @@ for i in eachindex(twist_angles)
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = dir*"zeeman/$(twist_angle)_strain"
+    foldername = dir*"zeeman/$(twist_angle)_nostrain"
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
     initParamsWithStrain(params)
     # for lines in -4:0
@@ -78,7 +78,7 @@ end
 
 
 tight_layout()
-savefig(joinpath(fpath,"fig1_strain.png"),transparent=false,dpi=600)
+savefig(joinpath(fpath,"fig1_nostrain.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 
@@ -121,9 +121,12 @@ for i in eachindex(twist_angles)
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
 end
 
-plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="sCC")
-plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSM")
+# plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="zCI")
+# plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSF")
 
+
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:")
+plot(twist_angles.*0.01,imag(Pzs_bounds),"k--")
 
 for st in sts
     s,t = st[1], st[2]
@@ -146,11 +149,13 @@ for st in sts
     end
 
     plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
+    # plot(twist_angles.*0.01,Pzs,"-o",ms=2)
 end
 
 # ylim([-0.06,0.66])
 yticks(collect(0:0.2:0.6))
-legend(loc="upper right",fontsize=8)
+legend(loc=[0.55,0.45],fontsize=10)
+# legend(loc=[0.6,0.6],fontsize=10)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩\ per\ electron")
 tight_layout()
