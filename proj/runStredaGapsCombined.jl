@@ -4,8 +4,8 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
-dir = "w0_w1_06/"
+# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+dir = "w0_w1_05/"
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -29,6 +29,7 @@ for i in eachindex(twist_angles)
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
+    # ax[r,c].text(-3.95,0.7,L"θ=%$(θ0)^\circ",size=11,c="k")
     foldername = dir*"zeeman/$(twist_angle)_nostrain"
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
     initParamsWithStrain(params)
@@ -59,7 +60,10 @@ for i in eachindex(twist_angles)
     if r==1 && c==1 
         ax[r,c].scatter([-1.0],[0.56],s=10^2/10,c="tab:red",edgecolor="none")
         ax[r,c].text(-0.9,0.55,"10 meV",size=11,c="tab:red")
+        # ax[r,c].scatter([-1.0],[0.71],s=10^2/10,c="tab:red",edgecolor="none")
+        # ax[r,c].text(-0.9,0.7,"10 meV",size=11,c="tab:red")
     end
+    # ax[r,c].axhline(0.6,c="k")
     # ax2 = ax[r,c].twinx()
     # mn, mx = ax[r,c].get_ylim()
     # ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
@@ -69,16 +73,17 @@ for i in eachindex(twist_angles)
     # end
 end
 
+
 for c in 1:3 
     ax[2,c].set_xlabel(L"n/n_s")
 end
 for r in 1:2
     ax[r,1].set_ylabel(L"ϕ/ϕ_0")
 end
-
-
+# ax[1,1].set_ylim([0,0.8])
+# ax[1,1].set_yticks(collect(0:0.2:0.5))
 tight_layout()
-savefig(joinpath(fpath,"fig1_nostrain.png"),transparent=false,dpi=600)
+savefig(joinpath(fpath,"ext_fig3.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 
