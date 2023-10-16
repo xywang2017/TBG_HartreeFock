@@ -5,16 +5,16 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 
 BLAS.set_num_threads(1)
 
-ϕmin = 1//12
+ϕmin = 1//40
 str = "K"
 w0 = 0.7
 w0str = "07"
 
-ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
-ϕs = ϕs[ϕs .> ϕmin]
+ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+# ϕs = ϕs[ϕs .> ϕmin]
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle = 130
+twist_angle = 128
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_strain"
@@ -24,13 +24,13 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 12÷denominator(ϕ) 
-    if q ==7 
-        nq =2  
-    end
+    nq = 40÷denominator(ϕ) 
+    # if q ==7 
+    #     nq =2  
+    # end
     println("p= ",p,", q= ",q,", nq= ",nq)
-    fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
-    # fname = ""
+    # fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
+    fname = ""
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
@@ -40,7 +40,7 @@ end
 
 #
 data = Dict()
-for ϕ in ϕs 
+for ϕ in ϕs 1
     @time begin
         # println("ϕ: ",ϕ)
         tmp = compute_bmLL(ϕ,str,w0,w0str);
@@ -59,14 +59,19 @@ function plot_LL_spectrum()
     fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(2.5,2.5))
-    ϕmin = 1//12
+    ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
-    ϕs = ϕs[ϕs .> ϕmin]
+    ϕs = ϕs[ϕs .>= ϕmin]
     ϕs = ϕs[ϕs .<=0.5]
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    initParamsWithStrain(params)
+    μB = ZeemanUnit(params)
+
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        plot(ones(length(energies[:]))*ϕ,energies[:],".",ms=3,markeredgecolor="none",color="b")
+        plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=2,markeredgecolor="none",color="tab:red")
+        plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=2,markeredgecolor="none",color="tab:blue")
         # plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
         # plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
@@ -84,12 +89,16 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/B/NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
-    ϕs = ϕs[ϕs .>= ϕmin]
-   
+    ϕs = ϕs[ϕs .<= 0.5]
+    
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    initParamsWithStrain(params)
+    μB = ZeemanUnit(params)
+
     fig = figure(figsize=(3,3))
     γ = 0.1   # meV
     E = collect(-50:0.1:50)
@@ -98,9 +107,7 @@ function plot_wannier(flag=false)
     for iϕ in eachindex(ϕs)
         ϕ = ϕs[iϕ]
         ϵ = data["$(ϕ)"]   
-        μB = 5.7883818012*0.01
-        # B = 23* 2*ϕ # assuming 25T at half flux
-        # ϵ = [ϵ .- μB*B; ϵ .+ μB *B]
+        ϵ = [ϵ .- μB*ϕ; ϵ .+ μB *ϕ]
         for iE in eachindex(E)
             ρνϕ[iE,iϕ] = 1/π * sum(γ./((ϵ .- E[iE]).^2 .+ γ^2))  / (length(ϵ))
             νs[iE,iϕ] = 8/π * sum(atan.((ϵ .- E[iE]) ./ γ)) / (length(ϵ))
@@ -110,7 +117,7 @@ function plot_wannier(flag=false)
     # pcolormesh(νs.*4,ϕs,ρνϕ')
     # colorbar()
     xlim([-4,4])
-    ylim([0,1])
+    ylim([0,0.55])
     xlabel(L"n/n_s")
     ylabel(L"ϕ/ϕ_0")
     tight_layout()

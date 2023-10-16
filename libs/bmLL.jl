@@ -82,44 +82,46 @@ function constructbmLL(A::bmLL,params::Params;
     computeSpectrum(A)
     # computeSpectrum_remote(A)
 
-    A.fname = fname 
-    fnameKprime = replace(fname,"_K_"=>"_Kprime_")
-    # write energies and wavefunctions
-    jldopen(fname, "w") do file
-        file["E"] = A.spectrum 
-        file["Vec"] = A.vec
-        file["PΣz"] = A.PΣz
-    end
-    if isequal(A._valley,"K")
+    if !isempty(fname)
+        A.fname = fname 
+        fnameKprime = replace(fname,"_K_"=>"_Kprime_")
         # write energies and wavefunctions
-        jldopen(fnameKprime, "w") do file
-            file["E"] = -reverse(A.spectrum,dims=1) 
-            file["Vec"] = reverse(A.vec,dims=2)
-            file["PΣz"] = -reverse(A.PΣz,dims=(1,2))
+        jldopen(fname, "w") do file
+            file["E"] = A.spectrum 
+            file["Vec"] = A.vec
+            file["PΣz"] = A.PΣz
         end
-    end
-
-    ng = 3
-    A.gvec = reshape(collect(-ng:ng),:,1)*A.params.g1 .+ reshape(collect(-ng*A.q:ng*A.q),1,:)*A.params.g2 ./A.q
-
-    if _calculate_overlap
-        A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
-        Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
-        tmpΛ = reshape(Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
-        tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
-        # for m in -ng:ng, n in -ng*A.q:ng*A.q 
-        for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
-            if mod(n,A.q) == 0
-                println("m:",m," n:",n÷A.q)
+        if isequal(A._valley,"K")
+            # write energies and wavefunctions
+            jldopen(fnameKprime, "w") do file
+                file["E"] = -reverse(A.spectrum,dims=1) 
+                file["Vec"] = reverse(A.vec,dims=2)
+                file["PΣz"] = -reverse(A.PΣz,dims=(1,2))
             end
-            computeCoulombOverlap_v2(A,m,n)  # q^2/(2q-1) times faster than computeCoulombOverlap(A,m,n)!
-            jldopen(fname, "a") do file
-                file["$(m)_$(n)"] = A.Λ
-            end
-            if isequal(A._valley,"K")
-                tmpΛ .= reverse(tmpΛ0,dims=(1,3))
-                jldopen(fnameKprime, "a") do file
-                    file["$(m)_$(n)"] = Λ
+        end
+
+        ng = 3
+        A.gvec = reshape(collect(-ng:ng),:,1)*A.params.g1 .+ reshape(collect(-ng*A.q:ng*A.q),1,:)*A.params.g2 ./A.q
+
+        if _calculate_overlap
+            A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
+            Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
+            tmpΛ = reshape(Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
+            tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
+            # for m in -ng:ng, n in -ng*A.q:ng*A.q 
+            for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
+                if mod(n,A.q) == 0
+                    println("m:",m," n:",n÷A.q)
+                end
+                computeCoulombOverlap_v2(A,m,n)  # q^2/(2q-1) times faster than computeCoulombOverlap(A,m,n)!
+                jldopen(fname, "a") do file
+                    file["$(m)_$(n)"] = A.Λ
+                end
+                if isequal(A._valley,"K")
+                    tmpΛ .= reverse(tmpΛ0,dims=(1,3))
+                    jldopen(fnameKprime, "a") do file
+                        file["$(m)_$(n)"] = Λ
+                    end
                 end
             end
         end
