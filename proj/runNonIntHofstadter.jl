@@ -14,10 +14,10 @@ w0str = "07"
 # ϕs = ϕs[ϕs .> ϕmin]
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle = 128
+twist_angle =  138
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "NonInt/Hofstadter/$(twist_angle)_strain"
+    fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
     if !isdir(fname)
         mkpath(fname)
     end
@@ -31,16 +31,16 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     println("p= ",p,", q= ",q,", nq= ",nq)
     # fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     fname = ""
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
+        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
     return bm.spectrum
 end
 
 #
 data = Dict()
-for ϕ in ϕs 1
+for ϕ in ϕs
     @time begin
         # println("ϕ: ",ϕ)
         tmp = compute_bmLL(ϕ,str,w0,w0str);
@@ -48,7 +48,7 @@ for ϕ in ϕs 1
     end
 end
 
-fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/$(str)_NonIntHofstadter_metadata.jld2")
+fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_nostrain/$(str)_NonIntHofstadter_metadata.jld2")
 jldopen(fname, "w") do file
     file["hoftstadter_data"] = data
 end
@@ -56,7 +56,7 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(2.5,2.5))
     ϕmin = 1//40
@@ -70,16 +70,17 @@ function plot_LL_spectrum()
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=2,markeredgecolor="none",color="tab:red")
-        plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=2,markeredgecolor="none",color="tab:blue")
+        plot(energies[:].-μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:red")
+        plot(energies[:].+μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:blue")
         # plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
         # plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
-    xlim([0,0.55])
-    xlabel(L"ϕ/ϕ_0")
-    ylabel("E (meV)")
+    ylim([0.06,0.51])
+    # ylim([-50,50])
+    ylabel(L"ϕ/ϕ_0")
+    xlabel("E (meV)")
     tight_layout() 
-    # savefig("BMLL_$(twist_angle)_nostrain.png",dpi=600,transparent=true)
+    savefig("test.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -89,17 +90,17 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
-    fig = figure(figsize=(3,3))
+    fig = figure(figsize=(2.5,2.5))
     γ = 0.1   # meV
     E = collect(-50:0.1:50)
     νs = zeros(Float64,length(E),length(ϕs))
@@ -117,17 +118,18 @@ function plot_wannier(flag=false)
     # pcolormesh(νs.*4,ϕs,ρνϕ')
     # colorbar()
     xlim([-4,4])
-    ylim([0,0.55])
+    xticks(collect(-3:3))
+    ylim([0.06,0.51])
     xlabel(L"n/n_s")
     ylabel(L"ϕ/ϕ_0")
     tight_layout()
     display(fig)
     if (flag ==true)
         fname = joinpath(fpath,"Wannier_$(twist_angle)_nostrain.png")
-        savefig(fname,dpi=500,transparent=false)
+        savefig(fname,dpi=500,transparent=true)
     end
     close(fig)
     return nothing
 end
 
-plot_wannier(false)
+plot_wannier(true)

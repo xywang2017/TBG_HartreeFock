@@ -13,13 +13,13 @@ twist_angle = 105
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
 # dir = ""
-foldername = dir*"zeeman/$(twist_angle)_nostrain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -3,-0
-p,q = 1,6
+s,t = -3,0
+p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
@@ -43,13 +43,13 @@ plot_density_matrix_global_order_parameters(metadata)
 
 ## strong coupling basis at reference point defined by metadata0
 s,t = -3,-1
-p,q = 1,6
+p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 
 metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)
 
-s,t = -3,-0
+s,t = -3,0
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)",_printinfo=true)

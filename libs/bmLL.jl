@@ -483,3 +483,25 @@ function computeCoulombOverlap_v2(A::bmLL,m::Int,n::Int)
     return nothing
 end
 
+
+
+
+function ZeemanUnit(params::Params)
+    """
+    Zeeman energy unit 
+    """
+    hbar = 1.054571817e-34
+    me = 9.1093837e-31
+    ee = 1.6e-19
+    aa = 2.46e-10 
+    V0 = 2π * hbar^2 / (2*me*params.area*aa^2) / ee * 1000 # in units of meV 
+    return V0 
+end
+
+
+function flux_conversion(ϕ::Float64,params::Params)
+    ee = 1.602176634e-19
+    h = 6.62607015e-34
+    aa = 2.46e-10 
+    return h/(ee*params.area*aa^2) * ϕ
+end

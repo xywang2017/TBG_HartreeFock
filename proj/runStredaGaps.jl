@@ -64,7 +64,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-# sts = [[-3,-1]]
+sts = [[-3,0]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -102,8 +102,9 @@ end
 # display(fig)
 # close(fig)
 
-fig,ax = subplots(2,2,figsize=(3,3),sharex=true,sharey=true)
+fig,ax = subplots(2,2,figsize=(3,2.5),sharex=true,sharey=true)
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+colors = ["k","k","k","k","k"]
 for i in eachindex(Δss)
     s, t = sts[i][1], sts[i][2]
     ax[i].plot(ϕs,Δss[i],"o",c=colors[i],ms=3,markeredgecolor="none",label="($(s),$(t))")

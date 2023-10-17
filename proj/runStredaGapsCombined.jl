@@ -4,8 +4,8 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
-dir = "w0_w1_05/"
+dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+# dir = "w0_w1_05/"
 
 w0 = "07"
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -28,7 +28,7 @@ for i in eachindex(twist_angles)
     r, c = (i-1)÷3 + 1, (i-1)%3 + 1
     θ0 = @sprintf "%.2f" twist_angle*0.01
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
-    ax[r,c].text(-3.95,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
+    ax[r,c].text(-1.15,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
     # ax[r,c].text(-3.95,0.7,L"θ=%$(θ0)^\circ",size=11,c="k")
     foldername = dir*"zeeman/$(twist_angle)_nostrain"
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -55,35 +55,34 @@ for i in eachindex(twist_angles)
                 # end
             end
         end
-        ax[r,c].scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
+        ax[r,c].scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="tab:blue",edgecolor="none")
     end
     if r==1 && c==1 
-        ax[r,c].scatter([-1.0],[0.56],s=10^2/10,c="tab:red",edgecolor="none")
-        ax[r,c].text(-0.9,0.55,"10 meV",size=11,c="tab:red")
+        ax[r,c].scatter([-3.93],[0.56],s=10^2/10,c="k",edgecolor="none")
+        ax[r,c].text(-3.83,0.55,"10 meV",size=11,c="k")
         # ax[r,c].scatter([-1.0],[0.71],s=10^2/10,c="tab:red",edgecolor="none")
         # ax[r,c].text(-0.9,0.7,"10 meV",size=11,c="tab:red")
     end
-    # ax[r,c].axhline(0.6,c="k")
-    # ax2 = ax[r,c].twinx()
-    # mn, mx = ax[r,c].get_ylim()
-    # ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
-    # ax2.set_yticks([flux_conversion(0.1,params),flux_conversion(0.5,params)])
-    # if c==3
-    #     ax2.set_ylabel("B (T)")
-    # end
+    ax2 = ax[r,c].twinx()
+    mn, mx = ax[r,c].get_ylim()
+    ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
+    ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
+    if c==3
+        ax2.set_ylabel("B (T)",fontsize=13)
+    end
 end
 
 
 for c in 1:3 
-    ax[2,c].set_xlabel(L"n/n_s")
+    ax[2,c].set_xlabel(L"n/n_s",fontsize=13)
 end
 for r in 1:2
-    ax[r,1].set_ylabel(L"ϕ/ϕ_0")
+    ax[r,1].set_ylabel(L"ϕ/ϕ_0",fontsize=13)
 end
 # ax[1,1].set_ylim([0,0.8])
 # ax[1,1].set_yticks(collect(0:0.2:0.5))
 tight_layout()
-savefig(joinpath(fpath,"ext_fig3.png"),transparent=false,dpi=600)
+savefig(joinpath(fpath,"fig1_nostrain_color.png"),transparent=true,dpi=600)
 display(fig)
 close(fig)
 

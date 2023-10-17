@@ -204,7 +204,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     hf = load(fname,"hf");
     fig = figure(figsize=(4.6,4))
     P0 = view(hf.P,:,:,ik) + 0.5I
-    pl = imshow(real.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
     # axhline(2hf.q+0.5,ls=":",c="gray")
