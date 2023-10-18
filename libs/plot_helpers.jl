@@ -381,9 +381,9 @@ function plot_density_matrix_global_order_parameters(fname::String)
     sy = ComplexF64[0 -1im;1im 0]
     sz = ComplexF64[1 0;0 -1]
     Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
-    # Iq = diagm([(-1)^((hf.q-1)÷i) for i in 1:(2hf.q)])
-    Iq = diagm([(-1)^(i) for i in 1:(2hf.q)])
-    Os = kron(sz,kron(s0,Iq))
+    Iq = diagm([(-1)^((hf.q-1)÷i) for i in 1:(2hf.q)])
+    # Iq = diagm([(-1)^(i) for i in 1:(2hf.q)])
+    Os = kron(s0,kron(sz,Iq))
     Sk = reshape( [tr(transpose(P[:,:,ik])*Os)/hf.q for ik in 1:size(P,3)], (:,hf.nq) )
     Sk = reshape( P[7hf.q,7hf.q,:].+0.5, (:,hf.nq) ) 
     # println(sum(Sk)/length(Sk))
@@ -420,7 +420,7 @@ function test_tL2_breaking(fname::String)
     hf = load(fname,"hf");
     P = reshape(hf.P,8hf.q,8hf.q,:,hf.nq^2)
     fluctP = P .- reshape(sum(P,dims=3),(8hf.q,8hf.q,1,:))/size(P,3)
-    normfluctP = norm(fluctP) #/length(fluctP)
+    normfluctP = norm(fluctP) /length(fluctP)
     if normfluctP > 1e-4 
         println(normfluctP)
     else 

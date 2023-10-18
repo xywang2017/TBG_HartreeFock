@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
@@ -24,6 +24,9 @@ for s in -3:3, t in -12:12
     push!(sts,[s,t])
     push!(sts,[-s,-t])
 end
+# for st in [[-0.5,-3],[-2/3,-3],[-1.5,-2],[-2.5,-1],[-3.5,0]]
+#     push!(sts,st)
+# end
 sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
