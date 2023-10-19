@@ -8,7 +8,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 120
+twist_angle = 105
 # for twist_angle in twist_angles
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
@@ -43,13 +43,13 @@ plot_density_matrix_global_order_parameters(metadata)
 
 ## strong coupling basis at reference point defined by metadata0
 s,t = 0,-4
-p,q = 1,9
+p,q = 1,10
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 
 metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-s,t = -3,-1
+s,t = -3,0
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
