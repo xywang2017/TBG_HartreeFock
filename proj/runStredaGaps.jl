@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
@@ -84,7 +84,8 @@ for st in sts
         end
     end
     # idx = [collect(1:6);8;10]
-    idx = collect(1:14)
+    # idx = collect(1:14)
+    idx = collect(1:length(ϕs))
     Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end

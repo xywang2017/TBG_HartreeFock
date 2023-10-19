@@ -100,16 +100,16 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
-        if j in indices
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
-        else
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
-        end
-        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
-        if j == length(metadatas)
-            # colorbar(pl,shrink=0.8)
-        end
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
+        # if j in indices
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
+        # else
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
+        # end
+        # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
+        # if j == length(metadatas)
+        #     # colorbar(pl,shrink=0.8)
+        # end
         # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
@@ -137,7 +137,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # xticks(collect(0.1:0.2:0.5))
     xlim([0,0.55])
     xticks([0.2,0.4])
-    ylim([-45,45])
+    # ylim([-45,45])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
