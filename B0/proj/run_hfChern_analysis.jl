@@ -37,7 +37,7 @@ plot_contour_maps(kvec,ϵ0[4,:,:],points=ComplexF64[0+0im],contourlines=[1.],lim
 fig, ax = subplots(figsize=(6,4),subplot_kw=Dict("projection"=>"3d"))
 pl = 0
 for i in 1:2:8
-    pl = ax.plot_surface(real(kvec),imag(kvec),ϵ0[i,:,:],cmap="coolwarm",vmin=minimum(ϵ0),vmax=maximum(ϵ0))
+    pl = ax.plot_surface(real(kvec),imag(kvec),ϵ0[i,:,:],cmap="coolwarm",vmin=minimum(ϵ0),vmax=maximum(ϵ0),alpha=0.8)
 end
 # ax.set_xticks(collect(-0.4:0.2:0.4))
 # ax.set_yticks(collect(-0.4:0.2:0.4))
@@ -48,6 +48,7 @@ ax.set_ylabel(L"k_y")
 ax.set_zlabel("E (meV)")
 colorbar(pl,shrink=0.4,location="left")
 tight_layout()
+savefig("tmp.png",dpi=500,transparent=true)
 display(fig)
 close(fig)
 
