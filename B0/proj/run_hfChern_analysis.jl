@@ -5,12 +5,10 @@ fpath = pwd()
 include(joinpath(fpath,"B0/libs/HFChern_mod.jl"))
 include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
-prefix = 1
-flag = "kivc"
 twist_angle = 1.05
 _is_strain = "strain"
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-ν = -2.0
+ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
 lk = 16
@@ -19,8 +17,9 @@ initParamsWithStrain(params)
 latt = Lattice()
 initLattice(latt,params;lk=lk)
 
+
 bm_path = joinpath(fpath,"$(foldername)/B0/bm_lk$(lk).jld2")
-hf_path = joinpath(fpath,"$(foldername)/B0/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
+hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_",_printinfo=false)
 
 # ----------------- Hartree-Fock dispersion part ---------------- # 
 hf = load(hf_path,"hf");
@@ -30,12 +29,27 @@ kvec = reshape(latt.kvec ./ abs(params.g1),lk,lk)
 # kvec = reshape(hf.latt.k1,:,1) .+ 1im*reshape(hf.latt.k2,1,:) 
 ϵ0 = reshape(hf.ϵk,hf.nt,lk,lk)
 plot_contour_maps(kvec,ϵ0[4,:,:],points=ComplexF64[0+0im],contourlines=[1.],limits=Float64[])
-iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
-kcut = real(kvec[:,iΓ])
-Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
-plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
+# iΓ = (lk%2==0) ? (lk÷2) : ((lk-1)÷2+1)
+# kcut = real(kvec[:,iΓ])
+# Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
+# plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
-
+fig, ax = subplots(figsize=(6,4),subplot_kw=Dict("projection"=>"3d"))
+pl = 0
+for i in 1:2:8
+    pl = ax.plot_surface(real(kvec),imag(kvec),ϵ0[i,:,:],cmap="coolwarm",vmin=minimum(ϵ0),vmax=maximum(ϵ0))
+end
+# ax.set_xticks(collect(-0.4:0.2:0.4))
+# ax.set_yticks(collect(-0.4:0.2:0.4))
+# ax.set_xlim([-0.55,0.55])
+# ax.set_ylim([-0.55,0.55])
+ax.set_xlabel(L"k_x")
+ax.set_ylabel(L"k_y")
+ax.set_zlabel("E (meV)")
+colorbar(pl,shrink=0.4,location="left")
+tight_layout()
+display(fig)
+close(fig)
 
 
 
@@ -44,25 +58,26 @@ plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
-    println(ν)
     νstr = round(Int,1000*ν)
-    hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_",_printinfo=true)
+    hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_",_printinfo=false)
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
         push!(μs,hf.μ)
     end
 end
-fig = figure(figsize=(5,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
-xlabel("ν")
-ylabel("μ")
-axhline(0,ls="--",c="gray")
-# ylim([0,30])
+fig = figure(figsize=(3,3))
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"b:^",ms=3)
+xlabel(L"n/n_s")
+ylabel("μ (meV)")
+# axhline(0,ls=":",c="gray")
+# axvline(0,ls=":",c="gray")
+ylim([-30,30])
+yticks(collect(-20:10:20))
 # ylim([0,14])
-# xlim([-0.1,4.1])
+xlim([-4.1,4.1])
 tight_layout()
-# savefig("cascade_strain_gapless.pdf")
+savefig("cascade_strain_gapless.pdf",dpi=500,transparent=true)
 display(fig)
 close(fig)
 
