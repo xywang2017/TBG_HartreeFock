@@ -191,7 +191,7 @@ function plot_density_matrix_bm_half(fname::String;ik::Int=1,savename::String="t
     yticks([])
     axhline(2hf.q+0.5,ls=":",c="gray")
     axvline(2hf.q+0.5,ls=":",c="gray")
-    colorbar(pl)
+    colorbar(pl,shrink=0.6)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -207,9 +207,11 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
-    # axhline(2hf.q+0.5,ls=":",c="gray")
-    # axvline(2hf.q+0.5,ls=":",c="gray")
-    # colorbar(pl)
+    for r in [2hf.q,4hf.q,6hf.q]
+        axhline(r+0.5,ls=":",c="gray")
+        axvline(r+0.5,ls=":",c="gray")
+    end
+    colorbar(pl,shrink=0.8)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -541,6 +543,40 @@ function plot_density_matrix_strong_coupling_valley_spin_v1(fname::String,fname0
     return nothing 
 end
 
+
+
+
+### strong coupling basis  valley spin
+function plot_density_matrix_strong_coupling_valley_spin_v1_half(fname::String,fname0::String)
+    ik = 1
+    hf = load(fname,"hf");
+    hf0 = load(fname0,"hf");
+    H0 = hf0.H
+    P = hf.P 
+    tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
+    Pstrong = zeros(ComplexF64,2hf.q,4,2hf.q,4)
+    vec = zeros(ComplexF64,2hf.q,2hf.q,4)
+    for iηs in 1:4
+        F = eigen(Hermitian(tmpH0[:,iηs,:,iηs]))
+        vec[:,:,iηs] = F.vectors
+    end 
+    for iη1 in 1:4, iη2 in 1:4 
+        Pstrong[:,iη1,:,iη2] = transpose(vec[:,:,iη1]) * P0[:,iη1,:,iη2] * conj.(vec[:,:,iη2]) 
+    end
+    fig = figure(figsize=(4,4))
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,:))[(4hf.q+1):end,(4hf.q+1):end],vmin=0,vmax=1,origin="lower")
+    colorbar(pl,shrink=0.6)
+    axhline(2hf.q-0.5,c="w",ls=":")
+    axvline(2hf.q-0.5,c="w",ls=":")
+    xticks([])
+    yticks([])
+    tight_layout()
+    savefig("test.png",dpi=500,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing 
+end
 
 
 ### strong coupling basis  valley spin

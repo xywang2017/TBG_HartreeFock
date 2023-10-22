@@ -1,75 +1,67 @@
-# #!/bin/bash -l 
+#!/bin/bash -l 
 
-# julia B0/proj/run_bm_chern.jl 1.20 strain 13
-
-
-julia B0/proj/run_hfChern.jl $1 -2.00 kivc 1.20 strain 13 
-
-
-# julia B0/proj/run_hfChern.jl $1 -3.96 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.84 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.72 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.60 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.48 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.36 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.24 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.12 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -3.00 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.88 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.76 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.64 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.52 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.40 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.28 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.16 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -2.04 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.92 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.80 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.68 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.56 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.44 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.32 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.20 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -1.08 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.96 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.84 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.72 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.60 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.48 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.36 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.24 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 -0.12 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.00 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.12 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.24 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.36 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.48 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.60 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.72 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.84 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 0.96 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.08 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.20 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.32 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.44 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.56 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.68 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.80 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 1.92 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.04 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.16 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.28 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.40 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.52 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.64 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.76 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 2.88 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.00 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.12 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.24 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.36 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.48 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.60 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.72 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.84 random 1.20 strain 15 
-# julia B0/proj/run_hfChern.jl $1 3.96 random 1.20 strain 15 
+# julia B0/proj/run_hfChern.jl $1 -4.0 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.875 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.75 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.625 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.5 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.375 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.25 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.125 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -3.0 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.875 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.75 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.625 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.5 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.375 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.25 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.125 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -2.0 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.875 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.75 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.625 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.5 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.375 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.25 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.125 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -1.0 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -0.875 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -0.75 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -0.625 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -0.5 random 1.05 strain 16 
+# julia B0/proj/run_hfChern.jl $1 -0.375 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 -0.25 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 -0.125 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.0 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.125 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.25 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.375 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.5 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.625 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.75 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 0.875 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.0 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.125 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.25 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.375 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.5 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.625 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.75 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 1.875 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.0 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.125 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.25 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.375 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.5 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.625 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.75 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 2.875 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.0 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.125 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.25 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.375 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.5 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.625 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.75 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 3.875 random 1.05 strain 16 
+julia B0/proj/run_hfChern.jl $1 4.0 random 1.05 strain 16 

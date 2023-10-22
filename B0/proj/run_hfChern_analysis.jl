@@ -7,13 +7,13 @@ include(joinpath(fpath,"B0/libs/plot_helpers.jl"))
 
 prefix = 1
 flag = "kivc"
-twist_angle = 1.20
+twist_angle = 1.05
 _is_strain = "strain"
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
 ν = -2.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 13
+lk = 16
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -36,55 +36,33 @@ Ecut = [ϵ0[j,i,iΓ] for j in 1:size(ϵ0,1),i in 1:size(ϵ0,3)];
 plot_energy_cuts(kcut,Ecut,lines=[hf.μ])
 
 
-# ----------------- all the chemical potentials ---------------- # 
-νs = collect(-3.9:0.12:-2.64)
-lk = 20
-phi = 0
-strain = 2
+
+
+
+### all the chemical potentials 
+νs = collect(-4.0:0.125:4.0)
 μs = Float64[]
 actual_νs = Float64[]
 for ν in νs 
+    println(ν)
     νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"feldman/B0/data/strain$(strain)/phi$(phi)/1_random_hf_$(νstr)_lk$(lk).jld2")
+    hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_",_printinfo=true)
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
         push!(μs,hf.μ)
     end
 end
-fig = figure(figsize=(4,3))
-for i in -4:4 
-    axvline(i,ls=":",c="gray")
-end
-axhline(0,ls=":",c="gray")
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-",ms=2)
+fig = figure(figsize=(5,3))
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
 xlabel("ν")
-ylabel("μ (meV)")
+ylabel("μ")
 axhline(0,ls="--",c="gray")
 # ylim([0,30])
 # ylim([0,14])
-xlim([-4.2,4.2])
+# xlim([-0.1,4.1])
 tight_layout()
-savefig("cascade_strain_phi$(phi).pdf")
+# savefig("cascade_strain_gapless.pdf")
 display(fig)
 close(fig)
 
-
-data = []
-for ν in sort([collect(-3.96:0.12:3.96);-2.0;-1.0;1.0;2.0])
-        lk, prefix, flag = 15, 1, "random"
-        νstr = round(Int,1000*ν)
-        hf_path = joinpath(fpath,"$(foldername)/B0/$(prefix)_$(flag)_hf_$(νstr)_lk$(lk).jld2")
-        hf = load(hf_path,"hf");
-        push!(data,hf.μ)
-end
-
-fig = figure()
-for i in -4:4 
-    axvline(i,ls=":",c="gray")
-end
-axhline(0,ls=":",c="gray")
-plot(sort([collect(-3.96:0.12:3.96);-2.0;-1.0;1.0;2.0]),data,"b-")
-tight_layout()
-display(fig)
-close(fig)

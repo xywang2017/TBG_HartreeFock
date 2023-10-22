@@ -91,9 +91,9 @@ close(fig)
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-ϕ = 1//8
+ϕ = 2//5
 p,q = numerator(ϕ), denominator(ϕ)
-_is_strain = "nostrain"
+_is_strain = "strain"
 # ϕ, s, t =1//8, -1,-3
 
 fig = figure(figsize=(3,2.8))
@@ -125,12 +125,12 @@ for i in eachindex(twist_angles)
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
 end
 
-# plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="zCI")
-# plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSF")
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="sCI")
+plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSF")
 
 
-plot(twist_angles.*0.01,real(Pzs_bounds),"k:")
-plot(twist_angles.*0.01,imag(Pzs_bounds),"k--")
+# plot(twist_angles.*0.01,real(Pzs_bounds),"k:")
+# plot(twist_angles.*0.01,imag(Pzs_bounds),"k--")
 
 for st in sts
     s,t = st[1], st[2]
@@ -152,14 +152,14 @@ for st in sts
         push!(Pzs,real(σzmid)) 
     end
 
-    plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
-    # plot(twist_angles.*0.01,Pzs,"-o",ms=2)
+    # plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
+    plot(twist_angles.*0.01,Pzs,"-o",ms=2)
 end
 
 # ylim([-0.06,0.66])
 yticks(collect(0:0.2:0.6))
-legend(loc=[0.55,0.45],fontsize=10)
-# legend(loc=[0.6,0.6],fontsize=10)
+# legend(loc=[0.55,0.45],fontsize=10)
+legend(loc=[0.6,0.6],fontsize=10)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩\ per\ electron")
 tight_layout()

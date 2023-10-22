@@ -76,30 +76,3 @@ tight_layout()
 savefig("test.pdf")
 display(fig)
 close(fig)
-
-### all the chemical potentials 
-νs = collect(0:0.2:4.0)
-μs = Float64[]
-actual_νs = Float64[]
-for ν in νs 
-    νstr = round(Int,1000*ν)
-    hf_path = joinpath(fpath,"data/2_strain_hf_$(νstr)_lk19.jld2")
-    if ispath(hf_path)
-        hf = load(hf_path,"hf");
-        push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
-        push!(μs,hf.μ)
-    end
-end
-fig = figure(figsize=(5,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b-o",ms=3)
-xlabel("ν")
-ylabel("μ")
-axhline(0,ls="--",c="gray")
-# ylim([0,30])
-# ylim([0,14])
-xlim([-0.1,4.1])
-tight_layout()
-# savefig("cascade_strain_gapless.pdf")
-display(fig)
-close(fig)
-

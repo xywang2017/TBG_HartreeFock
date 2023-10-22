@@ -35,3 +35,12 @@ function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt"
 end
 
 bm = compute_bm(latt,params,fname=bm_path);
+
+
+
+
+# open("B0hf_script.sh","w") do f 
+#     for n in collect(-4.0:0.0625*2:4.0)
+#         println(f,"julia B0/proj/run_hfChern.jl \$1 $(n) random 1.05 strain 16 ")
+#     end
+# end
