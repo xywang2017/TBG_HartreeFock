@@ -88,7 +88,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
     iter_energy = Float64[]
     iter_oda = Float64[]
     while norm_convergence > hf.precision
-        @time begin 
+        # @time begin 
             
             hf.H .= hf.H0 * 1.0
             add_HartreeFock(hf;β=1.0)
@@ -113,17 +113,16 @@ function run_HartreeFock(hf::HartreeFock,params::Params,latt::Lattice,fname::Str
                     file["iter_oda"] = iter_oda
                 end
                 hf.Λ = zeros(ComplexF64,hf.nt*latt.nk,hf.nt*latt.nk)
+                println("Iter: ",iter)
+                println("Running HF energy: ",Etot)
+                println("Running norm convergence: ",norm_convergence)
+                println("ODA parameter λ: ",λ)
             end
 
-            if iter >300 || λ < 1e-3
+            if iter >300 || λ < 1e-2
                 break 
             end
-
-            println("Iter: ",iter)
-            println("Running HF energy: ",Etot)
-            println("Running norm convergence: ",norm_convergence)
-            println("ODA parameter λ: ",λ)
-        end
+        # end
     end
 
     return nothing

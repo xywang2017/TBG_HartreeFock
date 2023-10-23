@@ -11,7 +11,7 @@ foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
 ν = 0.0
 νstr = round(Int,1000*ν)
 # ------------------ Specification ------------------ #
-lk = 21
+lk = 25
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 latt = Lattice()
@@ -19,7 +19,7 @@ initLattice(latt,params;lk=lk)
 
 
 bm_path = joinpath(fpath,"$(foldername)/B0/bm_lk$(lk).jld2")
-hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_lk21",_printinfo=false)
+hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_lk25",_printinfo=false)
 
 # ----------------- Hartree-Fock dispersion part ---------------- # 
 hf = load(hf_path,"hf");
@@ -62,6 +62,10 @@ actual_νs = Float64[]
 for ν in νs 
     νstr = round(Int,1000*ν)
     hf_path = find_lowest_energy_datafile("$(foldername)/B0";test_str="hf_$(νstr)_",_printinfo=false)
+    if νstr == -3500
+        println(hf_path)
+        println(load(hf_path,"iter_energy")[end])
+    end
     if ispath(hf_path)
         hf = load(hf_path,"hf");
         push!(actual_νs,round(Int,(hf.ν+4)/8*size(hf.H,1)*size(hf.H,3))/(size(hf.H,1)*size(hf.H,3))*8 - 4)
@@ -69,11 +73,13 @@ for ν in νs
     end
 end
 fig = figure(figsize=(4,3))
-plot(sort(actual_νs),μs[sortperm(actual_νs)],"b^",ms=3,lw=1)
+axhline(0,ls=":",c="gray",lw=0.5)
+for r in -3:3 
+    axvline(r,ls=":",c="gray",lw=0.5 )
+end
+plot(sort(actual_νs),μs[sortperm(actual_νs)],"-^",ms=3,lw=1,c="b")
 xlabel(L"n/n_s")
 ylabel("μ (meV)")
-# axhline(0,ls=":",c="gray")
-# axvline(0,ls=":",c="gray")
 xticks(collect(-3:3))
 ylim([-30,30])
 yticks(collect(-20:10:20))
