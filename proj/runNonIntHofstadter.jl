@@ -14,7 +14,7 @@ w0str = "07"
 # ϕs = ϕs[ϕs .> ϕmin]
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  138
+twist_angle =  105
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
@@ -90,19 +90,20 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
     fig = figure(figsize=(2.5,2.5))
     γ = 0.1   # meV
-    E = collect(-50:0.1:50)
+    # E = collect(-50:0.1:50)
+    E = collect(-10:0.1:10)
     νs = zeros(Float64,length(E),length(ϕs))
     ρνϕ = zeros(Float64,size(νs,1),length(ϕs))
     for iϕ in eachindex(ϕs)
@@ -125,7 +126,7 @@ function plot_wannier(flag=false)
     tight_layout()
     display(fig)
     if (flag ==true)
-        fname = joinpath(fpath,"Wannier_$(twist_angle)_nostrain.png")
+        fname = joinpath(fpath,"Wannier_$(twist_angle)_strain.png")
         savefig(fname,dpi=500,transparent=true)
     end
     close(fig)
