@@ -4,10 +4,10 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 132
+twist_angle = 138
 foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -17,7 +17,7 @@ w0 = "07"
 
 # ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
-ϕs = ϕs[ϕs.<=0.5]
+# ϕs = ϕs[ϕs.<=0.5]
 # ϕs = ϕs[ϕs .>0.1]
 sts = []
 for s in -3:3, t in -12:12
@@ -31,7 +31,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(4,3))
+fig = figure(figsize=(5,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -51,10 +51,10 @@ for ϕ in ϕs
             push!(gaps,Δ)
         end
     end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c="k",edgecolor="none")
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
-xlim([-4.3,0.3])
-ylim([0.05,0.55])
+# xlim([-4.3,0.3])
+# ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
