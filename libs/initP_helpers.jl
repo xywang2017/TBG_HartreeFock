@@ -18,7 +18,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"bm")
         init_P_bm(hf)
     elseif isequal(_Init,"bm_cascade")
-        init_P_bm_cascade(hf)
+        # init_P_bm_cascade(hf)
+        init_P_bm_cascade_testing(hf)
     elseif isequal(_Init,"vssymmetric")
         init_P_vs_symmetric(hf)
     else
@@ -31,7 +32,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    # init_P_valley_rotation(hf;α=1.0)
+    # init_P_valley_spin_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
@@ -96,6 +97,49 @@ function init_P_bm_cascade(hf::HartreeFock)
         indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
         if s<=1e-3
             for ifl in [3,4,1,2][1:(4-abs(s))], ib in 1:(hf.q-hf.p)
+            # for ifl in [1,4], ib in 1:(hf.q-hf.p)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
+            end 
+        else 
+            for ifl in 1:4, ib in 1:(hf.nb*hf.q)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
+            end
+            for ifl in 1:(4-abs(s)), ib in (hf.q+hf.p+1):(hf.nb*hf.q)
+                hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 0.0 
+            end
+        end
+    end
+    
+    νinit = tr(hf.P[:,:,1])/(hf.q) - 4 
+    println("Init density is: ",νinit)
+    for ik in 1:size(hf.P,3)
+        hf.P[:,:,ik] .= hf.P[:,:,ik] - 0.5I
+    end
+    return nothing
+end
+
+
+function init_P_bm_cascade_testing(hf::HartreeFock)
+    # only works for (0,4)  (2,2), (1,3) (3,1)
+    stlist = [[-3,1]]
+    s,t = 0,0
+    for i in eachindex(stlist)
+        s,t = stlist[i][1],stlist[i][2]
+        if abs(hf.ν-(s+t*hf.p/hf.q)) <1e-3
+            break 
+        end
+    end
+    if s==0 && t ==0 
+        println("Abort calculation, (s,t) does not belong to desired pairs")
+    else
+        println("s:",s," t:",t)
+        ϵ0 = zeros(Float64,size(hf.P,1),size(hf.P,3))
+        for j in 1:size(hf.P,3), i in 1:size(hf.P,1)
+            ϵ0[i,j] = hf.H0[i,i,j]
+        end
+        indices = reshape(collect(1:size(hf.P,1)),hf.q*hf.nb,hf.nη*hf.ns)
+        if s<=1e-3
+            for ifl in [3,4,1,2][1:(4-abs(s))], ib in 1:(hf.q+hf.p)
             # for ifl in [1,4], ib in 1:(hf.q-hf.p)
                 hf.P[indices[ib,ifl],indices[ib,ifl],:] .= 1.0 
             end 

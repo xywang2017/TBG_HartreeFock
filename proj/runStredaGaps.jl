@@ -7,7 +7,7 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 138
+twist_angle = 120
 foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -59,7 +59,7 @@ xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
 # savefig("105.png",transparent=false,dpi=600)
-# savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 
@@ -83,10 +83,10 @@ for st in sts
             end
         end
     end
-    # idx = [collect(1:6);8;10]
+    idx = [collect(1:6);8;10]
     # idx = collect(1:14)
-    idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    # idx = collect(1:length(ϕs))
+    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).pdf",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 

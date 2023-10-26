@@ -19,9 +19,6 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     ϵsorted = ϵk[idx] #./Vcoulomb
     chern = σzτz[idx]
 
-    # ϵsorted = ϵsorted[chern .>0] #./Vcoulomb
-    # chern = chern[chern .>0]
-
     pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
     colorbar(pl)
     ν = eachindex(ϵsorted) ./ length(ϵsorted)
@@ -38,7 +35,6 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
         ϵF = ϵsorted[end]
         Δ = 0 
     end
-    # Δ = (ϵsorted[i] - ϵsorted[i-1]) 
     println("Gap size: ", Δ)
     axhline(hf.μ,ls=":",c="gray")
     ylabel("E (meV)")
@@ -50,12 +46,53 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     # savefig(savename,transparent=true)
     display(fig)
     close(fig)
-    # println("Sublattice polarization operator is: ",sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8)
-    # println("Total energy: ",(0.25*sum(ϵsorted[ϵsorted.<ϵF])-0.25*sum(ϵsorted[ϵsorted.>=ϵF]))/size(hf.ϵk,2)/size(hf.ϵk,1)*8)
-    # return sum(chern[ϵsorted.<ϵF])/(size(ϵk,2)*size(ϵk,1))*8
     return Δ
 end
 
+
+## plot Hartree Fock spectra per flavor
+function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+    ϵk = hf.ϵk
+    σzτz = hf.σzτz
+    params = hf.params 
+
+    H = reshape(hf.H,2hf.q,4,2hf.q,4,:)
+    Σz = reshape(hf.Σz0,2hf.q,4,2hf.q,4,:)
+    ϵk = zeros(Float64,2hf.q)
+    σz = zeros(Float64,2hf.q)
+    colors=["tab:blue","tab:red","tab:green","tab:purple"]
+    str = ["K↑","K'↑","K↓","K'↓"]
+
+    fig, ax = subplots(2,2,figsize=(4,4),sharex=true,sharey=true)
+    for r in 1:2, c in 1:2 
+        elem = (r-1)*2 + c
+        for ik in 1:size(H,5) 
+            tmpH = view(H,:,elem,:,elem,ik)
+            F = eigen(Hermitian(tmpH))
+            ϵk .= real(F.values)
+            for j in eachindex(σz)
+                σz[j] = real(F.vectors[:,j]'*view(Σz,:,elem,:,elem,ik)*F.vectors[:,j])
+            end
+            # ax[r,c].plot(ones(length(ϵk))*hf.p/hf.q,ϵk,"o",c=colors[elem],ms=2)
+            ax[r,c].scatter(ones(length(ϵk))*hf.p/hf.q,ϵk,c=σz,cmap="coolwarm",s=4,vmin=-0.5,vmax=0.5)
+        end
+        ax[r,c].axhline(hf.μ,ls=":",c="gray")
+        if r==2 
+            ax[r,c].set_xlabel(L"ϕ/ϕ_0")
+        end
+        if c==1 
+            ax[r,c].set_ylabel("E (meV)")
+        end
+        ax[r,c].set_title(str[elem])
+    end
+    tight_layout()
+    savefig("1.20_degrees_-3_-1_1_5.pdf",dpi=500)
+    display(fig)
+    close(fig)
+    return nothing
+end
 
 ## Compute spectral gap from HF 
 function computegap(metadata::String;savename::String="tmp.pdf")
@@ -87,10 +124,11 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
-    fig = figure(figsize=(2.5,2.5))
-    # fig = figure(figsize=(6,4))
+    # fig = figure(figsize=(2.5,2.5))
+    fig = figure(figsize=(5,4))
     ϵFs = Float64[]
     Δs = Float64[]
+    cmap =["coolwarm","bwr"]
     for j in eachindex(metadatas) 
         metadata = metadatas[j]
         hf = load(metadata,"hf");
@@ -100,16 +138,16 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=2,vmin=-1,vmax=1,marker=".")
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-0.5,vmax=0.5,marker="o")
         # if j in indices
         #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
         # else
         #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
         # end
         # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
-        # if j == length(metadatas)
-        #     # colorbar(pl,shrink=0.8)
-        # end
+        if j == length(metadatas)
+             colorbar(pl,shrink=0.8)
+        end
         # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
@@ -135,6 +173,8 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     end 
     # title(titlestr)
     # xticks(collect(0.1:0.2:0.5))
+    axvline([(2//9+1//4)/2],ls=":",c="k")
+    axvline([1//8+1//7]/2,ls=":",c="k")
     xlim([0,0.55])
     xticks([0.2,0.4])
     # ylim([-45,45])
@@ -149,7 +189,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # xticks(ticklist,ticklistLabels)
     # title(titlestr)
     tight_layout()
-    savefig(savename,dpi=600,transparent=true)
+    savefig(savename,dpi=600,transparent=false)
     display(fig)
     close(fig)
 
