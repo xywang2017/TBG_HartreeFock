@@ -19,7 +19,7 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     ϵsorted = ϵk[idx] #./Vcoulomb
     chern = σzτz[idx]
 
-    pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1)
+    pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=8,vmin=-1,vmax=1)
     colorbar(pl)
     ν = eachindex(ϵsorted) ./ length(ϵsorted)
     i = 1

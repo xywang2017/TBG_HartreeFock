@@ -26,7 +26,7 @@ function init_P(hf::HartreeFock; _Init::String="Random",
     end
     # valley x spin U(4) rotation --- otherwise above initializations do not access valley spin coherent states
     # init_P_valley_spin_rotation(hf;α=0.2)
-    # init_P_valley_rotation(hf;α=1.0)
+    init_P_valley_rotation(hf;α=1.0)
     if isequal(_Init,"random")
         init_P_random_rotation(hf;α=1.0)
     end
