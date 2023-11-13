@@ -85,10 +85,10 @@ function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
         if c==1 
             ax[r,c].set_ylabel("E (meV)")
         end
-        ax[r,c].set_title(str[elem])
+        ax[r,c].text(0.1,20,str[elem])
     end
     tight_layout()
-    savefig("1.20_degrees_-3_-1_1_5.pdf",dpi=500)
+    savefig("1.20_degrees_-3_-1_1_5.png",dpi=500)
     display(fig)
     close(fig)
     return nothing
@@ -544,12 +544,12 @@ function plot_density_matrix_strong_coupling_valley_spin(fname::String,fname0::S
     fig,ax = subplots(2,2,figsize=(6,6))
     states = ["K↑","K'↑","K↓","K'↓"]
     for r in 1:2, c in 1:2 
-        pl=ax[r,c].imshow(abs.(Pstrong[:,:,r+2(c-1)]),vmin=0,vmax=1,origin="lower")
+        pl=ax[r,c].imshow(abs.(Pstrong[:,:,r+2(c-1)]),vmin=0,vmax=1,origin="lower",cmap="hot")
         colorbar(pl,ax=ax[r,c],fraction=0.046, pad=0.04)
         ax[r,c].set_title(states[r+2(c-1)])
     end
     tight_layout()
-    savefig("test.pdf")
+    savefig("test.png",dpi=500,transparent=true)
     display(fig)
     close(fig)
     return nothing 
@@ -576,6 +576,7 @@ function plot_density_matrix_strong_coupling_valley_spin_v1(fname::String,fname0
     end
     fig = figure(figsize=(6,6))
     pl=imshow(abs.(reshape(Pstrong,8hf.q,:)),vmin=0,vmax=1,origin="lower")
+    cbar.set_ticks(collect(0:0.2:1))
     colorbar(pl,fraction=0.046, pad=0.04)
     tight_layout()
     display(fig)
@@ -604,11 +605,11 @@ function plot_density_matrix_strong_coupling_valley_spin_v1_half(fname::String,f
     for iη1 in 1:4, iη2 in 1:4 
         Pstrong[:,iη1,:,iη2] = transpose(vec[:,:,iη1]) * P0[:,iη1,:,iη2] * conj.(vec[:,:,iη2]) 
     end
-    fig = figure(figsize=(4,4))
-    pl=imshow(abs.(reshape(Pstrong,8hf.q,:))[(4hf.q+1):end,(4hf.q+1):end],vmin=0,vmax=1,origin="lower")
+    fig = figure(figsize=(2.5,2.5))
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,:))[(6hf.q+1):end,(6hf.q+1):end],vmin=0,vmax=1,origin="lower",cmap="hot")
     colorbar(pl,shrink=0.6)
-    axhline(2hf.q-0.5,c="w",ls=":")
-    axvline(2hf.q-0.5,c="w",ls=":")
+    # axhline(2hf.q-0.5,c="w",ls=":")
+    # axvline(2hf.q-0.5,c="w",ls=":")
     xticks([])
     yticks([])
     tight_layout()
@@ -635,7 +636,7 @@ function plot_density_matrix_sublattice_v0(fname::String;titlestr::String="")
         # Pstrong[:,:,iηs] = vec' * P0[:,iηs,:,iηs] * vec
     end 
     fig,ax = subplots(figsize=(3,2.8))
-    pl=ax.imshow(abs.(Pstrong[:,:,3]),vmin=0,vmax=1,origin="lower",cmap="Reds")
+    pl=ax.imshow(abs.(Pstrong[:,:,3]),vmin=0,vmax=1,origin="lower",cmap="hot")
     colorbar(pl,ax=ax,fraction=0.046, pad=0.04)
     ax.set_title(titlestr)
     tight_layout()
