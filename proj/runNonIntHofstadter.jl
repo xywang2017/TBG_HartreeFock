@@ -9,12 +9,12 @@ BLAS.set_num_threads(1)
 str = "K"
 w0 = 0.7
 w0str = "07"
-
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
 # ϕs = ϕs[ϕs .> ϕmin]
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  105
+twist_angle =  120
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
@@ -56,29 +56,30 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(fpath,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(2.5,2.5))
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
     ϕs = ϕs[ϕs .>= ϕmin]
     ϕs = ϕs[ϕs .<=0.5]
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        plot(energies[:].-μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:red")
-        plot(energies[:].+μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:blue")
-        # plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
-        # plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
+        # plot(energies[:].-μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:red")
+        # plot(energies[:].+μB*ϕ,ones(length(energies[:]))*ϕ,".",ms=1,markeredgecolor="none",color="tab:blue")
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
+        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
-    ylim([0.06,0.51])
-    # ylim([-50,50])
-    ylabel(L"ϕ/ϕ_0")
-    xlabel("E (meV)")
+    # ylim([0.06,0.51])
+    ylim([-50,50])
+    xlabel(L"ϕ/ϕ_0")
+    ylabel("E (meV)")
     tight_layout() 
     savefig("test.png",dpi=600,transparent=true)
     display(fig)

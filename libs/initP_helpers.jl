@@ -18,8 +18,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"bm")
         init_P_bm(hf)
     elseif isequal(_Init,"bm_cascade")
-        # init_P_bm_cascade(hf)
-        init_P_bm_cascade_testing(hf)
+        init_P_bm_cascade(hf)
+        # init_P_bm_cascade_testing(hf)
     elseif isequal(_Init,"vssymmetric")
         init_P_vs_symmetric(hf)
     else

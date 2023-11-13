@@ -8,8 +8,8 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 132
-foldername = dir*"zeeman/$(twist_angle)_strain"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -45,15 +45,16 @@ for ϕ in ϕs
             push!(ns,ν)
             Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
-            if (ϕ<1//3) && abs(ν-(-3-ϕ))<1e-2
-                push!(colors,green)
-            elseif (ϕ<3//10) && abs(ν-(-2-2ϕ))<1e-2
-                push!(colors,green)
-            elseif (ϕ<2//5) && abs(ν-(-1-3ϕ))<1e-2
-                push!(colors,green)
-            else
-                push!(colors,red)
-            end
+            # push!(colors,red)
+            # if (ϕ<1//3) && abs(ν-(-3-ϕ))<1e-2
+            #     push!(colors,green)
+            # elseif (ϕ<3//10) && abs(ν-(-2-2ϕ))<1e-2
+            #     push!(colors,green)
+            # elseif (ϕ<2//5) && abs(ν-(-1-3ϕ))<1e-2
+            #     push!(colors,green)
+            # else
+            #     push!(colors,red)
+            # end
             # if (ϕ<1//4) && abs(ν-(-3-ϕ))<1e-2 && ϕ in [2//9;2//11;1//9;1//10;1//11;1//12;1//7;1//8]
             #     push!(colors,blue)
             # elseif (ϕ<1//10) && abs(ν-(-2-2ϕ))<1e-2
@@ -63,6 +64,15 @@ for ϕ in ϕs
             # else
             #     push!(colors,red)
             # end
+            if (ϕ<1//4) && abs(ν-(-3-ϕ))<1e-2 
+                push!(colors,green)
+            elseif (ϕ<2//7) && abs(ν-(-2-2ϕ))<1e-2
+                push!(colors,green)
+            elseif (ϕ<=2//5) && abs(ν-(-1-3ϕ))<1e-2
+                push!(colors,green)
+            else
+                push!(colors,red)
+            end
         end
     end
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2/10,c=colors,edgecolor="none")

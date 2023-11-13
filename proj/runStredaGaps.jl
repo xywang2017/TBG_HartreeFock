@@ -3,13 +3,14 @@ fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/RyanLee/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
-foldername = dir*"StrongScreening/$(twist_angle)_strain"
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+twist_angle = 132
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
+# params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -51,7 +52,7 @@ for ϕ in ϕs
             push!(gaps,Δ)
         end
     end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./4,c="tab:blue",edgecolor="none")
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 # xlim([-4.3,0.3])
 # ylim([0.05,0.55])
@@ -67,7 +68,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-3,-1]]
+sts = [[-1,-3]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
@@ -83,10 +84,10 @@ for st in sts
             end
         end
     end
-    idx = [collect(1:6);8;10]
+    idx = Int[]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).pdf",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 
@@ -123,7 +124,7 @@ end
 subplots_adjust(hspace=0,wspace=0)
 ax[1].set_xlim([0,0.55])
 ax[1].set_xticks([0.2,0.4])
-ax[1].set_ylim([0,24])
+ax[1].set_ylim([0,29])
 # tight_layout()
 savefig("tmp_$(twist_angle).png",transparent=true,dpi=600,bbox_inches="tight")
 display(fig)
