@@ -30,7 +30,7 @@ end
 function compute_bm(latt::Lattice,params::Params;fname::String="placeholder.txt")
     bm = HBM()
     initHBM(bm,latt,params;
-            lg=9,_σrotation=false,_calculate_overlap=true,fname=fname)
+            lg=9,_σrotation=false,_calculate_overlap=false,fname=fname)
     return bm
 end
 

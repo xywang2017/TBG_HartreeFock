@@ -7,8 +7,8 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/RyanLee/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"nozeeman/$(twist_angle)_strain"
+twist_angle = 105
+foldername = dir*"StrongScreening/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
@@ -51,7 +51,7 @@ for ϕ in ϕs
             push!(gaps,Δ)
         end
     end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./4,c="tab:blue",edgecolor="none")
 end
 # xlim([-4.3,0.3])
 # ylim([0.05,0.55])
