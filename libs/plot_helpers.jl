@@ -94,6 +94,48 @@ function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
     return nothing
 end
 
+function plot_spectra_flavorv1(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+    ϵk = hf.ϵk
+    σzτz = hf.σzτz
+    params = hf.params 
+
+    H = reshape(hf.H,2hf.q,4,2hf.q,4,:)
+    Σz = reshape(hf.Σz0,2hf.q,4,2hf.q,4,:)
+    ϵk = zeros(Float64,2hf.q)
+    σz = zeros(Float64,2hf.q)
+    colors=["tab:blue","tab:red","tab:green","tab:purple"]
+    str = ["K↑","K'↑","K↓","K'↓"]
+
+    fig, ax = subplots(1,1,figsize=(3,2.5))
+    pl = 0
+    for elem in 1:4
+        for ik in 1:size(H,5) 
+            tmpH = view(H,:,elem,:,elem,ik)
+            F = eigen(Hermitian(tmpH))
+            ϵk .= real(F.values)
+            for j in eachindex(σz)
+                σz[j] = real(F.vectors[:,j]'*view(Σz,:,elem,:,elem,ik)*F.vectors[:,j])
+            end
+            # ax[r,c].plot(ones(length(ϵk))*hf.p/hf.q,ϵk,"o",c=colors[elem],ms=2)
+            pl =ax.scatter(ones(length(ϵk))*elem,ϵk,c=σz,cmap="coolwarm",s=6,vmin=-1,vmax=1)
+        end 
+    end
+    # colorbar(pl,ax=ax)
+    ax.axhline(hf.μ,ls=":",c="gray")
+    ax.set_xlim([0,5])
+    ax.set_ylim(-35,39)
+    ax.set_ylabel("E (meV)")
+    ax.set_xticks([1,2,3,4])
+    ax.set_xticklabels(str)
+    tight_layout()
+    savefig("tmp.png",dpi=500,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
 ## Compute spectral gap from HF 
 function computegap(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");
@@ -124,7 +166,7 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
-    fig = figure(figsize=(2.5,2.5))
+    fig = figure(figsize=(3,2.5))
     # fig = figure(figsize=(5,4))
     ϵFs = Float64[]
     Δs = Float64[]
@@ -138,17 +180,17 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        # pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-0.5,vmax=0.5,marker="o")
-        if j in indices
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
-        else
-            plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
-        end
-        plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
-        # if j == length(metadatas)
-        #      colorbar(pl,shrink=0.8)
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=3,vmin=-1,vmax=1,marker="o")
+        # if j in indices
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
+        # else
+        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
         # end
-        # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
+        # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
+        if j == length(metadatas)
+             colorbar(pl,shrink=0.8)
+        end
+        plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
         i = 1
@@ -177,7 +219,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # axvline([1//8+1//7]/2,ls=":",c="k")
     xlim([0,0.55])
     xticks([0.2,0.4])
-    ylim([-50,50])
+    ylim([-49,55])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
@@ -243,6 +285,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
     fig = figure(figsize=(4.6,4))
+    # fig = figure(figsize=(2.5,2.5))
     P0 = view(hf.P,:,:,ik) + 0.5I
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
@@ -427,7 +470,7 @@ function plot_density_matrix_global_order_parameters(fname::String)
     # Iq = diagm([(-1)^(i) for i in 1:(2hf.q)])
     Os = kron(s0,kron(sz,Iq))
     Sk = reshape( [tr(transpose(P[:,:,ik])*Os)/hf.q for ik in 1:size(P,3)], (:,hf.nq) )
-    Sk = reshape( P[7hf.q,7hf.q,:].+0.5, (:,hf.nq) ) 
+    Sk = reshape( P[7hf.q+1,7hf.q+1,:].+0.5, (:,hf.nq) ) 
     # println(sum(Sk)/length(Sk))
     fig = figure(figsize=(6,1.5))
     avgval = sum(real(Sk)) / length(Sk)
@@ -680,12 +723,12 @@ end
 
 
 ### strong coupling basis  valley spin
-function plot_density_matrix_sublattice_full(fname::String)
-    ik = 1
+function plot_density_matrix_sublattice_full(fname::String;ik::Int=1)
     hf = load(fname,"hf");
     H0 = hf.Σz0
     P = hf.P 
     tmpH0 = reshape(view(H0,:,:,ik),2hf.q,4,2hf.q,4)
+    σzτz0 = eigvals(Hermitian(tmpH0[:,1,:,1]))
     P0 = reshape(view(P,:,:,ik)+0.5I,2hf.q,4,2hf.q,4)
     Pstrong = zeros(ComplexF64,2hf.q,4,2hf.q,4)
     for iηs in 1:4, iηs1 in 1:4
@@ -695,11 +738,22 @@ function plot_density_matrix_sublattice_full(fname::String)
         vec1 = F1.vectors
         Pstrong[:,iηs,:,iηs1] = transpose(vec) * P0[:,iηs,:,iηs1] * conj.(vec1) 
     end 
-    fig = figure(figsize=(6,6))
-    pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1,origin="lower")
-    colorbar(pl,fraction=0.046, pad=0.04)
+    fig = figure(figsize=(4.65,4))
+    pl=imshow(abs.(reshape(Pstrong,8hf.q,8hf.q)),vmin=0,vmax=1,origin="lower",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    xticks([])
+    yticks([])
+    for r in [2hf.q,4hf.q,6hf.q]
+        axhline(r+0.5,ls=":",c="gray")
+        axvline(r+0.5,ls=":",c="gray")
+    end
+    colorbar(pl,shrink=0.8)
+    # fig = figure(figsize=(2.4,2))
+    # plot(1:(hf.q+hf.p),σzτz0[1:hf.q+hf.p],"bo",ms=3)
+    # plot((hf.q+hf.p+1):(2hf.q),σzτz0[(hf.q+hf.p+1):(2hf.q)],"ro",ms=3)
+    # xticks([1,hf.q+hf.p,2hf.q],["1","q+p","2q"])
+    # ylabel(L"\rm eigvals\ of\ σ_zτ_z")
     tight_layout()
-    savefig("test.pdf")
+    savefig("test.png",dpi=500,transparent=true)
     display(fig)
     close(fig)
     return nothing 
