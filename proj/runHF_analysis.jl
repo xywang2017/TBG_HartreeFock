@@ -18,8 +18,8 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -0.5,-3
-p,q = 1,6
+s,t = -1,-3
+p,q = 1,7
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
@@ -32,7 +32,7 @@ metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init
 # plot_density_matrix_bm_valley_spinv0(metadata,ik=1,savename="$(str).png",jj=4,titlestr="")
 # plot_density_matrix_sublattice_full(metadata,ik=1)
 # end
-plot_density_matrix_bm(metadata,ik=1)
+plot_density_matrix_bm(metadata,ik=5)
 # end
 # plot_density_matrix_bm_half(metadata,ik=1)
 test_tL2_breaking(metadata)

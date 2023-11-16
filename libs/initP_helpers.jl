@@ -32,7 +32,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    # init_P_valley_rotation(hf;α=1.0)
+    init_P_valley_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
