@@ -6,9 +6,9 @@ fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
-dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -62,7 +62,7 @@ println("Running parameters: ","ϕ=",ϕ,", ν=",ν,", Init=",flag,", w0=",w0)
 println(savename)
 
 if isequal(_is_strain,"strain")
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+    params = Params(ϵ=0.004,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
 elseif isequal(_is_strain,"nostrain")
     params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
 end

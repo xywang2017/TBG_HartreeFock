@@ -43,7 +43,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     if isequal(_is_strain,"nostrain")
         params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
     else
-        params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
+        params = Params(ϵ=0.004,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
     end
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
