@@ -5,12 +5,13 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 105
 foldername = dir*"zeeman/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.004,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -40,7 +41,7 @@ for st in sts
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
             if !(t==-4 )
-                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_new_init_HF_$(p)_$(q)_nu_$(νstr)")
+                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_bm_cascade_tL_init_HF_$(p)_$(q)_nu_$(νstr)")
             else
                 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
             end
@@ -77,12 +78,13 @@ fig, ax = subplots(1,ntot,sharex=true,figsize=(2.8ntot,2.8))
 for r in 1:ntot 
     # ax[r].plot(ϕs,HF[r],"ro",label="HF G.S.",ms=3)
     # ax[r].plot(ϕs,HF_flavor[r],"b^",label="CHF",ms=3)
-    ax[r].plot(ϕs,HF[r]-HF_flavor[r] ,"-o",ms=5,c="tab:blue")
+    Bs = [flux_conversion(1.0*ϕ,params) for ϕ in ϕs]
+    ax[r].plot(Bs,HF[r]-HF_flavor[r] ,"-o",ms=5,c="tab:blue")
     # ax[r].plot(ϕs,HF_tL2[r],"g<",label="HF tL2",ms=2)
     if r == 1
         # ax[r].legend(fontsize=8)
     end
-    ax[r].set_xlabel(L"ϕ/ϕ_0")
+    ax[r].set_xlabel("B (T)")
     if r ==1
         ax[r].set_ylabel("HF energy (meV/u.c.)")
         ax[r].set_ylabel(L"\rm E_{G.S.}-E_{no ivc}\ (meV/u.c.)")
@@ -95,6 +97,6 @@ for r in 1:ntot
 end
 
 tight_layout()
-savefig("test.png",transparent=true,dpi=500)
+savefig("hf_transition_$(twist_angle).png",transparent=false,dpi=500)
 display(fig)
 close(fig)
