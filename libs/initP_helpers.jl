@@ -18,8 +18,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"bm")
         init_P_bm(hf)
     elseif isequal(_Init,"bm_cascade")
-        init_P_bm_cascade(hf)
-        # init_P_bm_cascade_testing(hf)
+        # init_P_bm_cascade(hf)
+        init_P_bm_cascade_testing(hf)
     elseif isequal(_Init,"vssymmetric")
         init_P_vs_symmetric(hf)
     else
@@ -32,7 +32,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
-    init_P_valley_spin_rotation(hf;α=1.0)
+    # init_P_valley_spin_rotation(hf;α=1.0)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
     return nothing
