@@ -50,7 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 15.0
+    ϵr = 40.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
     # return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*26)
 end

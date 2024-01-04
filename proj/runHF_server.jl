@@ -6,9 +6,9 @@ fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
-dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -34,11 +34,11 @@ if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
 end
 
 if isequal(_is_symmetric,"symmetric")
-    # savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_new_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
+    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_new_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
-    # savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
+    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 end
 
 ϕ = p//q 

@@ -770,3 +770,40 @@ function plot_density_matrix_sublattice_full(fname::String;ik::Int=1)
     close(fig)
     return nothing 
 end
+
+function plot_density_matrix_ivc_spin(metadata::String;ik::Int=1)
+    # only works for (-2,-2)
+    # plotting the spin for the two decoupled ivcs, namely {K↑,K'↓} versus {K↓,K'↑},
+    # define spin operator as Sx τx
+    hf = load(metadata,"hf");
+    s0 = ComplexF64[1 0;0 1]
+    sx = ComplexF64[0 1;1 0]
+    sy = ComplexF64[0 -1im;1im 0]
+    sz = ComplexF64[1 0;0 -1]
+    Iq = Array{ComplexF64}(I,2hf.q,2hf.q)
+
+    sxτxop = kron(sx,sx)
+    syτxop = kron(sy,sx)
+    sxτyop = kron(sx,sy)
+    syτyop = kron(sy,sy)
+    
+    P = reshape(hf.P,2hf.q,4,2hf.q,4,:)[:,:,:,:,ik:ik]
+    
+    P1 = copy(P)
+    P1[:,[2,3],:,[2,3],:] .= 0.0
+    P2 = copy(P)
+    P2[:,[1,4],:,[1,4],:] .= 0.0
+
+    sxτx1 = reshape( sum(P1.*reshape(sxτxop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)), 2hf.q,2hf.q )
+    sxτy1 = reshape( sum(P1.*reshape(sxτyop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+    syτx1 = reshape( sum(P1.*reshape(syτxop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+    syτy1 = reshape( sum(P1.*reshape(syτyop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+
+    sxτx2 = reshape( sum(P2.*reshape(sxτxop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+    sxτy2 = reshape( sum(P2.*reshape(sxτyop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+    syτx2 = reshape( sum(P2.*reshape(syτxop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+    syτy2 = reshape( sum(P2.*reshape(syτyop,1,4,1,4,1),dims=(2,4,5)) / (4size(hf.P,3)) , 2hf.q,2hf.q)
+
+    return [sxτx1,sxτy1,syτx1,syτy1], [sxτx2,sxτy2,syτx2,syτy2]
+
+end
