@@ -8,10 +8,10 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
-foldername = dir*"zeeman/$(twist_angle)_strain"
+twist_angle = 120
+foldername = dir*"MinHao/Zeeman/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.004,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.001,Da=-4100,φ=10.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -20,9 +20,9 @@ w0 = "07"
 # ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-# ϕs = ϕs[ϕs .>0.1]
+ϕs = [1//3;1//4]
 sts = []
-for s in -3:3, t in -12:12
+for s in -3:(1/6):3, t in -8:8
     push!(sts,[s,t])
     push!(sts,[-s,-t])
 end
@@ -42,7 +42,7 @@ for ϕ in ϕs
     gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
     fillings = unique(round.(fillings,digits=10))
-    fillings = fillings[fillings .<1e-5]
+    # fillings = fillings[fillings .<1e-5]
     ns = Float64[]
     for ν in fillings 
         νstr = round(Int,1000*ν)
@@ -56,7 +56,7 @@ for ϕ in ϕs
     scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 # xlim([-4.3,0.3])
-# ylim([0.05,0.55])
+ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
