@@ -13,9 +13,9 @@ w0str = "07"
 dir = ""
 ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
 # ϕs = ϕs[ϕs .> ϕmin]
-# ϕs = ϕs[ϕs .<=0.5]
+ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  128
+twist_angle =  095
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
@@ -61,8 +61,8 @@ function plot_LL_spectrum()
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4,4))
     ϕmin = 1//40
-    ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
-    ϕs = ϕs[ϕs .>= ϕmin]
+    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕs = ϕs[ϕs .<= 0.5]
     # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
@@ -71,10 +71,10 @@ function plot_LL_spectrum()
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
-        plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
-        # plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
-        # plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
+        # plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
+        # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
+        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
     # ylim([0.06,0.51])
     # ylim([-50,50])

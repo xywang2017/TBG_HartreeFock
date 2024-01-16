@@ -22,7 +22,7 @@ w0 = "07"
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = [1//3;1//4]
 sts = []
-for s in -3:0.5:3, t in -12:12
+for s in -3:1:3, t in -12:12
     push!(sts,[s,t])
 end
 # for st in [[-0.5,-3],[-2/3,-3],[-1.5,-2],[-2.5,-1],[-3.5,0]]
@@ -55,7 +55,11 @@ for ϕ in ϕs
             push!(gaps,Δ)
         end
     end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="k",edgecolor="none")
+    if q%2 ==0
+        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    else 
+        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    end
 end
 # scatter([-0.5-3*1/3],[1/3])
 xlim([-4.3,0.3])
