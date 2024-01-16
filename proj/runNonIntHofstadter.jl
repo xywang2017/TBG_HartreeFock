@@ -15,7 +15,7 @@ dir = ""
 # ϕs = ϕs[ϕs .> ϕmin]
 # ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  120
+twist_angle =  128
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
@@ -71,10 +71,10 @@ function plot_LL_spectrum()
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
-        # plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
-        # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
-        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
-        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
+        plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
+        plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
+        # plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="r")
+        # plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
     end
     # ylim([0.06,0.51])
     # ylim([-50,50])
@@ -148,7 +148,7 @@ function plot_dispersion(flag::Bool=false)
 
     fig,ax = subplots(2,2,figsize=(8,4))
     for iϕ in eachindex(ϕs)
-        if ϕs[iϕ] == 1//4
+        if ϕs[iϕ] == 1//3
             ϕ = ϕs[iϕ]
             p,q = numerator(ϕ), denominator(ϕ)
             nq = 40÷q

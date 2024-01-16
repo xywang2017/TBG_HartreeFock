@@ -5,13 +5,13 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = ""
+# dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"MinHao/Zeeman/$(twist_angle)_strain"
+twist_angle = 128
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.001,Da=-4100,φ=10.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -20,9 +20,9 @@ w0 = "07"
 # ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-ϕs = [1//3;1//4]
+# ϕs = [1//3;1//4]
 sts = []
-for s in -3:(1/6):3, t in -8:8
+for s in -3:3, t in -12:12
     push!(sts,[s,t])
     push!(sts,[-s,-t])
 end
