@@ -31,6 +31,7 @@ end
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
 if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
     mkpath(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
+    # mkpath(dir*"zeeman/$(foldername)/_$(p)_$(q)")
 end
 
 if isequal(_is_symmetric,"symmetric")
@@ -72,7 +73,7 @@ hf = HartreeFock()
 if !isequal(flag,"strong")
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
-    savename0 = dir*"zeeman/105_$(_is_strain)/_$(p)_$(q)/2_random_tL_init_HF_1_5_nu_-2200.jld2"
+    savename0 = dir*"zeeman/128_$(_is_strain)/_$(p)_$(q)/2_random_init_HF_1_3_nu_-1667.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)

@@ -5,7 +5,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 128
@@ -22,9 +22,8 @@ w0 = "07"
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = [1//3;1//4]
 sts = []
-for s in -3:3, t in -12:12
+for s in -3:0.5:3, t in -12:12
     push!(sts,[s,t])
-    push!(sts,[-s,-t])
 end
 # for st in [[-0.5,-3],[-2/3,-3],[-1.5,-2],[-2.5,-1],[-3.5,0]]
 #     push!(sts,st)
@@ -33,7 +32,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(5,4))
+fig = figure(figsize=(4,3))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -41,27 +40,31 @@ for ϕ in ϕs
     p,q = numerator(ϕ), denominator(ϕ)
     gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
-    fillings = unique(round.(fillings,digits=10))
-    # fillings = fillings[fillings .<1e-5]
+    fillings = unique(round.(fillings,digits=8))
+    fillings = fillings[fillings .<1e-5]
+    fillings = fillings[fillings .>-4]
+    fillings0 = round.(fillings,digits=3)
+    # println(fillings0)
     ns = Float64[]
-    for ν in fillings 
+    for ν in fillings0 
         νstr = round(Int,1000*ν)
-        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
         if !isempty(metadata)
             push!(ns,ν)
             Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
         end
     end
-    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="k",edgecolor="none")
 end
-# xlim([-4.3,0.3])
+# scatter([-0.5-3*1/3],[1/3])
+xlim([-4.3,0.3])
 ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
 # savefig("105.png",transparent=false,dpi=600)
-savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+# savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 

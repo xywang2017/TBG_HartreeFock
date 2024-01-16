@@ -50,7 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 40.0
+    ϵr = 15.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
     # return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*26)
 end
@@ -74,7 +74,7 @@ function ZeemanUnit(params::Params)
     ee = 1.6e-19
     aa = 2.46e-10 
     V0 = 2π * hbar^2 / (2*me*params.area*aa^2) / ee * 1000 # in units of meV 
-    return V0 *0.0
+    return V0
 end
 
 function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
