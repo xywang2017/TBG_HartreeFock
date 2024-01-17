@@ -219,7 +219,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # axvline([1//8+1//7]/2,ls=":",c="k")
     xlim([0,0.55])
     xticks([0.2,0.4])
-    ylim([-49,55])
+    # ylim([-49,55])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
