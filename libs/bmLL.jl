@@ -72,8 +72,8 @@ function constructbmLL(A::bmLL,params::Params;
     constructLattice(A.latt,A.params;lk = A.nq*A.q)  #[0,1)x[0,1), so far works for p/q < 1
 
     A.lB = sqrt( A.q/(2π*abs(A.p)) * A.params.area )
-    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[-1; -1+1im; 1im] : Complex{Int}[1; 1-1im; -1im]
-    # A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0; 1im; 1+1im] : Complex{Int}[0; -1im; -1-1im]
+    # A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[-1; -1+1im; 1im] : Complex{Int}[1; 1-1im; -1im]
+    A.qjs = (isequal(A._valley,"K")) ? Complex{Int}[0; 1im; 1+1im] : Complex{Int}[0; -1im; -1-1im]
     
     A.H = zeros(ComplexF64,A.nH,A.p,2,A.nH,A.p,2,A.nq,A.nq)
     constructDiagonals(A)
@@ -200,8 +200,8 @@ function constructOffDiagonals(A::bmLL)
         #     T12[iH1,iH2] = _tLL(_Tj,_q,n1,γ1,n2,γ2,A.lB,-A.params.dθ/2,A.params.dθ/2,A._σrotation)
         #     # T12[iH1,iH2] = _tLL(_Tj,_q,n1,γ1,n2,γ2,A.lB,θ_strain,θ_strain,true)
         # end
-        Kl = isequal(A._valley,"K") ? A.params.Kb : A.params.Kt
-        Kr = isequal(A._valley,"K") ? A.params.Kt : A.params.Kb
+        Kl = isequal(A._valley,"K") ? A.params.Kb : -A.params.Kb
+        Kr = isequal(A._valley,"K") ? A.params.Kt : -A.params.Kt
         for ik2 in 1:A.nq, r1 in 0:(A.p-1)
             k2l = projector_para(A.params.g2,A.params.a2) * A.latt.k2[r1*A.nq+ik2] - projector_para(Kl,A.params.a2)
             r2 = mod(r1 + A.q * imag(A.qjs[j]),A.p)
@@ -369,9 +369,9 @@ function computeCoulombOverlap(A::bmLL,m::Int,n::Int)
 
                 for layer in 1:2
                     if isequal(A._valley,"K")
-                        Kl = (layer==1) ? A.params.Kb : A.params.Kt
+                        Kl = (layer==1) ? A.params.Kb : -A.params.Kb
                     else
-                        Kl = (layer==1) ? A.params.Kt : A.params.Kb
+                        Kl = (layer==1) ? A.params.Kt : -A.params.Kt
                     end
                     θl = (2layer-3)*A.params.dθ/2
                     k2l = projector_para(A.params.g2,A.params.a2) * _k2 - projector_para(Kl,A.params.a2)
