@@ -16,7 +16,7 @@ function initCoords(A::Coords,params::Params,q::Int;lr::Int = 1)
     # A.x2 = collect(0:(q*lr-1)) ./ (lr)
     # A.x1 = collect(0:(lr-1)) ./ (lr)
 
-    lmax = (lr-1)/2
+    lmax = (lr-1) #/2
     A.x1 = collect(-lmax:lmax) ./ lr 
     lmax = (q*lr-1)/2
     A.x2 = collect(-lmax:lmax) ./ lr 
@@ -89,7 +89,7 @@ end
 function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG,bm::bmLL)
     Wz = zeros(ComplexF64,2,A.nH,A.p,A.nl,A.q,A.nq,A.nq) # first 2 is sublattice basis
     _z = A.coord.z[iz]
-    svec = collect(-30:30) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
+    svec = collect(-20:20) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
     for ik2 in 1:A.nq, l in 1:A.nl, r in 1:A.p, iH in 1:A.nH 
         Kr = (l==1) ? A.η*A.params.Kb : A.η*A.params.Kt
         n,γ = inγ(iH)
@@ -115,7 +115,7 @@ function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Pa
     # η = ± 1 : valley index
     x,y = projector_norm(z,params.a2), projector_para(z,params.a2)
     Kl = (l==1) ? (3-2η)*params.Kb : (3-2η)*params.Kt
-    xtilde = x/lB^2 + projector_para(k-Kl,params.a2)
+    xtilde = x/lB + projector_para(k-Kl,params.a2)*lB
     ψ = ComplexF64[0;0]
     θstrain = angle(params.a2)-π/2
     if η == 1 
@@ -139,10 +139,11 @@ function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Pa
 end
 
 function Φ(n::Int,x::Float64)
-    if n < 200
-        ψ=1/π^(1/4)*exp(n/2*log(2)-x^2/2-0.5*sf_lnfact(n))*hermiteh(n,x)
+    if n < 150
+        ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*sf_lnfact(n))*hermiteh(n,x)
     else
-        ψ=2^(n/2)/(π^(1/4)*factorial(big(n))^(1/2))*exp(-x^2/2)*hermiteh(big(n),x)
+        # ψ=2^(-n/2)/(π^(1/4)*factorial(big(n))^(1/2))*exp(-x^2/2)*hermiteh(big(n),x)
+        ψ = 0.0
     end
     return (abs(ψ)<1e-16) ? 0.0 : Float64(ψ)
 end
