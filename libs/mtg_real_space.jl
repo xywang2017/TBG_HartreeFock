@@ -89,7 +89,7 @@ end
 function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG,bm::bmLL)
     Wz = zeros(ComplexF64,2,A.nH,A.p,A.nl,A.q,A.nq,A.nq) # first 2 is sublattice basis
     _z = A.coord.z[iz]
-    svec = collect(-3:3) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
+    svec = collect(-30:30) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
     for ik2 in 1:A.nq, l in 1:A.nl, r in 1:A.p, iH in 1:A.nH 
         Kr = (l==1) ? A.η*A.params.Kb : A.η*A.params.Kt
         n,γ = inγ(iH)
@@ -113,7 +113,7 @@ end
 
 function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Params,lB::Float64)
     # η = ± 1 : valley index
-    x,y = real(z), imag(z)
+    x,y = projector_norm(z,params.a2), projector_para(z,params.a2)
     Kl = (l==1) ? (3-2η)*params.Kb : (3-2η)*params.Kt
     xtilde = x/lB^2 + projector_para(k-Kl,params.a2)
     ψ = ComplexF64[0;0]

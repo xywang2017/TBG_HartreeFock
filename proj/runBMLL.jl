@@ -74,7 +74,22 @@ mtg = compute_mtg(bm,ϕ,str,w0,w0str);
 ψr =  reshape(mtg.W[2,1,:],10,:)
 rvec = reshape(mtg.coord.z,10,:)
 fig = figure()
-pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), abs2.(ψr))
+pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), angle.(ψr), cmap="hsv")
+axis("equal")
+tight_layout()
+display(fig)
+close(fig)
+
+uvec = reshape(bm.vec,bm.nH*bm.p*2,2bm.q,bm.q*bm.nq^2);
+ψ = zeros(ComplexF64,2,2bm.q,bm.q*bm.nq^2,mtg.coord.nr);
+W = reshape(mtg.W,2,bm.nH*bm.p*2,bm.q*bm.nq^2,mtg.coord.nr);
+
+for ik in 1:size(ψ,3), ib in 1:size(ψ,2), τ in 1:2 , ir in 1:mtg.coord.nr
+    ψ[τ,ib,ir] = W[τ,:,ik,ir]'*uvec[:,ib,ik]
+end
+
+fig = figure()
+pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), abs2.(reshape(ψ[1,1,1,:],10,:)), cmap="bwr")
 axis("equal")
 tight_layout()
 display(fig)
