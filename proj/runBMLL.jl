@@ -2,18 +2,19 @@ using PyPlot
 using Printf
 using JLD2
 fpath = pwd()
-include(joinpath(fpath,"libs/bmLL.jl"))
+# include(joinpath(fpath,"libs/bmLL.jl"))
+include(joinpath(fpath,"libs/mtg_real_space.jl"))
 
 BLAS.set_num_threads(1)
 
-str = ARGS[1]
-w0 = parse(Float64,ARGS[2])*0.1
-w0str = ARGS[2]
-p = parse(Int,ARGS[3])
-q = parse(Int,ARGS[4])
+str = "K" #ARGS[1]
+w0 = 0.7 #parse(Float64,ARGS[2])*0.1
+w0str = "07" #ARGS[2]
+p = 1 #parse(Int,ARGS[3])
+q = 8 #parse(Int,ARGS[4])
 ϕ = p//q
-twist_angle = parse(Float64,ARGS[5])
-_is_strain = ARGS[6]
+twist_angle = 1.20  # parse(Float64,ARGS[5])
+_is_strain = "nostrain" # ARGS[6]
 
 foldername =  @sprintf "NonInt/%d_%s" round(Int,twist_angle*100) _is_strain 
 # calculate spectrum
@@ -48,9 +49,33 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
+
     return bm
 end
 
 #
 bm = compute_bmLL(ϕ,str,w0,w0str);
 
+
+function compute_mtg(bm::bmLL,ϕ::Rational,str::String,w0::Float64,w0str::String)
+    p = numerator(ϕ)
+    q = denominator(ϕ)
+    if !isdir(joinpath(fpath,"$(foldername)"))
+        mkpath(joinpath(fpath,"$(foldername)"))
+    end
+    fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_mtg_metadata.jld2")
+    mtg = constructMTG(bm;lr=10,fname=fname)
+    return mtg
+end
+
+mtg = compute_mtg(bm,ϕ,str,w0,w0str);
+
+
+ψr =  reshape(mtg.W[2,1,:],10,:)
+rvec = reshape(mtg.coord.z,10,:)
+fig = figure()
+pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), abs2.(ψr))
+axis("equal")
+tight_layout()
+display(fig)
+close(fig)
