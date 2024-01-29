@@ -81,16 +81,16 @@ tight_layout()
 display(fig)
 close(fig)
 
-uvec = reshape(bm.vec,bm.nH*bm.p*2,2bm.q,bm.q*bm.nq^2);
-ψ = zeros(ComplexF64,2,2bm.q,bm.q*bm.nq^2,mtg.coord.nr);
-W = reshape(mtg.W,2,bm.nH*bm.p*2,bm.q*bm.nq^2,mtg.coord.nr);
+uvec = reshape(bm.vec,bm.nH*bm.p,2,2bm.q,bm.q*bm.nq^2);
+ψ = zeros(ComplexF64,2,2,2bm.q,bm.q*bm.nq^2,mtg.coord.nr);
+W = reshape(mtg.W,2,bm.nH*bm.p,2,bm.q*bm.nq^2,mtg.coord.nr);
 
-for ik in 1:size(ψ,3), ib in 1:size(ψ,2), τ in 1:2 , ir in 1:mtg.coord.nr
-    ψ[τ,ib,ik,ir] = transpose(W[τ,:,ik,ir])*uvec[:,ib,ik]
+for ik in 1:size(ψ,3), ib in 1:size(ψ,2), τ in 1:2 , l in 1:2, ir in 1:mtg.coord.nr
+    ψ[τ,l,ib,ik,ir] = transpose(W[τ,:,l,ik,ir])*uvec[:,l,ib,ik]
 end
 
 fig = figure(figsize=(3,8))
-pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(abs2.(ψ[1,8,1,:]),:,80), cmap="bwr")
+pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(abs2.(ψ[1,1,8,1,:]),:,80), cmap="bwr")
 point1 = mtg.coord.z[1]
 point2 = point1 + mtg.params.a1
 for i in 1:7
@@ -105,7 +105,7 @@ close(fig)
 
 
 fig = figure(figsize=(3,8))
-pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(sum(abs2.(ψ),dims=(1,2,3)),:,80), cmap="bwr")
+pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(sum(abs2.(ψ),dims=(1,2,3,4)),:,80), cmap="bwr")
 point1 = mtg.coord.z[1]
 point2 = point1 + mtg.params.a1
 for i in 1:7
