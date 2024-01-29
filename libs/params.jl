@@ -21,10 +21,10 @@
 
     # coordinates for special points (Γ is at origin)
     Γ::ComplexF64 = 0.0im
-    # Kt::ComplexF64 = 4π/3 + kb/2 * exp(1im*π/2)
-    # Kb::ComplexF64 = 4π/3 - kb/2 * exp(1im*π/2)
-    Kt::ComplexF64 = 4π/3 * exp(1im*dθ/2)
-    Kb::ComplexF64 = 4π/3 * exp(-1im*dθ/2)
+    Kt::ComplexF64 = kb/2 * exp(1im*π/2)
+    Kb::ComplexF64 = - kb/2 * exp(1im*π/2)
+    # Kt::ComplexF64 = 4π/3 * exp(1im*dθ/2)
+    # Kb::ComplexF64 = 4π/3 * exp(-1im*dθ/2)
 
     # Tunneling matrix
     ω::ComplexF64 = exp(1im * 2π/3)

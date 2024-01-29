@@ -14,7 +14,7 @@ p = 1 #parse(Int,ARGS[3])
 q = 8 #parse(Int,ARGS[4])
 ϕ = p//q
 twist_angle = 1.20  # parse(Float64,ARGS[5])
-_is_strain = "nostrain" # ARGS[6]
+_is_strain = "strain" # ARGS[6]
 
 foldername =  @sprintf "NonInt/%d_%s" round(Int,twist_angle*100) _is_strain 
 # calculate spectrum
@@ -48,7 +48,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     end
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
 
     return bm
 end
@@ -71,7 +71,7 @@ end
 mtg = compute_mtg(bm,ϕ,str,w0,w0str);
 
 
-ψr =  reshape(mtg.W[2,16,:],10,:)
+ψr =  reshape(mtg.W[2,28,:],:,80)
 rvec = reshape(mtg.coord.z,:,80)
 fig = figure(figsize=(3,8))
 pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), abs2.(ψr), cmap="bwr")
@@ -90,7 +90,7 @@ for ik in 1:size(ψ,3), ib in 1:size(ψ,2), τ in 1:2 , ir in 1:mtg.coord.nr
 end
 
 fig = figure(figsize=(3,8))
-pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(abs2.(ψ[1,1,2,:]),:,80), cmap="bwr")
+pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(abs2.(ψ[1,8,1,:]),:,80), cmap="bwr")
 point1 = mtg.coord.z[1]
 point2 = point1 + mtg.params.a1
 for i in 1:7

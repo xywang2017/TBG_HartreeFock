@@ -134,7 +134,7 @@ function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Pa
         println("errow with η value")
     end
 
-    ψ .= ψ * exp(1im*projector_norm(Kl,params.a2)*x) * exp(1im*projector_para(k,params.a2)*y)
+    ψ .= ψ * exp(1im*projector_norm(Kl,params.a2)*x) * exp(1im*projector_para(k,params.a2)*y) * exp(1im*η*4π/3*real(z))
     return ψ
 end
 

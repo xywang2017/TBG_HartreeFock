@@ -211,7 +211,7 @@ function constructOffDiagonals(A::bmLL)
                 expfactor = exp(1im * 2π * s * (A.latt.k1[ik1]-p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
                             exp(1im *s*(s)/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
                             exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) * 
-                            exp(1im * real(_q)*k2l*A.lB^2) * exp(1im * real(_q) * imag(_q) * A.lB^2 / 2)
+                            exp(1im * real(_q)*k2l*A.lB^2) * exp(1im * real(_q) * imag(_q) * A.lB^2 / 2) 
                 A.H[:,r1+1,1,:,r2+1,2,ik1,ik2] .+=  expfactor * T12
             end
         end
