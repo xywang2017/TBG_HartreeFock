@@ -16,7 +16,7 @@ function initCoords(A::Coords,params::Params,q::Int;lr::Int = 1)
     # A.x2 = collect(0:(q*lr-1)) ./ (lr)
     # A.x1 = collect(0:(lr-1)) ./ (lr)
 
-    lmax = (lr-1) #/2
+    lmax = (lr-1) /2
     A.x1 = collect(-lmax:lmax) ./ lr 
     lmax = (q*lr-1)/2
     A.x2 = collect(-lmax:lmax) ./ lr 
@@ -52,7 +52,6 @@ end
 
 function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
     A = MTG()
-    A._valley = bm._valley
     A.nη = 2 # two valleys
     A.p = bm.p 
     A.q = bm.q 
@@ -99,7 +98,7 @@ function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG)
                 expfactor = exp(1im * 2π * s * (-p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
                                 exp(1im *s^2/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
                                 exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) 
-                Φz = Ψ(_z,η,n,γ,l,_k,A.params,A.lB)
+                Φz = Ψ(_z,3-2iη,n,γ,l,_k,A.params,A.lB)
                 for ik1 in 1:A.nq, iq in 1:A.q
                     k1 = A.latt.k2[ik1+(iq-1)*A.nq]
                     Wz[:,iH,r,l,iq,ik1,ik2] += expfactor * exp(1im*2π*k1*s) * Φz 
