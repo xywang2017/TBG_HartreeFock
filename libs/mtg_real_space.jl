@@ -114,7 +114,7 @@ end
 function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Params,lB::Float64)
     # η = ± 1 : valley index
     x,y = projector_norm(z,params.a2), projector_para(z,params.a2)
-    Kl = (l==1) ? (3-2η)*params.Kb : (3-2η)*params.Kt
+    Kl = (l==1) ? η*params.Kb : η*params.Kt
     xtilde = x/lB + projector_para(k-Kl,params.a2)*lB
     ψ = ComplexF64[0;0]
     θstrain = angle(params.a2)-π/2

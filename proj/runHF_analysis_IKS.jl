@@ -18,7 +18,7 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2,-2
+s,t = -0.5,-3
 p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
@@ -44,7 +44,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     U2 = zeros(ComplexF64,size(hf.H));
     energies = zeros(Float64,size(hf.ϵk))
     for ik in 1:size(hf.H,3) 
-        F = eigen(Hermitian(view(hf.H0,:,:,ik)))
+        F = eigen(Hermitian(view(hf.H,:,:,ik)))
         U2[:,:,ik] = F.vectors 
         energies[:,ik] = F.values
     end 
