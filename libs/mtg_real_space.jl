@@ -26,14 +26,12 @@ function initCoords(A::Coords,params::Params,q::Int;lr::Int = 1)
 end
 
 mutable struct MTG 
-    # String for valley 
-    _valley::String
-
     coord::Coords 
 
     params::Params 
+    latt::Lattice
 
-    η::Int # valley degree of freedom  
+    nη::Int # valley degree of freedom  
     nl::Int # number of layers
     nq::Int # number of points (linear) in [0,1/q)
 
@@ -46,7 +44,7 @@ mutable struct MTG
 
     lB::Float64  # magnetic length in absolute units 
 
-    W::Array{ComplexF64,3}  # sublattice, nr, l γ n  η k
+    W::Array{ComplexF64,4}  # sublattice, l n γ k, nr, nη
 
     fname::String # name to dump the MTG structure into 
     MTG() = new()
@@ -55,7 +53,7 @@ end
 function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
     A = MTG()
     A._valley = bm._valley
-    A.η = isequal(A._valley,"K") ? 1 : -1
+    A.nη = 2 # two valleys
     A.p = bm.p 
     A.q = bm.q 
     A.qϕ = bm.qϕ 
@@ -63,7 +61,8 @@ function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
     A.nγ = bm.nγ 
     A.nH = bm.nH
     A.lB = bm.lB 
-    A.params = bm.params 
+    A.params = bm.params
+    A.latt = bm.latt 
     A.fname = fname
     A.nl = 2 # number of layers
     A.nq = bm.nq
@@ -71,10 +70,10 @@ function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
     A.coord = Coords() 
     initCoords(A.coord,A.params,A.q; lr=lr)
 
-    A.W = zeros(ComplexF64,2,A.nH*A.p*A.nl*A.q*A.nq^2,A.coord.nr)  # first 2 is sublattice A, B basis
+    A.W = zeros(ComplexF64,2,A.nH*A.p*A.nl*A.q*A.nq^2,A.coord.nr,A.nη)  # first 2 is sublattice A, B basis
 
     for iz in 1:size(A.W,3)
-        constructMTGRealSpaceWavefunctions(iz,A,bm)
+        constructMTGRealSpaceWavefunctions(iz,A)
     end
 
     if !isempty(fname)
@@ -86,27 +85,29 @@ function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
 end
 
 
-function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG,bm::bmLL)
+function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG)
     Wz = zeros(ComplexF64,2,A.nH,A.p,A.nl,A.q,A.nq,A.nq) # first 2 is sublattice basis
     _z = A.coord.z[iz]
     svec = collect(-20:20) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
-    for ik2 in 1:A.nq, l in 1:A.nl, r in 1:A.p, iH in 1:A.nH 
-        Kr = (l==1) ? A.η*A.params.Kb : A.η*A.params.Kt
-        n,γ = inγ(iH)
-        p2 = bm.latt.k2[ik2+(r-1)*A.nq]
-        for s in svec 
-            _k = (bm.latt.k2[ik2+(r-1)*A.nq] - s*A.p/A.q ) * A.params.g2
-            expfactor = exp(1im * 2π * s * (-p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
-                            exp(1im *s^2/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
-                            exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) 
-            Φz = Ψ(_z,A.η,n,γ,l,_k,A.params,A.lB)
-            for ik1 in 1:A.nq, iq in 1:A.q
-                k1 = bm.latt.k2[ik1+(iq-1)*A.nq]
-                Wz[:,iH,r,l,iq,ik1,ik2] += expfactor * exp(1im*2π*k1*s) * Φz 
+    for iη in 1:A.nη
+        for ik2 in 1:A.nq, l in 1:A.nl, r in 1:A.p, iH in 1:A.nH 
+            Kr = (l==1) ? (3-2iη)*A.params.Kb : (3-2iη)*A.params.Kt
+            n,γ = inγ(iH)
+            p2 = A.latt.k2[ik2+(r-1)*A.nq]
+            for s in svec 
+                _k = (A.latt.k2[ik2+(r-1)*A.nq] - s*A.p/A.q ) * A.params.g2
+                expfactor = exp(1im * 2π * s * (-p2*projector_para(A.params.a1,A.params.a2)/abs(A.params.a2)) ) * 
+                                exp(1im *s^2/2 *projector_para(A.qϕ,A.params.a1)*abs(A.params.a1)) * 
+                                exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) 
+                Φz = Ψ(_z,η,n,γ,l,_k,A.params,A.lB)
+                for ik1 in 1:A.nq, iq in 1:A.q
+                    k1 = A.latt.k2[ik1+(iq-1)*A.nq]
+                    Wz[:,iH,r,l,iq,ik1,ik2] += expfactor * exp(1im*2π*k1*s) * Φz 
+                end
             end
         end
+        A.W[:,:,iz,iη] = reshape(Wz,2,:)
     end
-    A.W[:,:,iz] = reshape(Wz,2,:)
     return nothing 
 end
 
@@ -126,9 +127,9 @@ function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Pa
         end
     elseif η == -1 
         if n == 0
-            ψ .= ComplexF64[Φ(n,xtilde); 0]
+            ψ .= ComplexF64[Φ(n,xtilde); 0] *(3-2l)
         else
-            ψ .= ComplexF64[Φ(n,xtilde);1im*γ*exp(-1im*θstrain)*Φ(n-1,xtilde)]/sqrt(2)
+            ψ .= ComplexF64[Φ(n,xtilde);1im*γ*exp(-1im*θstrain)*Φ(n-1,xtilde)]/sqrt(2) *(3-2l)
         end
     else
         println("errow with η value")

@@ -57,11 +57,10 @@ end
 
 # plot spectrum 
 function plot_LL_spectrum()
-    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4,4))
-    ϕmin = 1//40
-    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕs = unique(sort([p//q for q in 1:26 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
@@ -138,9 +137,9 @@ plot_wannier(true)
 
 
 function plot_dispersion(flag::Bool=false)
-    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    ϕs = unique(sort([p//q for q in 1:36 for p in 1:q]))
     
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
@@ -148,10 +147,10 @@ function plot_dispersion(flag::Bool=false)
 
     fig,ax = subplots(2,2,figsize=(8,4))
     for iϕ in eachindex(ϕs)
-        if ϕs[iϕ] == 1//3
+        if ϕs[iϕ] == 1//6
             ϕ = ϕs[iϕ]
             p,q = numerator(ϕ), denominator(ϕ)
-            nq = 40÷q
+            nq = 36÷q
             ϵ0 = reshape(data["$(ϕ)"],2q,nq,nq)
             ϵ = zeros(Float64,2q,2nq,2nq)
             tmpϵ = reshape(ϵ,2q,nq,2,nq,2)
@@ -162,7 +161,7 @@ function plot_dispersion(flag::Bool=false)
             lin_k2 = ((1:2nq).-1)./(nq*q)
             kvec = (reshape(lin_k1,:,1)*params.g1 .+ reshape(lin_k2,1,:)*params.g2) ./abs(params.g1)
             for i in 1:4
-                pl = ax[(i-1)÷2+1,mod(i-1,2)+1].contourf(real(kvec),imag(kvec),ϵ[i,:,:],levels=20)
+                pl = ax[(i-1)÷2+1,mod(i-1,2)+1].contourf(real(kvec),imag(kvec),ϵ[i,:,:],levels=20,cmap="bwr")
                 κs = [(params.Kt+params.g1) / abs(params.g1) / q ]
                 ax[(i-1)÷2+1,mod(i-1,2)+1].plot(real(κs),imag(κs),"k+")
                 # colorbar(pl,ax=ax[(i-1)÷2+1,mod(i-1,2)+1],shrink=0.8)
