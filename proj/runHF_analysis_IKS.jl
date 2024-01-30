@@ -92,7 +92,7 @@ mtg = load(mtg_data,"MTG");
 
 fig, ax = subplots(1,1,figsize=(5,8))
 ldos1 = reshape(sum(ldos,dims=3),size(rvec))
-# ldos1 = ldos[:,:,2]
+ldos1 = ldos[:,:,2]
 # ldos2 = ldos[:,:,2]
 ldos1 ./= maximum(ldos1)
 
