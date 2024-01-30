@@ -18,20 +18,20 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -0.5,-3
-p,q = 1,8
+s,t = -2/3,-3
+p,q = 1,6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-# plot_spectra(metadata;savename="test.png")
-# plot_density_matrix_bm(metadata,ik=1)
+plot_spectra(metadata;savename="test.png")
+# plot_density_matrix_bm(metadata,ik=3)
 # test_tL2_breaking(metadata)
 # plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 
-# P = reshape(load(metadata,"hf").P,2q,2,2,2q,2,2,:);
+# P = reshape(load(metadata,"hf").P,8q,8q,q,:);
 
 # p_subblock = P[:,2,1,:,2,1,:];
 
@@ -63,7 +63,6 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     for ik in 1:size(U1,3)
         Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
     end
-    println(size(hf.H,3))
 
     ## real space info 
     mtg = load(mtg_data,"MTG");
@@ -87,14 +86,15 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     return rvec, ldos
 end
 
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-5.0);
+μ = load(metadata,"hf").μ
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,μ-5.0);
 mtg = load(mtg_data,"MTG");
 
 fig, ax = subplots(1,1,figsize=(5,8))
 ldos1 = reshape(sum(ldos,dims=3),size(rvec))
-# ldos1 = ldos[:,:,1] ./ maximum(ldos)
-# ldos2 = ldos[:,:,2] ./ maximum(ldos)
-ldos1 ./= maximum(ldos)
+# ldos1 = ldos[:,:,2]
+# ldos2 = ldos[:,:,2]
+ldos1 ./= maximum(ldos1)
 
 for jj in -3:3
     pl=ax.pcolormesh(real(rvec).+jj*real(params.a1), imag(rvec).+jj*imag(params.a1),ldos1, cmap="bwr",vmin=0,vmax=1)
