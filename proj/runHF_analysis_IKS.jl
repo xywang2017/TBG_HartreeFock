@@ -38,7 +38,7 @@ p_subblock = P[:,2,1,:,2,1,:];
 _pratio = p_subblock[:,:,4]./ p_subblock[:,:,6]
 
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
-mtg_data = "NonInt/105_strain/_1_8_mtg_metadata.jld2"
+mtg_data = "NonInt/105_strain/_1_8_mtg_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
     hf = load(metadata,"hf");
     U2 = zeros(ComplexF64,size(hf.H));
@@ -74,7 +74,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
         ψ[sublatt,ir,ib,ik] = sum(view(W,sublatt,:,ik,ir,:,:).*reshape(view(uvec,:,ib,ik),:,hf.nη,hf.ns))
     end
 
-    rvec = reshape(mtg.coord.z,mtg.coord.lr,:);
+    rvec = reshape(mtg.coord.x,:,1) .+ 1im*reshape(mtg.coord.y,1,:)
     ir = reshape(1:length(rvec),size(rvec))
     ldos = zeros(Float64,size(rvec,1),size(rvec,2),2)
     for x in 1:size(ldos,1), y in 1:size(ldos,2), jj in 1:2 
@@ -91,13 +91,13 @@ mtg = load(mtg_data,"MTG");
 fig, ax = subplots(1,2,figsize=(4,4))
 ldos ./= maximum(ldos)
 for i in 1:2
-    pl=ax[i].pcolormesh(real(rvec) ./abs(params.a1), imag(rvec)./abs(params.a1),ldos[:,:,i], cmap="bwr",vmin=0,vmax=1)
-    point1 = mtg.coord.z[1]
-    point2 = point1 + params.a1
-    # for j in 1:7
-    #     point_pair = ([point1 ; point2] .+ j* params.a2 ) ./ abs(params.a1)
-    #     ax[i].plot(real(point_pair),imag(point_pair),":",c="k")
-    # end
+    pl=ax[i].pcolormesh(real(rvec), imag(rvec),ldos[:,:,i], cmap="bwr",vmin=0,vmax=1)
+    point1 = mtg.coord.x[1] + 1im*mtg.coord.y[1]
+    point2 = point1 + 1
+    for j in 1:7
+        point_pair = [point1 ; point2] .+ j* 1im 
+        ax[i].plot(real(point_pair),imag(point_pair),":",c="k")
+    end
     # ax[i].plot([0],[0],"k+")
     ax[i].axis("equal")
     if i==2 
