@@ -24,21 +24,21 @@ p,q = 1,8
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectra(metadata;savename="test.png")
-plot_density_matrix_bm(metadata,ik=1)
-test_tL2_breaking(metadata)
-plot_density_matrix_global_order_parameters(metadata)
+# plot_spectra(metadata;savename="test.png")
+# plot_density_matrix_bm(metadata,ik=1)
+# test_tL2_breaking(metadata)
+# plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 
-P = reshape(load(metadata,"hf").P,2q,2,2,2q,2,2,:);
+# P = reshape(load(metadata,"hf").P,2q,2,2,2q,2,2,:);
 
-p_subblock = P[:,2,1,:,2,1,:];
+# p_subblock = P[:,2,1,:,2,1,:];
 
-_pratio = p_subblock[:,:,4]./ p_subblock[:,:,6]
+# _pratio = p_subblock[:,:,4]./ p_subblock[:,:,6]
 
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
-mtg_data = "NonInt/105_strain/_1_8_mtg_metadata.jld2";
+mtg_data = "NonInt/105_strain/_$(p)_$(q)_mtg_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
     hf = load(metadata,"hf");
     U2 = zeros(ComplexF64,size(hf.H));
@@ -63,6 +63,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     for ik in 1:size(U1,3)
         Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
     end
+    println(size(hf.H,3))
 
     ## real space info 
     mtg = load(mtg_data,"MTG");
@@ -74,7 +75,8 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
         ψ[sublatt,ir,ib,ik] = sum(view(W,sublatt,:,ik,ir,:,:).*reshape(view(uvec,:,ib,ik),:,hf.nη,hf.ns))
     end
 
-    rvec = reshape(mtg.coord.x,:,1) .+ 1im*reshape(mtg.coord.y,1,:)
+    rvec = reshape(mtg.coord.z,mtg.coord.lr,:)
+    # rvec = reshape(mtg.coord.x1,:,1) .+ 1im*reshape(mtg.coord.x2,1,:)
     ir = reshape(1:length(rvec),size(rvec))
     ldos = zeros(Float64,size(rvec,1),size(rvec,2),2)
     for x in 1:size(ldos,1), y in 1:size(ldos,2), jj in 1:2 
@@ -85,25 +87,22 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     return rvec, ldos
 end
 
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,0.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-5.0);
 mtg = load(mtg_data,"MTG");
 
-fig, ax = subplots(1,2,figsize=(4,4))
-ldos ./= maximum(ldos)
-for i in 1:2
-    pl=ax[i].pcolormesh(real(rvec), imag(rvec),ldos[:,:,i], cmap="bwr",vmin=0,vmax=1)
-    point1 = mtg.coord.x[1] + 1im*mtg.coord.y[1]
-    point2 = point1 + 1
-    for j in 1:7
-        point_pair = [point1 ; point2] .+ j* 1im 
-        ax[i].plot(real(point_pair),imag(point_pair),":",c="k")
-    end
-    # ax[i].plot([0],[0],"k+")
-    ax[i].axis("equal")
-    if i==2 
-        colorbar(pl,ax=ax[i],shrink=0.6)
-    end
+fig, ax = subplots(1,1,figsize=(5,8))
+ldos1 = reshape(sum(ldos,dims=3),size(rvec))
+# ldos1 = ldos[:,:,1] ./ maximum(ldos)
+# ldos2 = ldos[:,:,2] ./ maximum(ldos)
+ldos1 ./= maximum(ldos)
+
+for jj in -3:3
+    pl=ax.pcolormesh(real(rvec).+jj*real(params.a1), imag(rvec).+jj*imag(params.a1),ldos1, cmap="bwr",vmin=0,vmax=1)
 end
+points = reshape(-3:3,:,1)*params.a1 .+ reshape(-3:3,1,:)*params.a2 
+ax.scatter(real(points),imag(points),s=5,c="k")
+ax.axis("equal")
+colorbar(pl,shrink=0.6)
 tight_layout()
 display(fig)
 close(fig)

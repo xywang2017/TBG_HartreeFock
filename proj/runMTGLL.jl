@@ -11,7 +11,7 @@ str = "K" #ARGS[1]
 w0 = 0.7 #parse(Float64,ARGS[2])*0.1
 w0str = "07" #ARGS[2]
 p = 1 #parse(Int,ARGS[3])
-q = 8 #parse(Int,ARGS[4])
+q = 6 #parse(Int,ARGS[4])
 ϕ = p//q
 twist_angle = 1.05  # parse(Float64,ARGS[5])
 _is_strain = "strain" # ARGS[6]
@@ -40,6 +40,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     end
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata.jld2")
+    # fname = ""
     println(fname)
     if isequal(_is_strain,"nostrain")
         params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
@@ -64,14 +65,15 @@ function compute_mtg(bm::bmLL,ϕ::Rational,str::String,w0::Float64,w0str::String
         mkpath(joinpath(fpath,"$(foldername)"))
     end
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_mtg_metadata.jld2")
-    mtg = constructMTG(bm;lr=16,fname=fname)
+    mtg = constructMTG(bm;lr=10,fname=fname)
     return mtg
 end
 
 mtg = compute_mtg(bm,ϕ,str,w0,w0str);
 
 
-rvec = reshape(mtg.coord.z,mtg.coord.lr,:);
+# rvec = reshape(mtg.coord.x1,:,1) .+ 1im*reshape(mtg.coord.x2,1,:)
+rvec = reshape(mtg.coord.z,mtg.coord.lr,:)
 uvec = reshape(bm.vec,bm.nH*bm.p,2,2bm.q,bm.q*bm.nq^2);
 ψ = zeros(ComplexF64,2,2,2bm.q,bm.q*bm.nq^2,mtg.coord.nr);
 W = reshape(mtg.W,2,bm.nH*bm.p,2,bm.q*bm.nq^2,mtg.coord.nr,2);
@@ -85,14 +87,11 @@ for i in 1:4
     idx = 4
     vmax = maximum(abs2.(ψ[:,:,idx,1,:]))
     r,c = (i-1)%2 + 1, (i-1)÷2 + 1
-    pl=ax[i].pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(abs2.(ψ[r,c,idx,1,:]),mtg.coord.lr,:), cmap="bwr",vmin=0,vmax=vmax)
-    point1 = mtg.coord.z[1]
-    point2 = point1 + mtg.params.a1
-    for j in 1:7
-        ax[i].plot((real([point1;point2]).+j*real(mtg.params.a2))./abs(mtg.params.a1),(imag([point1;point2]).+j*imag(mtg.params.a2))./abs(mtg.params.a1),":",c="gray")
-    end
+    pl=ax[i].pcolormesh(real(rvec), imag(rvec), reshape(abs2.(ψ[r,c,idx,1,:]),mtg.coord.lr,:), cmap="bwr",vmin=0,vmax=vmax)
     ax[i].plot([0],[0],"k+")
-    colorbar(pl,ax=ax[i],shrink=0.6)
+    if i==4
+        colorbar(pl,ax=ax[i],shrink=0.6)
+    end
     ax[i].axis("equal")
 end
 tight_layout()
@@ -100,13 +99,8 @@ display(fig)
 close(fig)
 
 
-fig = figure(figsize=(4,4))
-pl=pcolormesh(real(rvec) ./abs(mtg.params.a1), imag(rvec)./abs(mtg.params.a1), reshape(sum(abs2.(ψ),dims=(1,2,3,4)),mtg.coord.lr,:), cmap="bwr")
-point1 = mtg.coord.z[1]
-point2 = point1 + mtg.params.a1
-for i in 1:7
-    plot((real([point1;point2]).+i*real(mtg.params.a2))./abs(mtg.params.a1),(imag([point1;point2]).+i*imag(mtg.params.a2))./abs(mtg.params.a1),"k:")
-end
+fig = figure(figsize=(8,8))
+pl=pcolormesh(real(rvec), imag(rvec),reshape(sum(abs2.(ψ),dims=(1,2,3,4)),mtg.coord.lr,:), cmap="bwr")
 plot([0],[0],"k+")
 colorbar(pl,shrink=0.6)
 axis("equal")

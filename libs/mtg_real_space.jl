@@ -1,4 +1,5 @@
 include("bmLL.jl")
+using SpecialFunctions
 
 mutable struct Coords 
     z::Vector{ComplexF64}
@@ -140,10 +141,10 @@ end
 
 function Φ(n::Int,x::Float64)
     if n < 150
-        ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*sf_lnfact(n))*hermiteh(n,x)
+        ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*loggamma(n+1))*hermiteh(n,x)
     else
-        # ψ=2^(-n/2)/(π^(1/4)*factorial(big(n))^(1/2))*exp(-x^2/2)*hermiteh(big(n),x)
-        ψ = 0.0
+        ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*loggamma(n+1))*hermiteh(n,big(x))
+        # ψ = 0.0
     end
     return (abs(ψ)<1e-16) ? 0.0 : Float64(ψ)
 end
