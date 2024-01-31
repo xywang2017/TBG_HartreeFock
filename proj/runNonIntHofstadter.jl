@@ -5,37 +5,38 @@ include(joinpath(fpath,"libs/bmLL.jl"))
 
 BLAS.set_num_threads(1)
 
-ϕmin = 1//36
+ϕmin = 1//24
 str = "K"
 w0 = 0.7
 w0str = "07"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = ""
-ϕs = unique(sort([p//q for q in 1:36 for p in 1:q]))
-# ϕs = ϕs[ϕs .> ϕmin]
+ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs .<=0.5]
+ϕs = ϕs[ϕs .>=1//8]
 
-twist_angle =  138
+twist_angle =  103
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "NonInt/Hofstadter/$(twist_angle)_strain"
+    # fname = "NonInt/Hofstadter/$(twist_angle)_strain"
+    fname = "NonInt/$(twist_angle)_strain"
     if !isdir(fname)
         mkpath(fname)
     end
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 36÷denominator(ϕ) 
+    nq = 12÷denominator(ϕ) 
     # if q ==7 
     #     nq =2  
     # end
     println("p= ",p,", q= ",q,", nq= ",nq)
-    # fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
-    fname = ""
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
+    # fname = ""
+    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
+        _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true)
     return bm.spectrum
 end
 
@@ -60,10 +61,10 @@ function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4,4))
-    ϕs = unique(sort([p//q for q in 1:26 for p in 1:q]))
+    ϕs = unique(sort([p//q for q in 1:24 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 

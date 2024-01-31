@@ -1,5 +1,5 @@
 @with_kw mutable struct Params
-    vf::Float64 = 2482 #2135.4  #2445.38  #2135.4 # 2422.76   # Weizmann
+    vf::Float64 = 2125.6 #2482 #2135.4  #2445.38  #2135.4 # 2422.76
     dθ::Float64 = 1.06π/180
     μ::Float64 = 0.0
     w0::Float64 = 77 # 110*0.8 ## AA tunneling chiral limit
