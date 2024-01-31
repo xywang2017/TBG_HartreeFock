@@ -59,10 +59,10 @@ function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4,4))
-    ϕs = unique(sort([p//q for q in 1:24 for p in 1:q]))
+    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
-    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
@@ -89,18 +89,18 @@ plot_LL_spectrum()
 
 # Wannier plot
 function plot_wannier(flag=false)
-    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
+    fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     ϕmin = 1//40
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
-    # ϕs = ϕs[ϕs .<= 0.5]
+    ϕs = ϕs[ϕs .<= 0.5]
     
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
     fig = figure(figsize=(4,4))
-    γ = 0.1   # meV
+    γ = 0.05   # meV
     # E = collect(-50:0.1:50)
     E = collect(-20:0.1:20)
     νs = zeros(Float64,length(E),length(ϕs))
@@ -114,12 +114,12 @@ function plot_wannier(flag=false)
             νs[iE,iϕ] = 8/π * sum(atan.((ϵ .- E[iE]) ./ γ)) / (length(ϵ))
         end
     end
-    pcolor(νs,repeat(ϕs',size(νs,1)),1 ./ (ρνϕ).^(1/6),cmap="Blues_r" )
+    pcolor(νs,repeat(ϕs',size(νs,1)),1 ./ (ρνϕ).^(1/8),cmap="bwr" )
     # pcolormesh(νs.*4,ϕs,ρνϕ')
     # colorbar()
     xlim([-4,4])
     xticks(collect(-3:3))
-    ylim([0.0,1.02])
+    ylim([0.0,0.55])
     xlabel(L"n/n_s")
     ylabel(L"ϕ/ϕ_0")
     tight_layout()
