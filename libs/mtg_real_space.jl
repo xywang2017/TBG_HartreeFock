@@ -18,13 +18,13 @@ function initCoords(A::Coords,params::Params,q::Int;lr::Int = 1)
     # A.x1 = collect(0:(lr-1)) ./ (lr)
 
     lmax = (lr-1) /2
-    # A.x1 = collect(-lmax:lmax) ./ lr 
-    # lmax = (q*lr-1)/2
-    # A.x2 = collect(-lmax:lmax) ./ lr 
+    A.x1 = collect(-lmax:lmax) ./ lr 
+    lmax = (q*lr-1)/2
+    A.x2 = collect(-lmax:lmax) ./ lr 
 
-    A.x1 = collect(-lmax:lmax) ./ (2lr) 
-    lmax = (lr-1)/2
-    A.x2 = collect(-lmax:lmax) ./ (2lr) 
+    # A.x1 = collect(-lmax:lmax) ./ (2lr) 
+    # lmax = (lr-1)/2
+    # A.x2 = collect(-lmax:lmax) ./ (2lr) 
 
     A.z = (reshape(A.x1,:,1)*params.a1 .+ reshape(A.x2,1,:)*params.a2)[:]
     A.nr = length(A.z)

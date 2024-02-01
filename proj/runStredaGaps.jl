@@ -5,29 +5,25 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
-foldername = dir*"zeeman/$(twist_angle)_nostrain"
+twist_angle = 103
+foldername = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 initParamsWithStrain(params)
 
 
 w0 = "07"
 
-# ϕs = [1//8;1//6;1//5;1//4;2//7;1//3;2//5;3//7;1//2]
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-# ϕs = [1//3;1//4]
+ϕs = ϕs[ϕs.>=1//8]
 sts = []
-for s in -3:1:3, t in -12:12
+for s in -3:3, t in -12:12
     push!(sts,[s,t])
 end
-# for st in [[-0.5,-3],[-2/3,-3],[-1.5,-2],[-2.5,-1],[-3.5,0]]
-#     push!(sts,st)
-# end
 sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
@@ -76,7 +72,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-3,0]]
+sts = [[-2,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]

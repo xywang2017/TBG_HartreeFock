@@ -29,16 +29,16 @@ else
 end
 
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-if ! isdir(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
-    mkpath(joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)"))
+if ! isdir(joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)"))
+    mkpath(joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)"))
     # mkpath(dir*"zeeman/$(foldername)/_$(p)_$(q)")
 end
 
 if isequal(_is_symmetric,"symmetric")
-    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_new_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
-    savename = joinpath(fpath,"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 end
 
@@ -63,17 +63,17 @@ println("Running parameters: ","ϕ=",ϕ,", ν=",ν,", Init=",flag,", w0=",w0)
 println(savename)
 
 if isequal(_is_strain,"strain")
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+    params = Params(ϵ=0.001,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110)
 elseif isequal(_is_strain,"nostrain")
-    params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110,vf=2482)
+    params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=parse(Float64,ARGS[5])*0.1*110)
 end
 initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"MinHao/NonInt/$(foldername)/",_Init=_Init,savename=savename)
 else
-    savename0 = dir*"zeeman/128_$(_is_strain)/_$(p)_$(q)/2_random_init_HF_1_3_nu_-1667.jld2"
+    savename0 = dir*"MinHao/128_$(_is_strain)/_$(p)_$(q)/2_random_init_HF_1_3_nu_-1667.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)
