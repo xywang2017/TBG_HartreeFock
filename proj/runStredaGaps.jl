@@ -9,7 +9,7 @@ dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 103
-foldername = dir*"MinHao/$(twist_angle)_strain"
+foldername = dir*"MinHao/$(twist_angle)_strain_phi30"
 # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 initParamsWithStrain(params)
@@ -28,7 +28,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(4,3))
+fig = figure(figsize=(6,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
