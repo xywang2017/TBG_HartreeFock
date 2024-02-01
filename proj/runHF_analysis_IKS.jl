@@ -19,15 +19,15 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -0.5,-3
-p,q = 1,8
+p,q = 1,4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 # plot_spectra(metadata;savename="test.png")
-# plot_density_matrix_bm(metadata,ik=1)
+# plot_density_matrix_bm(metadata,ik=4)
 # test_tL2_breaking(metadata)
-plot_density_matrix_global_order_parameters(metadata)
+# plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 
@@ -87,7 +87,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
 end
 
 μ = load(metadata,"hf").μ
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,0.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,μ-10.0);
 mtg = load(mtg_data,"MTG");
 
 
