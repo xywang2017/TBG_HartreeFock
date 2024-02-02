@@ -19,7 +19,7 @@ w0 = "07"
 
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-ϕs = ϕs[ϕs.>=1//8]
+# ϕs = ϕs[ϕs.>=1//8]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -37,10 +37,13 @@ for ϕ in ϕs
     gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
     fillings = unique(round.(fillings,digits=8))
-    fillings = fillings[fillings .<1e-5]
-    fillings = fillings[fillings .>-4]
+    # fillings = fillings[fillings .<1e-5]
+    # fillings = fillings[fillings .>-4]
+    fillings = fillings[abs.(fillings) .<4]
     fillings0 = round.(fillings,digits=3)
-    # println(fillings0)
+    if ϕ == 1//12
+        println(length(fillings0) )
+    end
     ns = Float64[]
     for ν in fillings0 
         νstr = round(Int,1000*ν)

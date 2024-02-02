@@ -110,6 +110,7 @@ function constructbmLL(A::bmLL,params::Params;
             tmpΛ0 = reshape(A.Λ,2A.q,A.q*A.nq^2,2A.q,A.q*A.nq^2)
             # for m in -ng:ng, n in -ng*A.q:ng*A.q 
             for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
+                @time begin
                 if mod(n,A.q) == 0
                     println("m:",m," n:",n÷A.q)
                 end
@@ -123,6 +124,7 @@ function constructbmLL(A::bmLL,params::Params;
                         file["$(m)_$(n)"] = Λ
                     end
                 end
+            end
             end
         end
     end
