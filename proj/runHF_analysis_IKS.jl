@@ -22,9 +22,9 @@ s,t = -0.5,-3
 p,q = 1,4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-# plot_spectra(metadata;savename="test.png")
+plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
@@ -95,7 +95,7 @@ mtg = load(mtg_data,"MTG");
 
 fig, ax = subplots(1,1,figsize=(5,8))
 ldos1 = reshape(sum(ldos,dims=3),size(rvec))
-ldos1 = ldos[:,:,2]
+# ldos1 = ldos[:,:,2]
 # ldos2 = ldos[:,:,2]
 ldos1 ./= maximum(ldos1)
 
