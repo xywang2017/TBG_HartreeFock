@@ -11,7 +11,7 @@ str = "K" #ARGS[1]
 w0 = 0.7 #parse(Float64,ARGS[2])*0.1
 w0str = "07" #ARGS[2]
 p = 1 #parse(Int,ARGS[3])
-q = 4 #parse(Int,ARGS[4])
+q = 8 #parse(Int,ARGS[4])
 ϕ = p//q
 twist_angle = 1.03  # parse(Float64,ARGS[5])
 _is_strain = "nostrain" # ARGS[6]
@@ -65,7 +65,7 @@ function compute_mtg(bm::bmLL,ϕ::Rational,str::String,w0::Float64,w0str::String
         mkpath(joinpath(fpath,"$(foldername)"))
     end
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_mtg_metadata.jld2")
-    mtg = constructMTG(bm;lr=16,fname=fname)
+    mtg = constructMTG(bm;lr=10,fname=fname)
     return mtg
 end
 
