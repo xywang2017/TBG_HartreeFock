@@ -13,16 +13,16 @@ twist_angle = 103
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 dir = ""
-foldername = dir*"MinHao/$(twist_angle)_nostrain"
+foldername = dir*"MinHao/$(twist_angle)_nostrain_epsilonr_15"
 params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -0.5,-3
-p,q = 1,4
+s,t = -1.5,-1
+p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
@@ -87,7 +87,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
 end
 
 μ = load(metadata,"hf").μ
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,0.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-10.0);
 mtg = load(mtg_data,"MTG");
 
 
@@ -108,5 +108,6 @@ ax.axis("equal")
 ax.axis("off")
 # colorbar(pl,shrink=0.6)
 tight_layout()
+savefig("test.png",dpi=600,transparent=false)
 display(fig)
 close(fig)

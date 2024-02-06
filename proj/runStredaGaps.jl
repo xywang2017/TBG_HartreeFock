@@ -37,13 +37,10 @@ for ϕ in ϕs
     gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
     fillings = unique(round.(fillings,digits=8))
-    # fillings = fillings[fillings .<1e-5]
-    # fillings = fillings[fillings .>-4]
-    fillings = fillings[abs.(fillings) .<4]
+    fillings = fillings[fillings .<1e-5]
+    fillings = fillings[fillings .>-4]
+    # fillings = fillings[abs.(fillings) .<4]
     fillings0 = round.(fillings,digits=3)
-    if ϕ == 1//12
-        println(length(fillings0) )
-    end
     ns = Float64[]
     for ν in fillings0 
         νstr = round(Int,1000*ν)
@@ -66,7 +63,7 @@ ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
-# savefig("105.png",transparent=false,dpi=600)
+savefig("105.png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)

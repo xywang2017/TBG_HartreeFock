@@ -24,14 +24,14 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 40÷denominator(ϕ) 
+    nq = 24÷denominator(ϕ) 
     # if q ==7 
     #     nq =2  
     # end
     println("p= ",p,", q= ",q,", nq= ",nq)
     # fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     fname = ""
-    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
+    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
@@ -58,11 +58,11 @@ end
 function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fig = figure(figsize=(4,4))
-    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
+    fig = figure(figsize=(6,6))
+    ϕs = unique(sort([p//q for q in 1:36 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
-    params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
+    # params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
@@ -79,7 +79,7 @@ function plot_LL_spectrum()
     xlabel(L"ϕ/ϕ_0")
     ylabel("E (meV)")
     tight_layout() 
-    savefig("test.png",dpi=600,transparent=true)
+    savefig("test.png",dpi=600,transparent=false)
     display(fig)
     close(fig)
     return nothing
