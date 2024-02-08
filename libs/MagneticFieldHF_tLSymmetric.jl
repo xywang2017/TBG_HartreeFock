@@ -50,7 +50,11 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
+<<<<<<< Updated upstream
     ϵr = 30.0
+=======
+    ϵr = 15.0
+>>>>>>> Stashed changes
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 
@@ -95,6 +99,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     hf.nq = 12÷hf.q
     if hf.q==7 
         hf.nq = 2
+    end
+    if hf.nq ==0 
+        hf.nq = 1
     end
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]

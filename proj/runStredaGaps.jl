@@ -9,17 +9,17 @@ dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 103
-foldername = dir*"MinHao/$(twist_angle)_nostrain"
-params = Params(ϵ=0.0,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
-# params = Params(ϵ=0.001,Da=-4100,φ=30.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
+foldername = dir*"MinHao/$(twist_angle)_strain"
+# params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-# ϕs = ϕs[ϕs.>=1//8]
+ϕs = ϕs[ϕs.>=1//8]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -28,11 +28,12 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(6,4))
+fig = figure(figsize=(5,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
-for ϕ in ϕs 
+for iϕ in eachindex(ϕs)
+    ϕ = ϕs[iϕ] 
     p,q = numerator(ϕ), denominator(ϕ)
     gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
@@ -52,19 +53,24 @@ for ϕ in ϕs
         end
     end
     if q%2 ==0
-        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+        scatter(ns,ones(length(ns))*iϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
     else 
-        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+        scatter(ns,ones(length(ns))*iϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
     end
 end
 # scatter([-0.5-3*1/3],[1/3])
-xlim([-4.3,0.3])
-ylim([0.05,0.55])
+# xlim([-4.3,0.3])
+# ylim([0.05,0.55])
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
+<<<<<<< Updated upstream
 savefig("105.png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+=======
+# savefig("105.png",transparent=false,dpi=600)
+savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+>>>>>>> Stashed changes
 display(fig)
 close(fig)
 
@@ -72,7 +78,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-1]]
+sts = [[-0.5,-3]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]
