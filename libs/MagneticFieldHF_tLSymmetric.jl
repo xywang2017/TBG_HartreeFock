@@ -50,11 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-<<<<<<< Updated upstream
-    ϵr = 30.0
-=======
     ϵr = 15.0
->>>>>>> Stashed changes
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 

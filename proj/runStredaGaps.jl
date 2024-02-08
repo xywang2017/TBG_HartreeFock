@@ -64,13 +64,8 @@ end
 xlabel(L"n/n_s")
 ylabel(L"ϕ/ϕ_0")
 tight_layout()
-<<<<<<< Updated upstream
-savefig("105.png",transparent=false,dpi=600)
-# savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
-=======
 # savefig("105.png",transparent=false,dpi=600)
 savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
->>>>>>> Stashed changes
 display(fig)
 close(fig)
 
