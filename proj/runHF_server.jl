@@ -21,24 +21,27 @@ seed = ARGS[6]
 twist_angle = parse(Float64,ARGS[7])
 _is_strain = ARGS[8]
 _is_symmetric = ARGS[9]
+q1 = parse(Int,ARGS[10])
+q2 = parse(Int,ARGS[11])
+QIKS = q1 + 1im* q2
 
 if isequal(_is_symmetric,"symmetric")
     include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
 else
-    include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+    include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
 end
 
 foldername = @sprintf "%d_%s" round(Int,twist_angle*100) _is_strain
-if ! isdir(joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)"))
-    mkpath(joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)"))
+if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
+    mkpath(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
     # mkpath(dir*"zeeman/$(foldername)/_$(p)_$(q)")
 end
 
 if isequal(_is_symmetric,"symmetric")
-    savename = joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_new_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
-    savename = joinpath(fpath,"MinHao/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 end
 
@@ -71,10 +74,10 @@ initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"MinHao/NonInt/$(foldername)/",_Init=_Init,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
 else
     savename0 = dir*"MinHao/128_$(_is_strain)/_$(p)_$(q)/2_random_init_HF_1_3_nu_-1667.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename)
 end

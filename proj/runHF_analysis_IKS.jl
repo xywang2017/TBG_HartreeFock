@@ -1,7 +1,7 @@
 using PyPlot,JLD2
 using Printf 
 fpath = pwd()
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 #
@@ -13,16 +13,16 @@ twist_angle = 103
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 dir = ""
-foldername = dir*"MinHao/$(twist_angle)_strain"
+foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -3,0
-p,q = 2, 15
+p,q = 1, 8 
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
