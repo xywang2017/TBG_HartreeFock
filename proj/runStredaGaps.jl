@@ -53,9 +53,9 @@ for iϕ in eachindex(ϕs)
         end
     end
     if q%2 ==0
-        scatter(ns,ones(length(ns))*iϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
     else 
-        scatter(ns,ones(length(ns))*iϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
     end
 end
 # scatter([-0.5-3*1/3],[1/3])
