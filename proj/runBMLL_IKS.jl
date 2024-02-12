@@ -55,7 +55,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     end
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=0+0im)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS)
 
     return bm
 end
