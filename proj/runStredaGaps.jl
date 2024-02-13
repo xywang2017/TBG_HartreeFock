@@ -17,7 +17,7 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = ϕs[ϕs.>=1//8]
 sts = []
