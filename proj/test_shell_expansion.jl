@@ -6,9 +6,9 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Hartree Fock related 
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=1.20π/180,w1=110,w0=110*0.7,vf=2482)
 initParamsWithStrain(params)
-p, q = 1,10
+p, q = 2, 7
 # Λ1 = load(joinpath(fpath,"NonInt/105_strain/_$(p)_$(q)_K_metadata_v1.jld2"),"bmLL").Λ;
-jldopen(joinpath(fpath,"NonInt/105_strain/_$(p)_$(q)_K_metadata.jld2")) do file 
+jldopen(joinpath(fpath,"NonInt/105_nostrain/_$(p)_$(q)_Kprime_4_0_metadata.jld2")) do file 
     # for m in -3:3, n in -12:12 
     #     jm, jn = m +4, n + 3q + 1
     #     tmp = reshape(Λ1[:,:,:,jm,jn],2q,9,2q,9,:)[:,2,:,3,:]
@@ -21,7 +21,7 @@ jldopen(joinpath(fpath,"NonInt/105_strain/_$(p)_$(q)_K_metadata.jld2")) do file
     #         end
     #     end
     # end
-    m , n = 3, 3q 
+    m , n = 3, 21
     Λ = file["$(m)_$(n)"]
     fig = figure(figsize=(5,4))
     pl=imshow(abs.(Λ),origin="lower")
@@ -30,6 +30,7 @@ jldopen(joinpath(fpath,"NonInt/105_strain/_$(p)_$(q)_K_metadata.jld2")) do file
     axis("equal")
     display(fig)
     close(fig)
+    # println(keys(file))
 end
 
 
