@@ -8,7 +8,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 105
+twist_angle = 124
 # for twist_angle in twist_angles
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
