@@ -177,7 +177,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
 
             iter +=1
             
-            if iter > 500 || λ < 1e-3
+            if iter > 300 || λ < 1e-3
                 break 
             end
         # end
