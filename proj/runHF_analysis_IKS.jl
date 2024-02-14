@@ -8,7 +8,7 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 124
+twist_angle = 105
 # for twist_angle in twist_angles
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
@@ -18,11 +18,11 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2, 0
-p,q = 1, 8
+s,t = -0.5,-3
+p,q = 1, 3
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_random_tL_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
@@ -109,5 +109,17 @@ ax.axis("off")
 # colorbar(pl,shrink=0.6)
 tight_layout()
 savefig("test.png",dpi=600,transparent=false)
+display(fig)
+close(fig)
+
+
+
+
+
+# ------------
+fig = figure(figsize=(4,3))
+contourf(hf.latt.k1[1:4],hf.latt.k2[1:4],reshape(hf.ϵk[8,:],4,4),cmap="bwr")
+colorbar()
+axis("equal")
 display(fig)
 close(fig)

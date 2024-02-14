@@ -76,7 +76,7 @@ function ZeemanUnit(params::Params)
     return V0 
 end
 
-function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
+function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,QIKS::Complex{Int}=0+0im,
         ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",savename::String="placeholder.txt",
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     p, q = numerator(ϕ), denominator(ϕ)
@@ -99,8 +99,11 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     if hf.nq ==0 
         hf.nq = 1
     end
+    if hf.q ==3 
+        hf.nq = 8 
+    end
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
-                   prefix*"_$(p)_$(q)_Kprime_metadata.jld2"]
+                   prefix*"_$(p)_$(q)_Kprime_0_0_metadata.jld2"]
     hf.lk = hf.nq^2
     
     hf.savename = savename

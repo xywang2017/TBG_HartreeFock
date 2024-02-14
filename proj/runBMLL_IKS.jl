@@ -41,6 +41,9 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     if q==7 
         nq = 2 
     end
+    if q ==3 
+        nq = 8
+    end
     println("p= ",p,", q= ",q,", nq= ",nq)
     if isequal(str,"K")
         fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata.jld2")
