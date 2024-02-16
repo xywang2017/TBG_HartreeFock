@@ -31,12 +31,13 @@ plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 
-# P = reshape(load(metadata,"hf").P,8q,8q,q,:);
+P = reshape(load(metadata,"hf").P,2q,4,2q,4,q,:);
 
-# p_subblock = P[:,2,1,:,2,1,:];
+p_subblock = P[:,2,:,3,:];
 
-# _pratio = p_subblock[:,:,4]./ p_subblock[:,:,6]
+_pratio = p_subblock[:,:,1]./ p_subblock[:,:,2]
 
+angle.(_pratio) * 180/π
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
 mtg_data = "MinHao/NonInt/103_nostrain/_$(p)_$(q)_mtg_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
