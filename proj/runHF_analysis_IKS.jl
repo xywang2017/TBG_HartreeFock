@@ -18,7 +18,7 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -0.5,-3
+s,t = -1,-2
 p,q = 1, 3
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
@@ -117,9 +117,15 @@ close(fig)
 
 
 # ------------
+hf = load(metadata,"hf");
 fig = figure(figsize=(4,3))
-contourf(hf.latt.k1[1:4],hf.latt.k2[1:4],reshape(hf.ϵk[8,:],4,4),cmap="bwr")
+kvec = reshape(hf.latt.k1[1:8],:,1) * hf.params.g1 .+ reshape(hf.latt.k2[1:8],1,:)*hf.params.g2
+contourf(real(kvec),imag(kvec),reshape(hf.ϵk[9,:],8,8))
+# pcolormesh(real(kvec),imag(kvec),reshape(hf.ϵk[8,:],8,8))
 colorbar()
+# contour(real(kvec),imag(kvec),reshape(hf.ϵk[8,:],8,8),[hf.μ])
+
 axis("equal")
 display(fig)
+savefig("abc.png",dpi=500)
 close(fig)
