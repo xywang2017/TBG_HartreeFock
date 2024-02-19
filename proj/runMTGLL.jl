@@ -14,7 +14,10 @@ p = 1 #parse(Int,ARGS[3])
 q = 4 #parse(Int,ARGS[4])
 ϕ = p//q
 twist_angle = 1.03  # parse(Float64,ARGS[5])
-_is_strain = "nostrain" # ARGS[6]
+_is_strain = "strain" # ARGS[6]
+q1 = 0 
+q2 = 0 
+q0 = q1 + 1im*q2 
 
 foldername =  @sprintf "MinHao/NonInt/%d_%s" round(Int,twist_angle*100) _is_strain 
 # calculate spectrum
@@ -38,9 +41,12 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     if q==7 
         nq = 2 
     end
+    if nq ==0 
+        nq = 1
+    end
     println("p= ",p,", q= ",q,", nq= ",nq)
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_metadata.jld2")
-    # fname = ""
+    fname = ""
     println(fname)
     if isequal(_is_strain,"nostrain")
         params = Params(ϵ=0.00,Da=0.0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
@@ -49,7 +55,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     end
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
-        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true)
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=false)
 
     return bm
 end
@@ -58,18 +64,19 @@ end
 bm = compute_bmLL(ϕ,str,w0,w0str);
 
 
-function compute_mtg(bm::bmLL,ϕ::Rational,str::String,w0::Float64,w0str::String)
+function compute_mtg(bm::bmLL,ϕ::Rational,str::String,w0::Float64,w0str::String,q0::Complex{Int}=0+0im)
     p = numerator(ϕ)
     q = denominator(ϕ)
     if !isdir(joinpath(fpath,"$(foldername)"))
         mkpath(joinpath(fpath,"$(foldername)"))
     end
-    fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_mtg_metadata.jld2")
-    mtg = constructMTG(bm;lr=10,fname=fname)
+    q1, q2 = real(q0), imag(q0)
+    fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_mtg_$(q1)_$(q2)_metadata.jld2")
+    mtg = constructMTG(bm;lr=16,fname=fname,q0=q0)
     return mtg
 end
 
-mtg = compute_mtg(bm,ϕ,str,w0,w0str);
+mtg = compute_mtg(bm,ϕ,str,w0,w0str,q0);
 
 
 # rvec = reshape(mtg.coord.x1,:,1) .+ 1im*reshape(mtg.coord.x2,1,:)

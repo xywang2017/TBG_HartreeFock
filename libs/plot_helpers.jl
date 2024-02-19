@@ -43,7 +43,7 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     # ylim([-0.4,0.8])
     # ylim([-25,35])
     tight_layout()
-    # savefig(savename,transparent=true)
+    savefig(savename,transparent=true,dpi=600)
     display(fig)
     close(fig)
     return Δ

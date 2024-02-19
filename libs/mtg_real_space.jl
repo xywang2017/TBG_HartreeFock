@@ -55,7 +55,7 @@ mutable struct MTG
     MTG() = new()
 end
 
-function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
+function constructMTG(bm::bmLL;lr::Int=1,fname::String="",q0::Complex{Int}=0+0im)
     A = MTG()
     A.nη = 2 # two valleys
     A.p = bm.p 
@@ -77,7 +77,7 @@ function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
     A.W = zeros(ComplexF64,2,A.nH*A.p*A.nl*A.q*A.nq^2,A.coord.nr,A.nη)  # first 2 is sublattice A, B basis
 
     for iz in 1:size(A.W,3)
-        constructMTGRealSpaceWavefunctions(iz,A)
+        constructMTGRealSpaceWavefunctions(iz,A,q0=q0)
     end
 
     if !isempty(fname)
@@ -89,11 +89,13 @@ function constructMTG(bm::bmLL;lr::Int=1,fname::String="")
 end
 
 
-function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG)
+function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG;q0::Complex{Int}=0+0im)
     Wz = zeros(ComplexF64,2,A.nH,A.p,A.nl,A.q,A.nq,A.nq) # first 2 is sublattice basis
     _z = A.coord.z[iz]
     svec = collect(-20:20) # range of s to consider in generating MTG eigenstates from LL wavefunctions 
-    for iη in 1:A.nη
+    for iη in 1:A.nη 
+        _valley = (iη==1) ? "K" : "Kprime"
+        constructLatticeIKS(A.latt,A.params;lk = A.nq*A.q,_valley=_valley,q0=q0)
         for ik2 in 1:A.nq, l in 1:A.nl, r in 1:A.p, iH in 1:A.nH 
             Kr = (l==1) ? (3-2iη)*A.params.Kb : (3-2iη)*A.params.Kt
             n,γ = inγ(iH)

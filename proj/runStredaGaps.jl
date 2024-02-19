@@ -5,11 +5,11 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"zeeman/$(twist_angle)_strain"
+twist_angle = 103
+foldername = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -17,9 +17,9 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-# ϕs = ϕs[ϕs.>=1//8]
+ϕs = ϕs[ϕs.>=1//8]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -28,7 +28,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig = figure(figsize=(5,4))
+fig, ax = subplots(figsize=(5,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -52,17 +52,18 @@ for iϕ in eachindex(ϕs)
             push!(gaps,Δ)
         end
     end
-    if q%2 ==0
-        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
-    else 
-        scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
-    end
+    ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
+ax.set_xlim([-4.3,0.3])
+ax.set_ylim([0.05,0.55])
+ax.set_xlabel(L"n/n_s")
+ax.set_ylabel(L"ϕ/ϕ_0")
+ax2 = ax.twinx()
+mn, mx = ax.get_ylim()
+ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
+ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
+ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
-xlim([-4.3,0.3])
-ylim([0.05,0.55])
-xlabel(L"n/n_s")
-ylabel(L"ϕ/ϕ_0")
 tight_layout()
 # savefig("105.png",transparent=false,dpi=600)
 savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
