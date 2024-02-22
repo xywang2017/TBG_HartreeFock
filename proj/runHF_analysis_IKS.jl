@@ -9,21 +9,21 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 120
+twist_angle = 105
 # for twist_angle in twist_angles
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = "MinHao/"
-foldername = dir*"$(twist_angle)_strain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2,0
-p,q = 1,7
+s,t = 0,-2
+p,q = 1,4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
@@ -31,14 +31,31 @@ plot_density_matrix_bm(metadata,ik=1)
 plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
+nq = 12÷q 
+q1s = collect(0:(nq*q-1))
+energies = []
+for q1 in q1s 
+    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_$(q1)_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+    push!(energies,load(metadata,"iter_energy")[end])
+end
+fig = figure(figsize=(4,3))
+plot(q1s./(nq*q),energies .- energies[1],"k--^")
+xlabel(L"q_1")
+ylabel(L"E(q_1)-E(0)\ (meV)")
+xlim([-0.09,1.09])
+tight_layout()
+savefig("test.png",dpi=600)
+display(fig)
+close(fig)
+
 
 P = reshape(load(metadata,"hf").P,2q,4,2q,4,:);
 
-p_subblock = P[:,2,:,3,:];
+p_subblock = P[:,3,:,4,:];
 
-_pratio = p_subblock[:,:,1]./ p_subblock[:,:,3]
+_pratio = p_subblock[:,:,3]./ p_subblock[:,:,1]
 
-angle.(_pratio) *180/π
+angle.(_pratio) /(2π) * 11
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
 mtg_data = "NonInt/120_strain/_$(p)_$(q)_mtg_0_0_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
@@ -154,9 +171,14 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
         end
     end
 
-    Utot = zeros(ComplexF64,size(U1))
-    for ik in 1:size(U1,3)
-        Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
+    # Utot = zeros(ComplexF64,size(U1))
+    # for ik in 1:size(U1,3)
+    #     Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
+    # end
+
+    Utot = zeros(ComplexF64,size(U2))
+    for ik in 1:size(U2,3)
+        Utot[:,:,ik] = view(U2,:,:,ik)
     end
 
     ldosLL = zeros(Float64,size(Utot,1))
@@ -171,16 +193,19 @@ ldosLL  = plot_orbital_decomposition(metadata,-8.0,0.0);
 
 
 # ----------------------------------------------------------------
-ldosLL_toplot = sum(reshape(ldosLL,:,p,2,2,2),dims=(2,3,4,5))[:];
+# ldosLL_toplot = sum(reshape(ldosLL,:,p,2,2,2),dims=(2,3,4,5))[:];
+ldosLL_toplot = sum(reshape(ldosLL,:,2,2),dims=(2,3))[:];
 fig, ax = subplots(figsize=(4,3))
-nLL = 25*q÷p
-idx = (-(nLL-1)):(nLL-1)
-tmp = ldosLL_toplot[1:2:end] + ldosLL_toplot[1:2:end]
-tmp = [ldosLL_toplot[(end-1):-2:2] + ldosLL_toplot[(end-1):-2:2]; tmp ]
-ax.plot(idx,tmp*100,"g.-",ms=2)
+# nLL = 25*q÷p
+# idx = (-(nLL-1)):(nLL-1)
+idx = (-q+1):q
+# tmp = ldosLL_toplot[1:2:end] + ldosLL_toplot[1:2:end]
+# tmp = [ldosLL_toplot[(end-1):-2:2] + ldosLL_toplot[(end-1):-2:2]; tmp ]
+# ax.plot(idx,tmp*100,"g.-",ms=2)
+ax.plot(idx,ldosLL_toplot,"g.-",ms=2)
 # ax.set_xlim([-79,79])
-ax.set_ylim([-2,19])
-ax.set_yticks(collect(0:5:15))
+# ax.set_ylim([-2,19])
+# ax.set_yticks(collect(0:5:15))
 ax.set_xlabel("LL index")
 ax.set_ylabel("Orbital weight (%)")
 ax.set_title("1.05 strain (0,-2) $(p)/$(q)")

@@ -231,7 +231,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # xticks(ticklist,ticklistLabels)
     # title(titlestr)
     tight_layout()
-    savefig(savename,dpi=600,transparent=true)
+    savefig(savename,dpi=600,transparent=false)
     display(fig)
     close(fig)
 
@@ -288,6 +288,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     # fig = figure(figsize=(2.5,2.5))
     P0 = view(hf.P,:,:,ik) + 0.5I
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    # pl = imshow(abs.(P0),vmin=0,vmax=1,cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
     for r in [2hf.q,4hf.q,6hf.q]
