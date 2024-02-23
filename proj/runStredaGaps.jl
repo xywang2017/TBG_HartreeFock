@@ -8,7 +8,7 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 124
 foldername = dir*"zeeman/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -53,6 +53,7 @@ for iϕ in eachindex(ϕs)
             push!(gaps,Δ)
         end
     end
+    # gaps[gaps .< 5.0] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 ax.set_xlim([-4.3,0.3])

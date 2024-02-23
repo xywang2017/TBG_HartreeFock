@@ -601,8 +601,7 @@ end
 
 
 ### strong coupling basis  valley spin
-function plot_density_matrix_strong_coupling_valley_spin_v1(fname::String,fname0::String)
-    ik = 1
+function plot_density_matrix_strong_coupling_valley_spin_v1(fname::String,fname0::String;ik::Int=1)
     hf = load(fname,"hf");
     hf0 = load(fname0,"hf");
     H0 = hf0.H

@@ -6,10 +6,11 @@ fpath = pwd()
 # include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 
 BLAS.set_num_threads(1)
-# dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir1 = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/ReRuns/"
-dir = ""
+dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
+dir1 = "/Volumes/Data/ReRuns/"
+# dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+# dir1 = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/ReRuns/"
+# dir = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -27,7 +28,7 @@ q2 = parse(Int,ARGS[11])
 QIKS = q1 + 1im* q2
 
 if isequal(_is_symmetric,"symmetric")
-    include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric.jl"))
+    include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric_IKS.jl"))
 else
     include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
 end
@@ -75,10 +76,10 @@ initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
 else
     savename0 = dir*"120_strain/_$(p)_$(q)/1_4_0_random_init_HF_1_10_nu_-2000.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename,QIKS=QIKS)
+    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename,QIKS=QIKS)
 end
