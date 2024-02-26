@@ -357,8 +357,15 @@ function init_P_strong_coupling(hf::HartreeFock;
     # this function initializes the density matrix into a Chern state of the strong coupling spectrum 
     # first need to recreate the density matrix based on CNP 
     hf.H .= H0
-    hf.P .= P0
-    update_P(hf;_oda=false)
+    hf.P .= P0 
+
+    # add a wavevector 
+    tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
+    for iq in 1:hf.q 
+        tmpP[:,3,:,4,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
+        tmpP[:,4,:,3,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
+    end
+    # update_P(hf;_oda=false)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
 end
