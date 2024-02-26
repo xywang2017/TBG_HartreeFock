@@ -360,11 +360,11 @@ function init_P_strong_coupling(hf::HartreeFock;
     hf.P .= P0 
 
     # add a wavevector 
-    tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
-    for iq in 1:hf.q 
-        tmpP[:,3,:,4,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
-        tmpP[:,4,:,3,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
-    end
+    # tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
+    # for iq in 1:hf.q 
+    #     tmpP[:,3,:,4,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
+    #     tmpP[:,4,:,3,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
+    # end
     # update_P(hf;_oda=false)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
