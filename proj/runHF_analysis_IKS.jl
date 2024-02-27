@@ -23,7 +23,7 @@ s,t = -2, 0
 p,q = 1, 8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="6_4_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
