@@ -166,8 +166,8 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
-    fig = figure(figsize=(3,2.5))
-    # fig = figure(figsize=(5,4))
+    # fig = figure(figsize=(3,2.5))
+    fig = figure(figsize=(5,4))
     ϵFs = Float64[]
     Δs = Float64[]
     cmap =["coolwarm","bwr"]
