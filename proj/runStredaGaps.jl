@@ -8,7 +8,7 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 124
 foldername = dir*"zeeman/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -67,7 +67,7 @@ ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-savefig("120.png",transparent=false,dpi=600)
+savefig("132.png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)

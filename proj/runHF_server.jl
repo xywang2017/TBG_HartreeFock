@@ -40,11 +40,11 @@ if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
 end
 
 if isequal(_is_symmetric,"symmetric")
-    # savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
-    # savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
-    savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 end
 
 ϕ = p//q 
