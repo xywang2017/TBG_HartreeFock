@@ -4,7 +4,7 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
@@ -67,11 +67,7 @@ ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-<<<<<<< Updated upstream
-savefig("132.png",transparent=false,dpi=600)
-=======
 savefig("138.png",transparent=false,dpi=600)
->>>>>>> Stashed changes
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)

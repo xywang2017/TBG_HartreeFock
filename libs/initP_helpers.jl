@@ -29,6 +29,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     # init_P_valley_spin_roation(hf;α=0.2)
     if isequal(_Init,"Random")
         init_P_random_rotation(hf;α=1.0)
+        # init_P_valley_spin_rotation(hf;α=1.0)
+        # init_P_valley_rotation(hf;α=1.0)
     elseif isequal(_Init,"Flavor U(4)")
         init_P_valley_spin_rotation(hf;α=0.0)
     end
@@ -166,7 +168,10 @@ function init_P_valley_spin_rotation(hf::HartreeFock;α::Float64=0.2)
     P0 = reshape(hf.P,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,:)
     vecs = zeros(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)
     for ik in 1:size(hf.P,3), iband in 1:size(P0,1)
-        vecs .= eigvecs(Hermitian(rand(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)))
+        # mat = rand(ComplexF64,hf.nη*hf.ns,hf.nη*hf.ns)
+        α1, α2 = rand(ComplexF64), rand(ComplexF64)
+        mat = [0 0 0 α1; 0 0 α2 0; 0 α2' 0 0; α1' 0 0 0]
+        vecs .= eigvecs(Hermitian(mat))
         P0[iband,:,iband,:,ik] .= (1-α)*view(P0,iband,:,iband,:,ik) + α* vecs' * view(P0,iband,:,iband,:,ik) * vecs
     end
     return nothing

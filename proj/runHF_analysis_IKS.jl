@@ -13,17 +13,17 @@ twist_angle = 138
 # for twist_angle in twist_angles
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
-# dir = ""
+dir = ""
 foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -2, 0
-p,q = 1, 8
+p,q = 1, 9
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="8_5_0_random_tL_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)

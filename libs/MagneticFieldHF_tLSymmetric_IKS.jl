@@ -219,7 +219,8 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
     
     metadata = zeros(ComplexF64,2hf.q^2*hf.lk,2hf.q^2*hf.lk)
     tmp_metadata = reshape(metadata,2hf.q,hf.q*hf.lk,2hf.q,hf.q*hf.lk)
-
+    tmpP = zeros(ComplexF64,2hf.q*hf.nη*hf.ns,2hf.q*hf.nη*hf.ns)
+    tmp_tmpP = reshape(tmpP,2hf.q,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns)
     # files = [load(hf.metadata[1]),load(hf.metadata[2])]
     G0 = abs(3*hf.params.g1+3*hf.params.g2)*1.00001
     for m in -hf.ng:hf.ng, n in (-hf.ng*hf.q):(hf.ng*hf.q)
@@ -248,8 +249,9 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0)
             for ik in 1:size(hf.P,3) 
                 tmp_Fock .= 0.0 + 0.0im
                 for ip in 1:size(hf.P,3), rp1 in 1:hf.q
+                    tmpP .= transpose(view(hf.P,:,:,ip))
                     tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
-                                ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*transpose(view(hf.P,:,:,ip))*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
+                                ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*tmpP*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
                 end
                 hf.H[:,:,ik] -= tmp_Fock
             end
