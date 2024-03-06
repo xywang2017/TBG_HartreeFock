@@ -8,7 +8,7 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 132
 foldername = dir*"zeeman/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -57,17 +57,17 @@ for iϕ in eachindex(ϕs)
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 ax.set_xlim([-4.3,0.3])
-ax.set_ylim([-0.01,0.55])
+ax.set_ylim([0.05,0.55])
 ax.set_xlabel(L"n/n_s",fontsize=13)
 ax.set_ylabel(L"ϕ/ϕ_0",fontsize=13)
 ax2 = ax.twinx()
 mn, mx = ax.get_ylim()
 ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
-ax2.set_yticks(collect(0:5:flux_conversion(mx,params)))
+ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-savefig("120_new.png",transparent=false,dpi=600)
+savefig("132_new.png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
