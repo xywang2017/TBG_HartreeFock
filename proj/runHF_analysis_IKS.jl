@@ -12,16 +12,17 @@ twist_angles = [105; collect(106:2:138)]
 twist_angle = 105
 # for twist_angle in twist_angles
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
 # dir = ""
 foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -3, -1
-p,q = 1, 8
+s,t = -2, -1
+p,q = 2, 7
 νF = (s)+(t)*p/q
+νF = -2.143
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
@@ -55,7 +56,7 @@ close(fig)
 
 P = reshape(load(metadata,"hf").P,2q,4,2q,4,:);
 
-p_subblock = P[:,3,:,4,:];
+p_subblock = P[:,1,:,4,:];
 
 _pratio = p_subblock[:,:,2]./ p_subblock[:,:,1]
 
