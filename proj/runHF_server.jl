@@ -26,9 +26,12 @@ _is_symmetric = ARGS[9]
 q1 = parse(Int,ARGS[10])
 q2 = parse(Int,ARGS[11])
 QIKS = q1 + 1im* q2
+q2φ = 0
 
 if isequal(_is_symmetric,"symmetric")
-    include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric_IKS.jl"))
+    include(joinpath(fpath,"libs/MagneticFieldHF_tLSymmetric_IKS_testing.jl"))
+    q2φ = parse(Int,ARGS[12])
+    φ = 2π*q2φ/q
 else
     include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
 end
@@ -40,7 +43,7 @@ if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
 end
 
 if isequal(_is_symmetric,"symmetric")
-    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_$(q2φ)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
     savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
