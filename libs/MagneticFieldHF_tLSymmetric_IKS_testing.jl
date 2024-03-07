@@ -248,14 +248,12 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0,φ::Float64=0.0)
             # --------------------------------------- Fock ------------------------------- #
             for ik in 1:size(hf.P,3) 
                 tmp_Fock .= 0.0 + 0.0im
-                for ip in 1:size(hf.P,3)
+                for ip in 1:size(hf.P,3),rp1 in 1:hf.q
                     tmpP .= transpose(view(hf.P,:,:,ip))
-                    tmp_tmpP[:,1,:,:,2,:] .*= exp(1im*φ)
-                    tmp_tmpP[:,2,:,:,1,:] .*= exp(-1im*φ)
-                    for rp1 in 1:hf.q
-                        tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
-                                    ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*tmpP*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
-                    end
+                    tmp_tmpP[:,1,:,:,2,:] .*= exp(-1im*φ*(rp1-1))
+                    tmp_tmpP[:,2,:,:,1,:] .*= exp(1im*φ*(rp1-1))
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
+                                ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*tmpP*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
                 end
                 hf.H[:,:,ik] -= tmp_Fock
             end
@@ -362,14 +360,12 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
             # --------------------------------------- Fock ------------------------------- #
             for ik in 1:size(δH,3) 
                 tmp_Fock .= 0.0 + 0.0im
-                for ip in 1:size(δH,3)
+                for ip in 1:size(δH,3), rp1 in 1:hf.q
                     tmpP .= transpose(view(δP,:,:,ip))
-                    tmp_tmpP[:,1,:,:,2,:] .*= exp(1im*φ)
-                    tmp_tmpP[:,2,:,:,1,:] .*= exp(-1im*φ)
-                    for rp1 in 1:hf.q
-                        tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
+                    tmp_tmpP[:,1,:,:,2,:] .*= exp(-1im*φ*(rp1-1))
+                    tmp_tmpP[:,2,:,:,1,:] .*= exp(1im*φ*(rp1-1))
+                    tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
                                     ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*tmpP*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
-                    end
                 end
                 δH[:,:,ik] -= tmp_Fock
             end

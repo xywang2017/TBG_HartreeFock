@@ -43,7 +43,7 @@ if ! isdir(joinpath(fpath,"$(foldername)/_$(p)_$(q)"))
 end
 
 if isequal(_is_symmetric,"symmetric")
-    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_$(q2φ)_nu_$(νstr).jld2")
+    savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(q2φ)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
     # savename = dir*"zeeman/$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_tL_init_HF_$(p)_$(q)_nu_$(νstr).jld2"
 else
     savename = joinpath(fpath,"$(foldername)/_$(p)_$(q)/$(seed)_$(q1)_$(q2)_$(flag)_init_HF_$(p)_$(q)_nu_$(νstr).jld2")
@@ -79,7 +79,12 @@ initParamsWithStrain(params)
 hf = HartreeFock()
 
 if !isequal(flag,"strong")
-    iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
+    if isequal(_is_symmetric,"symmetric")
+        println(φ)
+        iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS,φ=φ)
+    else
+        iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
+    end
 else
     savename0 = dir*"zeeman/132_strain/_$(p)_$(q)/1_6_0_random_init_HF_1_9_nu_-2000.jld2"
     hf0 = load(savename0,"hf")
