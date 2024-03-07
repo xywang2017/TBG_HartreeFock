@@ -318,7 +318,7 @@ function compute_HF_energy(H_HF::Array{ComplexF64,3},H0::Array{ComplexF64,3},P::
     return real(Etot)/(size(H0,3)*size(H0,1))*8 # per moire unit cell
 end
 
-function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0,,φ::Float64=0.0)
+function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float64=1.0,φ::Float64=0.0)
     # translation invariant version: 
     # density matrix is Pαβ(:,:,q,nq,nq), no dispersion with respect to q 
     Indices = reshape(collect(1:(hf.q*hf.nq^2)),hf.q,hf.nq^2)
