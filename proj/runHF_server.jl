@@ -80,7 +80,6 @@ hf = HartreeFock()
 
 if !isequal(flag,"strong")
     if isequal(_is_symmetric,"symmetric")
-        println(φ)
         iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS,φ=φ)
     else
         iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)

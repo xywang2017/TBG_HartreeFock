@@ -32,7 +32,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
         # init_P_valley_spin_rotation(hf;α=1.0)
         # init_P_valley_rotation(hf;α=1.0)
     elseif isequal(_Init,"Flavor U(4)")
-        init_P_valley_spin_rotation(hf;α=0.0)
+        init_P_valley_rotation(hf;α=1.0)
     end
     # init_P_valley_spin_rotation(hf;α=1.0)
     # init_P_random_rotation(hf;α=0.5)
