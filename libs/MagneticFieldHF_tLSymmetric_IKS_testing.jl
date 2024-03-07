@@ -76,7 +76,7 @@ function ZeemanUnit(params::Params)
     return V0 
 end
 
-function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,QIKS::Complex{Int}=0+0im,
+function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,QIKS::Complex{Int}=0+0im, φ::Float64=0.0,
         ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",savename::String="placeholder.txt",
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     p, q = numerator(ϕ), denominator(ϕ)
@@ -150,9 +150,9 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     while norm_convergence > hf.precision
         # @time begin 
             hf.H .= hf.H0 * 1.0
-            add_HartreeFock(hf;β=1.0)
+            add_HartreeFock(hf;β=1.0,φ=φ)
             Etot = compute_HF_energy(hf.H .- hf.H0,hf.H0,hf.P,hf.ν)
-            norm_convergence,λ = update_P(hf;Δ=0.0)
+            norm_convergence,λ = update_P(hf;Δ=0.0,φ=φ)
             
             push!(iter_energy,Etot)
             push!(iter_err,norm_convergence)
@@ -264,7 +264,7 @@ function add_HartreeFock(hf::HartreeFock;β::Float64=1.0,φ::Float64=0.0)
     return nothing
 end
 
-function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
+function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true,φ::Float64=0.0)
     """
         Diagonalize Hamiltonian for every k; use ν to keep the lowest N particle states;
         update P 
@@ -297,7 +297,7 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     end
 
     if _oda 
-        λ = oda_parametrization(hf,P_new .- hf.P;β=1.0)
+        λ = oda_parametrization(hf,P_new .- hf.P;β=1.0,φ=φ)
     else
         λ = 1.0 # often times oda_parameterization returns λ = 1.0, therefore not necessary
     end
@@ -368,7 +368,7 @@ function oda_parametrization(hf::HartreeFock,δP::Array{ComplexF64,3};β::Float6
                     tmp_tmpP[:,2,:,:,1,:] .*= exp(-1im*φ)
                     for rp1 in 1:hf.q
                         tmp_Fock .+= ( β*hf.V0*V(kvec[Indices[rp1,ip]]-kvec[Indices[1,ik]]+G,Lm) /hf.latt.nk) * 
-                                    ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*transpose(view(δP,:,:,ip))*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
+                                    ( view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])*tmpP*view(hf.Λ,:,Indices[1,ik],:,Indices[rp1,ip])' )
                     end
                 end
                 δH[:,:,ik] -= tmp_Fock
