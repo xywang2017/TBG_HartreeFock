@@ -1,3 +1,2 @@
-#!/bin/bash -l 
 
-julia proj/runHF_server.jl 2 7 -2.143 ${4} 07 1 1.05 strain symmetric ${1} ${2} ${3}
+julia proj/runHF_server.jl 3 8 -1.375 ${5} 07 ${1} 1.38 strain nosymmetric ${2} ${3} ${4}
