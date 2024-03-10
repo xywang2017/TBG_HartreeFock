@@ -8,8 +8,9 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 138
+twist_angle = 105
 foldername = dir*"zeeman/$(twist_angle)_strain"
+fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -17,7 +18,7 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = ϕs[ϕs.>=1//8]
 sts = []
@@ -45,7 +46,11 @@ for iϕ in eachindex(ϕs)
     ns = Float64[]
     for ν in fillings0 
         νstr = round(Int,1000*ν)
-        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+        if q <=12
+            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+        else
+            metadata = find_lowest_energy_datafile("$(fname1)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+        end
         # println(metadata)
         if !isempty(metadata)
             push!(ns,ν)
@@ -53,7 +58,7 @@ for iϕ in eachindex(ϕs)
             push!(gaps,Δ)
         end
     end
-    # gaps[gaps .< 5.0] .= 0.0 
+    gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 ax.set_xlim([-4.3,0.3])
