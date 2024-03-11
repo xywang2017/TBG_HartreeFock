@@ -8,7 +8,7 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 120
 foldername = dir*"zeeman/$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
@@ -18,7 +18,7 @@ initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = ϕs[ϕs.>=1//8]
 sts = []
@@ -58,7 +58,7 @@ for iϕ in eachindex(ϕs)
             push!(gaps,Δ)
         end
     end
-    gaps[gaps .< 5.5] .= 0.0 
+    # gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
 end
 ax.set_xlim([-4.3,0.3])
@@ -73,7 +73,7 @@ ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
 # savefig("$(twist_angle).png",transparent=false,dpi=600)
-savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
+# savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
 
@@ -81,7 +81,7 @@ close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-2]]
+sts = [[-3,-1]]
 for st in sts 
     s,t = st[1], st[2]
     metadatas = String[]

@@ -168,9 +168,10 @@ end
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
     # fig = figure(figsize=(3,2.5))
     fig = figure(figsize=(5,4))
-    ϵFs = Float64[]
+    ϕs = Float64[]
     Δs = Float64[]
     cmap =["coolwarm","bwr"]
+    μs = Float64[]
     for j in eachindex(metadatas) 
         metadata = metadatas[j]
         hf = load(metadata,"hf");
@@ -190,7 +191,9 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         if j == length(metadatas)
              colorbar(pl,shrink=0.8)
         end
-        plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
+        # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
+        push!(μs,hf.μ)
+        push!(ϕs,hf.p/hf.q)
         
         ν = eachindex(ϵsorted) ./ length(ϵsorted)
         i = 1
@@ -213,6 +216,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         # push!(Δs,(ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ]) +1] - ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ])]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
+    plot(ϕs,μs,":",c="k",lw=0.5)
     # title(titlestr)
     # xticks(collect(0.1:0.2:0.5))
     # axvline([(2//9+1//4)/2],ls=":",c="k")
