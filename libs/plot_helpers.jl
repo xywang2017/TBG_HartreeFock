@@ -244,6 +244,53 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
 end
 
 
+
+## plot Hartree Fock spectra collectively, color by spin + valley polarization
+function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
+    # fig = figure(figsize=(3,2.5))
+    fig = figure(figsize=(5,4))
+    ϕs = Float64[]
+    μs = Float64[]
+    a0 = Float64[1 0; 0 1]
+    az = Float64[1 0; 0 -1]
+    for j in eachindex(metadatas) 
+        metadata = metadatas[j]
+        hf = load(metadata,"hf");
+        ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
+        sz = zeros(Float64,size(ϵk))
+        ηz = zeros(Float64,size(ϵk))
+        Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
+        Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
+        for ik in 1:size(ϵk,2)
+            F = eigen(Hermitian(hf.H[:,:,ik]))
+            ϵk[:,ik] = F.values 
+            for iq in 1:size(hf.H,1)
+                sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
+                ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
+            end
+        end
+        pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=3,vmin=0,vmax=1,marker="o")
+        scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=2,marker="o")
+        if j == length(metadatas)
+             colorbar(pl,shrink=0.8)
+        end
+        push!(μs,hf.μ)
+        push!(ϕs,hf.p/hf.q)
+    end 
+    plot(ϕs,μs,":",c="k",lw=0.5)
+    xlim([0,0.55])
+    xticks([0.2,0.4])
+    ylabel("E (meV)")
+    xlabel(L"ϕ/ϕ_0")
+    tight_layout()
+    savefig(savename,dpi=600,transparent=false)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+
 ## plot error and energies under Hartree Fock iterations 
 function plot_hf_iterations(fname::String)
     iter_err = load(fname,"iter_err")

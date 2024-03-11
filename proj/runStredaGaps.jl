@@ -100,7 +100,7 @@ for st in sts
     idx = Int[]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collectivev2(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 
