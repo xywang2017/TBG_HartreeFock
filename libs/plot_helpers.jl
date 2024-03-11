@@ -3,17 +3,9 @@ using PyPlot
 ## plot Hartree Fock spectra
 function plot_spectra(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");
-    νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
     ϵk = hf.ϵk
     σzτz = hf.σzτz
-    params = hf.params 
 
-    ee = 1.6e-19
-    ϵϵ = 8.8541878128e−12	
-    aa = 2.46e-10
-    ϵr = 15.0
-    Vcoulomb = ee/(4π*ϵϵ*ϵr* abs(params.a1)*aa) * 1e3
-    println("Coulomb scale: ",Vcoulomb)
     fig = figure(figsize=(3,3))
     idx = sortperm(ϵk[:])
     ϵsorted = ϵk[idx] #./Vcoulomb
@@ -21,34 +13,57 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
 
     pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=8,vmin=-1,vmax=1)
     colorbar(pl)
-    ν = eachindex(ϵsorted) ./ length(ϵsorted)
-    i = 1
-    while (νF+4)/8 > ν[i]
-        i += 1
-    end
-    if i<length(chern)
-        # i = i-1
-        ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
-        i = length(ϵsorted[ϵsorted .<=hf.μ])
-        Δ = ϵsorted[i+1] - ϵsorted[i]
-    else
-        ϵF = ϵsorted[end]
-        Δ = 0 
-    end
-    println("Gap size: ", Δ)
+    
     axhline(hf.μ,ls=":",c="gray")
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
-    # legend()
-    # ylim([-0.4,0.8])
-    # ylim([-25,35])
     tight_layout()
     savefig(savename,transparent=true,dpi=600)
     display(fig)
     close(fig)
-    return Δ
+    return nothing
 end
 
+
+## plot Hartree Fock spectra
+function plot_spectrav2(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    a0 = Float64[1 0; 0 1]
+    az = Float64[1 0; 0 -1]
+    ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
+    sz = zeros(Float64,size(ϵk))
+    ηz = zeros(Float64,size(ϵk))
+    Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
+    Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
+    for ik in 1:size(ϵk,2)
+        F = eigen(Hermitian(hf.H[:,:,ik]))
+        ϵk[:,ik] = real(F.values )
+        for iq in 1:size(hf.H,1)
+            sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
+            ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
+        end
+    end
+    
+    ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
+    ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
+    idx =sortperm(ϵk[:])
+    ηz = ηz[idx] 
+    ϵk = ϵk[idx]
+    fig = figure(figsize=(3,3))
+    pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=4,vmin=0,vmax=1,marker="o")
+    # scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=2,marker="o")
+    pl=scatter(ones(length(ϵk[ϵk .> hf.μ]))*hf.p/hf.q,ϵk[ϵk .> hf.μ],c=abs.(ηz[ϵk .> hf.μ]),cmap="coolwarm",s=4,vmin=0,vmax=1,marker="o")
+    colorbar(pl)
+    
+    axhline(hf.μ,ls=":",c="gray")
+    ylabel("E (meV)")
+    xlabel(L"ϕ/ϕ_0")
+    tight_layout()
+    savefig(savename,transparent=true,dpi=600)
+    display(fig)
+    close(fig)
+    return nothing
+end
 
 ## plot Hartree Fock spectra per flavor
 function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
@@ -269,13 +284,22 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
                 ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
             end
         end
-        pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=3,vmin=0,vmax=1,marker="o")
-        scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=2,marker="o")
+        if !occursin("_tL_",metadata)
+            ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
+            ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
+        end
+        pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=6,vmin=0,vmax=1,marker="o",edgecolors="none")
+        scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=6,marker="o",edgecolors="none")
+        # pl=scatter(ones(length(ϵk[ϵk .> hf.μ]))*hf.p/hf.q,ϵk[ϵk .> hf.μ],c=abs.(ηz[ϵk .> hf.μ]),cmap="coolwarm",s=2,vmin=0,vmax=1,marker="o")
         if j == length(metadatas)
              colorbar(pl,shrink=0.8)
         end
         push!(μs,hf.μ)
         push!(ϕs,hf.p/hf.q)
+
+        # if hf.q == 12  && hf.p == 1
+        #     println(abs.(ηz[ϵk .< hf.μ]))
+        # end
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
     xlim([0,0.55])
