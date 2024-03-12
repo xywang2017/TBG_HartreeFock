@@ -80,17 +80,23 @@ close(fig)
 
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
+energies1 = zeros(Float64,length(ϕs),3)
+energies = zeros(Float64,length(ϕs),3)
+sts = [[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-2,-2]]
-for st in sts 
+for i in eachindex(sts) 
+    st = sts[i]
     s,t = st[1], st[2]
     metadatas = String[]
-    for ϕ in ϕs 
+    for iϕ in eachindex(ϕs)
+        ϕ = ϕs[iϕ] 
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
-        # println(ϕ)
         if abs(s+t*p/q) < 4
-            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr)")
+            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_new_init_HF_$(p)_$(q)_nu_$(νstr)")
+            # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
+            # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
+            # energies[iϕ,i] = load(metadata,"iter_energy")[end]
             if !isempty(metadata)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
@@ -103,6 +109,7 @@ for st in sts
     Δs= plot_spectra_collectivev2(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
+
 
 # fig = figure(figsize=(2.5,2.5))
 # colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
@@ -188,3 +195,97 @@ end
 
 plot_LL_spectrum(params,angle=132)
 
+
+
+# ------------------- 
+data = readdlm("Bc_theta.txt")
+yvals = zeros(Float64,size(data,1),size(data,2)-1)
+for i in 1:size(data,1)
+    twist_angle = data[i,1] * 100
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+    initParamsWithStrain(params)
+    for j in 2:size(data,2) 
+        yvals[i,j-1] = flux_conversion(data[i,j],params)
+    end
+end
+
+fig, ax = subplots(1,3,figsize=(4,2.5),sharex=true,sharey=true)
+lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+for j in 1:3
+    ax[j].plot(data[:,1],yvals[:,j],"--x",label=lblstr[j],c=colors[j+1])
+    ax[j].legend(loc="upper left")
+end
+ax[2].set_xlabel("θ (degrees)")
+ax[1].set_ylim([0,29])
+ax[1].set_ylabel(L"\rm  B_c\ (T)")
+tight_layout()
+subplots_adjust(wspace=0.0)
+savefig("test.png",dpi=600,transparent=true)
+display(fig)
+close(fig)
+
+fig,ax = subplots(figsize=(3,3))
+lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+for j in 1:3
+    ax.plot(data[:,1],yvals[:,j],"--x",label=lblstr[j],c=colors[j+1])
+    ax.legend(loc="upper left")
+    ax.set_xlabel("θ (degrees)")
+end
+ax.set_ylim([0,29])
+ax.set_ylabel(L"\rm  B_c\ (T)")
+tight_layout()
+savefig("test.png",dpi=600,transparent=true)
+display(fig)
+close(fig)
+
+
+
+energies1 = readdlm("120_BM_energies.txt")
+energies = readdlm("120_HF_energies.txt")
+
+fig,ax = subplots(3,1,figsize=(2.5,3),sharex=true)
+lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+for j in 1:3
+    ax[j].plot(ϕs,energies[:,j]-energies1[:,j],".-",ms=4,label=lblstr[j],c=colors[j+1])
+    # ax[j].plot(ϕs,energies1[:,j],"--.",label=lblstr[j],c=colors[j+1])
+    ax[j].legend(loc="lower right")
+    
+end
+ax[1].set_ylim([-0.9,0.1])
+ax[2].set_ylim([-0.3,0.1])
+ax[3].set_ylim([-0.3,0.1])
+ax[3].set_xlabel(L"ϕ/ϕ_0")
+ax[2].set_ylabel(L"\rm E_{HF}-E_{CHF}\ (meV/u.c.)")
+ax[3].set_xlim([0.01,0.53])
+ax[3].set_xticks([0.1,0.3,0.5])
+tight_layout()
+subplots_adjust(hspace=0.0)
+savefig("test.png",dpi=600,transparent=true)
+display(fig)
+close(fig)
+
+
+
+
+energies1 = readdlm("120_BM_energies.txt")
+energies = readdlm("120_HF_energies.txt")
+
+fig, ax = subplots(figsize=(3,3))
+lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
+for j in 1:1
+    # ax[j].plot(ϕs,energies[:,j]-energies1[:,j],".-",ms=4,label=lblstr[j],c=colors[j+1])
+    ax.plot(ϕs[1:10],energies1[1:10,j],"--.",label=lblstr[j],c=colors[j+1])
+    ax.plot(ϕs[1:10],energies[1:10,j],"--.",label=lblstr[j],c="k")
+    ax.legend(loc="lower right")
+    
+end
+# ax[1].set_ylim([-0.9,0.08])
+ax.set_xlabel(L"ϕ/ϕ_0")
+ax.set_ylabel(L"\rm E_{HF}-E_{CHF}\ (meV/u.c.)")
+tight_layout()
+display(fig)
+close(fig)

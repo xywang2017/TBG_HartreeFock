@@ -28,33 +28,43 @@ end
 ## plot Hartree Fock spectra
 function plot_spectrav2(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");
+    ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
+    H = reshape(hf.H,2hf.q,4,2hf.q,4,:) 
+    H1 = reshape(H[:,[1,4],:,[1,4],:],4hf.q,4hf.q,:)
+    H2 = reshape(H[:,[2,3],:,[2,3],:],4hf.q,4hf.q,:)
+
+
     a0 = Float64[1 0; 0 1]
     az = Float64[1 0; 0 -1]
-    ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
-    sz = zeros(Float64,size(ϵk))
     ηz = zeros(Float64,size(ϵk))
-    Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
     Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
+    tmpOηz = reshape(Oηz,2hf.q,4,2hf.q,4)
+    O1 = reshape(tmpOηz[:,[1,4],:,[1,4]],4hf.q,4hf.q)
+    O2 = reshape(tmpOηz[:,[2,3],:,[2,3]],4hf.q,4hf.q)
+
     for ik in 1:size(ϵk,2)
-        F = eigen(Hermitian(hf.H[:,:,ik]))
-        ϵk[:,ik] = real(F.values )
-        for iq in 1:size(hf.H,1)
-            sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
-            ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
+        F = eigen(Hermitian(H1[:,:,ik]))
+        ϵk[1:(4hf.q),ik] = real(F.values )
+        for iq in 1:size(H1,1)
+            ηz[iq,ik] = real(F.vectors[:,iq]'*O1*F.vectors[:,iq] )
+        end
+        F = eigen(Hermitian(H2[:,:,ik]))
+        ϵk[(4hf.q+1):end,ik] = real(F.values )
+        for iq in 1:size(H2,1)
+            ηz[iq+4hf.q,ik] = real(F.vectors[:,iq]'*O2*F.vectors[:,iq] )
         end
     end
     
-    ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
-    ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
-    idx =sortperm(ϵk[:])
-    ηz = ηz[idx] 
-    ϵk = ϵk[idx]
+    if !occursin("_tL_",metadata)
+        ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
+        ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
+    end
+    
     fig = figure(figsize=(3,3))
     pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=4,vmin=0,vmax=1,marker="o")
     # scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=2,marker="o")
     pl=scatter(ones(length(ϵk[ϵk .> hf.μ]))*hf.p/hf.q,ϵk[ϵk .> hf.μ],c=abs.(ηz[ϵk .> hf.μ]),cmap="coolwarm",s=4,vmin=0,vmax=1,marker="o")
     colorbar(pl)
-    
     axhline(hf.μ,ls=":",c="gray")
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
@@ -263,7 +273,8 @@ end
 ## plot Hartree Fock spectra collectively, color by spin + valley polarization
 function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
     # fig = figure(figsize=(3,2.5))
-    fig = figure(figsize=(5,4))
+    # fig = figure(figsize=(3.3,3))
+    fig = figure(figsize=(6,4))
     ϕs = Float64[]
     μs = Float64[]
     a0 = Float64[1 0; 0 1]
@@ -292,7 +303,7 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
         scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=6,marker="o",edgecolors="none")
         # pl=scatter(ones(length(ϵk[ϵk .> hf.μ]))*hf.p/hf.q,ϵk[ϵk .> hf.μ],c=abs.(ηz[ϵk .> hf.μ]),cmap="coolwarm",s=2,vmin=0,vmax=1,marker="o")
         if j == length(metadatas)
-             colorbar(pl,shrink=0.8)
+            #  colorbar(pl,shrink=0.8)
         end
         push!(μs,hf.μ)
         push!(ϕs,hf.p/hf.q)
@@ -302,12 +313,14 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
         # end
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
-    xlim([0,0.55])
-    xticks([0.2,0.4])
-    ylabel("E (meV)")
-    xlabel(L"ϕ/ϕ_0")
+    xlim([0.01,0.55])
+    ylim([-44,44])
+    yticks(collect(-40:20:20),fontsize=13)
+    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=13)
+    ylabel("E (meV)",fontsize=13)
+    xlabel(L"ϕ/ϕ_0",fontsize=13)
     tight_layout()
-    savefig(savename,dpi=600,transparent=false)
+    savefig(savename,dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing
@@ -348,7 +361,7 @@ function plot_density_matrix_bm_half(fname::String;ik::Int=1,savename::String="t
     yticks([])
     axhline(2hf.q+0.5,ls=":",c="gray")
     axvline(2hf.q+0.5,ls=":",c="gray")
-    colorbar(pl,shrink=0.6)
+    colorbar(pl,shrink=0.8)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -362,15 +375,16 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
     fig = figure(figsize=(3.6,3))
     # fig = figure(figsize=(2.5,2.5))
     P0 = view(hf.P,:,:,ik) + 0.5I
+    # P0 = view(hf.H,:,:,ik)
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
-    # pl = imshow(abs.(P0),vmin=0,vmax=1,cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
+    # pl = imshow(abs.(P0),vmin=0,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)
     xticks([])
     yticks([])
     for r in [2hf.q,4hf.q,6hf.q]
         axhline(r+0.5,ls=":",c="gray")
         axvline(r+0.5,ls=":",c="gray")
     end
-    colorbar(pl,shrink=0.9)
+    colorbar(pl,shrink=0.8)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)

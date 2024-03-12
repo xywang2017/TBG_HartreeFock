@@ -30,8 +30,8 @@ for i in eachindex(twist_angles)
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-1.15,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
     # ax[r,c].text(-3.95,0.7,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = dir*"zeeman/$(twist_angle)_nostrain"
-    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+    foldername = dir*"zeeman/$(twist_angle)_strain"
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
     initParamsWithStrain(params)
     # for lines in -4:0
     #     ax[r,c].axvline(lines,ls=":",c="gray",lw=0.5)
@@ -82,7 +82,7 @@ end
 # ax[1,1].set_ylim([0,0.8])
 # ax[1,1].set_yticks(collect(0:0.2:0.5))
 tight_layout()
-savefig(joinpath(fpath,"fig1_nostrain_color.png"),transparent=true,dpi=600)
+savefig(joinpath(fpath,"fig1_strain_color.png"),transparent=true,dpi=600)
 display(fig)
 close(fig)
 
@@ -91,7 +91,7 @@ close(fig)
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-ϕ = 2//5
+ϕ = 1//8
 p,q = numerator(ϕ), denominator(ϕ)
 _is_strain = "strain"
 # ϕ, s, t =1//8, -1,-3
@@ -125,12 +125,12 @@ for i in eachindex(twist_angles)
     push!(Pzs_bounds,(σz_upper+1im*σz_lower)/((q-p)*size(P,3)))
 end
 
-plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="sCI")
-plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSF")
+# plot(twist_angles.*0.01,real(Pzs_bounds),"k:",label="sCI")
+# plot(twist_angles.*0.01,imag(Pzs_bounds),"k--",label="HSF")
 
 
-# plot(twist_angles.*0.01,real(Pzs_bounds),"k:")
-# plot(twist_angles.*0.01,imag(Pzs_bounds),"k--")
+plot(twist_angles.*0.01,real(Pzs_bounds),"k:")
+plot(twist_angles.*0.01,imag(Pzs_bounds),"k--")
 
 for st in sts
     s,t = st[1], st[2]
@@ -152,8 +152,8 @@ for st in sts
         push!(Pzs,real(σzmid)) 
     end
 
-    # plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
-    plot(twist_angles.*0.01,Pzs,"-o",ms=2)
+    plot(twist_angles.*0.01,Pzs,"-o",ms=2,label="($(s),$(t))")
+    # plot(twist_angles.*0.01,Pzs,"-o",ms=2)
 end
 
 # ylim([-0.06,0.66])

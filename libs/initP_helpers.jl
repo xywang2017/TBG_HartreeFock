@@ -32,10 +32,12 @@ function init_P(hf::HartreeFock; _Init::String="BM",
         # init_P_valley_spin_rotation(hf;α=1.0)
         # init_P_valley_rotation(hf;α=1.0)
     elseif isequal(_Init,"Flavor U(4)")
+        init_P_intra_valley_spin_rotation(hf;α=1.0)
         # init_P_valley_rotation(hf;α=1.0)
-        init_P_valley_spin_rotation(hf;α=1.0)
+        # init_P_valley_spin_rotation(hf;α=1.0)
     end
     # init_P_valley_spin_rotation(hf;α=1.0)
+    # init_P_valley_rotation(hf;α=1.0)
     # init_P_random_rotation(hf;α=0.5)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
@@ -182,6 +184,16 @@ function init_P_valley_rotation(hf::HartreeFock;α::Float64=0.2)
     P0 = reshape(hf.P,hf.nb*hf.q*hf.nη,hf.ns,hf.nb*hf.q*hf.nη,hf.ns,:)
     vecs = zeros(ComplexF64,hf.nb*hf.q*hf.nη,hf.nb*hf.q*hf.nη)
     for ik in 1:size(hf.P,3), is in 1:hf.ns
+        vecs .= eigvecs(Hermitian(rand(ComplexF64,size(vecs))))
+        P0[:,is,:,is,ik] .= (1-α) *view(P0,:,is,:,is,ik) .+ α* vecs' * view(P0,:,is,:,is,ik) * vecs
+    end
+    return nothing
+end
+
+function init_P_intra_valley_spin_rotation(hf::HartreeFock;α::Float64=0.2)
+    P0 = reshape(hf.P,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,:)
+    vecs = zeros(ComplexF64,hf.nb*hf.q,hf.nb*hf.q)
+    for ik in 1:size(hf.P,3), is in 1:hf.ns*hf.nη
         vecs .= eigvecs(Hermitian(rand(ComplexF64,size(vecs))))
         P0[:,is,:,is,ik] .= (1-α) *view(P0,:,is,:,is,ik) .+ α* vecs' * view(P0,:,is,:,is,ik) * vecs
     end
@@ -362,18 +374,23 @@ function init_P_strong_coupling(hf::HartreeFock;
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     # this function initializes the density matrix into a Chern state of the strong coupling spectrum 
     # first need to recreate the density matrix based on CNP 
-    hf.H .= H0
+    tmpP0 = reshape(P0,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,:)
+    # hf.H .= H0
+    tmpP0[:,4,:,4,:] .= 0.0
+    for ik in 1:size(hf.P,3),iq in 1:size(tmpP0,1)
+        tmpP0[iq,4,iq,4,ik] = -0.5
+    end
     hf.P .= P0 
 
     # add a wavevector 
-    tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
-    for iq in 2:hf.q 
-        tmpP[:,3,:,2,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
-        tmpP[:,2,:,3,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
-        tmpP[:,1,:,4,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
-        tmpP[:,4,:,1,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
-        # tmpP[:,:,:,:,iq,:] .= tmpP[:,:,:,:,1,:]
-    end
+    # tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
+    # for iq in 2:hf.q 
+    #     tmpP[:,3,:,2,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
+    #     tmpP[:,2,:,3,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
+    #     tmpP[:,1,:,4,iq,:] .*= exp(-1im*hf.p/hf.q*2π*(iq-1))
+    #     tmpP[:,4,:,1,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
+    #     # tmpP[:,:,:,:,iq,:] .= tmpP[:,:,:,:,1,:]
+    # end
     # update_P(hf;_oda=false)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
@@ -390,7 +407,7 @@ function init_P_flavor_polarization(hf::HartreeFock)
     num_part_flavors_to_populate = (νmax % n_per_valley_spin ==0) ? 0 : 1
     
     # flavors_to_populate = randperm(hf.nη*hf.ns)[1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
-    flavors_to_populate = [3,4,2,1][1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
+    flavors_to_populate = [4,3,2,1][1:(num_full_flavors_to_populate+num_part_flavors_to_populate)]
 
     for iηs in flavors_to_populate[1:(end-num_part_flavors_to_populate)], iq in 1:size(tmpP,1)
         tmpP[iq,iηs,iq,iηs,:] .= 1.0 
