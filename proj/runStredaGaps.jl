@@ -5,14 +5,14 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"zeeman/$(twist_angle)_strain"
+twist_angle = 138
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -29,7 +29,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig, ax = subplots(figsize=(5,4))
+fig, ax = subplots(figsize=(6,5))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -44,7 +44,7 @@ for iϕ in eachindex(ϕs)
     # fillings = fillings[abs.(fillings) .<4]
     fillings0 = round.(fillings,digits=3)
     ns = Float64[]
-    for ν in fillings0 
+    for ν in fillings
         νstr = round(Int,1000*ν)
         if q <=12
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
@@ -60,9 +60,12 @@ for iϕ in eachindex(ϕs)
     end
     # gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    # if ! isempty(ns)
+    #     writedlm("105_fillings_gaps/$(p)_$(q)_fillings_gaps.txt",[ns gaps])
+    # end
 end
 ax.set_xlim([-4.3,0.3])
-ax.set_ylim([0.05,0.55])
+ax.set_ylim([-0.01,0.55])
 ax.set_xlabel(L"n/n_s",fontsize=13)
 ax.set_ylabel(L"ϕ/ϕ_0",fontsize=13)
 ax2 = ax.twinx()
@@ -72,7 +75,7 @@ ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-# savefig("$(twist_angle).png",transparent=false,dpi=600)
+savefig("$(twist_angle).png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)
@@ -83,7 +86,7 @@ close(fig)
 energies1 = zeros(Float64,length(ϕs),3)
 energies = zeros(Float64,length(ϕs),3)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-1,-3]]
+sts = [[-3,-1]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -93,8 +96,8 @@ for i in eachindex(sts)
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
-            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_new_init_HF_$(p)_$(q)_nu_$(νstr)")
-            energies1[iϕ,i] = load(metadata,"iter_energy")[end]
+            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
+            # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
             # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
             # energies[iϕ,i] = load(metadata,"iter_energy")[end]
             if !isempty(metadata)
