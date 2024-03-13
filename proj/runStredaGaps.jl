@@ -83,7 +83,7 @@ close(fig)
 energies1 = zeros(Float64,length(ϕs),3)
 energies = zeros(Float64,length(ϕs),3)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-2]]
+sts = [[-1,-3]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -94,7 +94,7 @@ for i in eachindex(sts)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_new_init_HF_$(p)_$(q)_nu_$(νstr)")
-            # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
+            energies1[iϕ,i] = load(metadata,"iter_energy")[end]
             # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
             # energies[iϕ,i] = load(metadata,"iter_energy")[end]
             if !isempty(metadata)
@@ -246,15 +246,19 @@ energies1 = readdlm("120_BM_energies.txt")
 energies = readdlm("120_HF_energies.txt")
 
 fig,ax = subplots(1,3,figsize=(5,2.5),sharex=true,sharey=true)
-lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+lblstr = ["(-1,-3)","(-2,-2)","(-3,-1)"]
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for j in 1:3
-    ax[j].plot(ϕs,energies[:,j]-energies1[:,j],".-",ms=4,label=lblstr[j],c=colors[j+1])
+    if j==3
+        ax[j].plot(ϕs[4:end],energies[4:end,4-j]-energies1[4:end,4-j],".-",ms=4,label=lblstr[4-j],c=colors[j+1])
+    else
+        ax[j].plot(ϕs,energies[:,4-j]-energies1[:,4-j],".-",ms=4,label=lblstr[4-j],c=colors[j+1])
+    end
     # ax[j].plot(ϕs,energies1[:,j],"--.",label=lblstr[j],c=colors[j+1])
     ax[j].legend(loc="lower right")
     
 end
-ax[1].set_ylim([-0.9,0.1])
+ax[1].set_ylim([-0.35,0.06])
 # ax[2].set_ylim([-0.3,0.1])
 # ax[3].set_ylim([-0.3,0.1])
 ax[2].set_xlabel(L"ϕ/ϕ_0")
@@ -274,7 +278,7 @@ energies1 = readdlm("120_BM_energies.txt")
 energies = readdlm("120_HF_energies.txt")
 
 fig, ax = subplots(figsize=(3,3))
-lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
+lblstr = ["(-1,-3)","(-2,-2)","(-3,-1)"]
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for j in 1:1
     # ax[j].plot(ϕs,energies[:,j]-energies1[:,j],".-",ms=4,label=lblstr[j],c=colors[j+1])

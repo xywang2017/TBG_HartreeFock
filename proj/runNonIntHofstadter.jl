@@ -61,7 +61,8 @@ function plot_LL_spectrum()
     fig = figure(figsize=(4.3,3))
     ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
-    # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    # ϕs = ϕs[ϕs .>= 1//12]
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
     # params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2125.6)
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)

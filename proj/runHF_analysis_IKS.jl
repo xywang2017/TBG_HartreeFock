@@ -19,13 +19,13 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = 0,-4
-p,q = 1, 8
+s,t = -1,-3
+p,q = 1, 9
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="bm_cascade_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectrav2(metadata;savename="test.png")
+# plot_spectrav2(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
