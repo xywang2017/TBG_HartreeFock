@@ -245,7 +245,7 @@ close(fig)
 energies1 = readdlm("120_BM_energies.txt")
 energies = readdlm("120_HF_energies.txt")
 
-fig,ax = subplots(3,1,figsize=(2.5,3),sharex=true)
+fig,ax = subplots(1,3,figsize=(5,2.5),sharex=true,sharey=true)
 lblstr = ["(-3,-1)","(-2,-2)","(-1,-3)"]
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for j in 1:3
@@ -255,14 +255,14 @@ for j in 1:3
     
 end
 ax[1].set_ylim([-0.9,0.1])
-ax[2].set_ylim([-0.3,0.1])
-ax[3].set_ylim([-0.3,0.1])
-ax[3].set_xlabel(L"ϕ/ϕ_0")
-ax[2].set_ylabel(L"\rm E_{HF}-E_{CHF}\ (meV/u.c.)")
+# ax[2].set_ylim([-0.3,0.1])
+# ax[3].set_ylim([-0.3,0.1])
+ax[2].set_xlabel(L"ϕ/ϕ_0")
+ax[1].set_ylabel(L"\rm E_{HF}-E_{CHF}\ (meV/u.c.)")
 ax[3].set_xlim([0.01,0.53])
 ax[3].set_xticks([0.1,0.3,0.5])
 tight_layout()
-subplots_adjust(hspace=0.0)
+subplots_adjust(wspace=0.0)
 savefig("test.png",dpi=600,transparent=true)
 display(fig)
 close(fig)

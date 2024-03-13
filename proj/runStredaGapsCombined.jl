@@ -91,7 +91,7 @@ close(fig)
 twist_angles = [105; collect(106:2:138)]
 # twist_angles = [105;120;124;128;132;138]
 sts = [[0,-4],[-1,-3],[-2,-2],[-3,-1]]
-ϕ = 1//8
+ϕ = 2//5
 p,q = numerator(ϕ), denominator(ϕ)
 _is_strain = "strain"
 # ϕ, s, t =1//8, -1,-3
@@ -159,7 +159,7 @@ end
 # ylim([-0.06,0.66])
 yticks(collect(0:0.2:0.6))
 # legend(loc=[0.55,0.45],fontsize=10)
-legend(loc=[0.6,0.6],fontsize=10)
+legend(loc=[0.5,0.4],fontsize=10)
 xlabel("θ")
 ylabel(L"\rm ⟨σ_zτ_z⟩\ per\ electron")
 tight_layout()
