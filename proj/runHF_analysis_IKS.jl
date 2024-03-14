@@ -59,6 +59,25 @@ p_subblock = P[:,3,:,2,:];
 _pratio = p_subblock[:,:,2]./ p_subblock[:,:,1]
 
 angle.(_pratio) /(2π) /(1/10)
+
+# ------------------------------ IKS energy vs wavevector 
+qs = reshape(0:7,:,1) .+ 1im*reshape(0:7,1,:)
+energies = zeros(Float64,size(qs))
+for iq in eachindex(qs)
+    q1, q2 = real(qs[iq]), imag(qs[iq])
+    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_$(q1)_0_$(q2)_flavor_tL_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+    energies[iq] = load(metadata,"iter_energy")[end]
+end
+
+fig = figure(figsize=(3.6,3))
+pl = pcolor(real(qs), imag(qs),energies,cmap="bwr")
+colorbar(pl,shrink=0.8)
+xlabel(L"q_1")
+ylabel(L"q_2")
+tight_layout()
+display(fig)
+close(fig)
+
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
 mtg_data = "NonInt/120_strain/_$(p)_$(q)_mtg_0_0_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
