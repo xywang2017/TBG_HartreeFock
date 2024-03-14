@@ -191,8 +191,8 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
-    # fig = figure(figsize=(3,2.5))
-    fig = figure(figsize=(5,4))
+    fig = figure(figsize=(3,2.5))
+    # fig = figure(figsize=(5,4))
     ϕs = Float64[]
     Δs = Float64[]
     cmap =["coolwarm","bwr"]
@@ -260,7 +260,7 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # xticks(ticklist,ticklistLabels)
     # title(titlestr)
     tight_layout()
-    savefig(savename,dpi=600,transparent=false)
+    savefig(savename,dpi=600,transparent=true)
     display(fig)
     close(fig)
 
@@ -273,8 +273,8 @@ end
 ## plot Hartree Fock spectra collectively, color by spin + valley polarization
 function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
     # fig = figure(figsize=(3,2.5))
-    # fig = figure(figsize=(3.3,3))
-    fig = figure(figsize=(6,4))
+    fig = figure(figsize=(3.3,3))
+    # fig = figure(figsize=(6,4))
     ϕs = Float64[]
     μs = Float64[]
     a0 = Float64[1 0; 0 1]
@@ -288,7 +288,9 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
         Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
         Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
         for ik in 1:size(ϵk,2)
-            F = eigen(Hermitian(hf.H[:,:,ik]))
+            H = hf.H[:,:,ik]
+            H[abs.(H) .<1e-2] .= 0.0
+            F = eigen(Hermitian(H))
             ϵk[:,ik] = F.values 
             for iq in 1:size(hf.H,1)
                 sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
@@ -384,7 +386,7 @@ function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.p
         axhline(r+0.5,ls=":",c="gray")
         axvline(r+0.5,ls=":",c="gray")
     end
-    colorbar(pl,shrink=0.8)
+    colorbar(pl,shrink=0.9)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)

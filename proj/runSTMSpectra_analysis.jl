@@ -6,9 +6,9 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Xiaoyu/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
-twist_angle = 105
+twist_angle = 138
 foldername = dir*"zeeman/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
@@ -22,25 +22,38 @@ for s in -3:3, t in -12:12
     push!(sts,[-s,-t])
 end
 sts = unique(sts)
-νs = sort(unique([sts[i][1]+sts[i][2]*ϕ*1.0 for i in eachindex(sts)]))
+νs = sort(unique([sts[i][1]+sts[i][2]*ϕ for i in eachindex(sts)]))
 νs = νs[abs.(νs) .<=4]
 # νs = νs[νs .<=1e-3]
 #
 fig = figure(figsize=(3,3))
-ϵs = collect(range(-45,45,400))
+ϵs = collect(range(-90,90,400))
 γ = 1
 dos = zeros(Float64,length(ϵs),length(νs))
 p,q = numerator(ϕ), denominator(ϕ)
 for j in eachindex(νs)
     ν = νs[j]
-    νstr = round(Int,1000*ν)
-    metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=false)
-    if isfile(metadata)
-        energies = load(metadata,"hf").ϵk[:]
-        μ =load(metadata,"hf").μ
-        # plot(energies,ones(length(energies))*ν,"ko",ms=2,markeredgecolor="none")
-        for i in eachindex(ϵs)
-            dos[i,j] = 1/π * sum(γ./(γ^2 .+ (ϵs[i].-(energies.-μ)).^2)) / length(energies)
+    if ν<=0.0
+        νstr = round(Int,1000*ν)
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=false)
+        if isfile(metadata)
+            energies = load(metadata,"hf").ϵk[:]
+            μ =load(metadata,"hf").μ
+            # plot(energies,ones(length(energies))*ν,"ko",ms=2,markeredgecolor="none")
+            for i in eachindex(ϵs)
+                dos[i,j] = 1/π * sum(γ./(γ^2 .+ (ϵs[i].-(energies.-μ)).^2)) / length(energies)
+            end
+        end
+    else
+        νstr = round(Int,-1000*ν)
+        metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=false)
+        if isfile(metadata)
+            energies = -load(metadata,"hf").ϵk[:]
+            μ = - load(metadata,"hf").μ
+            # plot(energies,ones(length(energies))*ν,"ko",ms=2,markeredgecolor="none")
+            for i in eachindex(ϵs)
+                dos[i,j] = 1/π * sum(γ./(γ^2 .+ (ϵs[i].-(energies.-μ)).^2)) / length(energies)
+            end
         end
     end
 end

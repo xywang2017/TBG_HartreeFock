@@ -57,13 +57,13 @@ close(fig)
 
 ## strong coupling basis at reference point defined by metadata0
 s,t = 0,-4
-p,q = 3,10
+p,q = 1,8
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 
-metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata0 = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_3_0_bm_cascade_init_HF_1_8_nu_-500",_printinfo=true)
 
-s,t = -0.5,-3
+s,t = -2,-1
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
@@ -71,7 +71,7 @@ metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init
 
 # plot_density_matrix_strong_coupling(metadata,metadata0)
 # plot_density_matrix_strong_coupling_valley_spin(metadata,metadata0)
-plot_density_matrix_strong_coupling_valley_spin_v1(metadata,metadata0,ik=2)
+plot_density_matrix_strong_coupling_valley_spin_v1(metadata,metadata0,ik=1)
 
 # 
 # plot_order_parameters(metadata)
