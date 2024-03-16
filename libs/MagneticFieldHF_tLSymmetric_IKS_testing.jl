@@ -99,9 +99,6 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     if hf.nq ==0 
         hf.nq = 1
     end
-    if hf.q ==3 
-        hf.nq = 8 
-    end
     _q1, _q2 = real(QIKS), imag(QIKS)
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_$(_q1)_$(_q2)_metadata.jld2"]
