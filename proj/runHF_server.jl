@@ -10,8 +10,8 @@ dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
 dir1 = "/Volumes/Data/ReRuns/"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir1 = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/ReRuns/"
-# dir = ""
-# dir1 = ""
+dir = ""
+dir1 = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
@@ -86,7 +86,7 @@ if !isequal(flag,"strong")
         iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=_Init,savename=savename,QIKS=QIKS)
     end
 else
-    savename0 = dir*"115_nostrain/_$(p)_$(q)/1_0_0_0_flavor_tL_init_HF_1_8_nu_-2000.jld2"
+    savename0 = "120_nostrain/_$(p)_$(q)/2_0_0_0_flavor_tL_init_HF_1_12_nu_-2000.jld2"
     hf0 = load(savename0,"hf")
     P0,H0 = hf0.P,hf0.H
     iter_err, iter_energy = run_HartreeFock(hf,params,ν=ν,ϕ=ϕ,prefix=dir1*"NonInt/$(foldername)/",_Init=" ",H0=H0,P0=P0,savename=savename,QIKS=QIKS)

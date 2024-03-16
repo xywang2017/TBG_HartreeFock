@@ -38,7 +38,7 @@ function init_P(hf::HartreeFock; _Init::String="BM",
     end
     # init_P_intra_valley_spin_rotation(hf;α=1.0)
     # init_P_valley_spin_rotation(hf;α=1.0)
-    # init_P_valley_rotation(hf;α=1.0)
+    init_P_valley_rotation(hf;α=1.0)
     # init_P_random_rotation(hf;α=0.5)
     println("Initial filling is: ", real( 8*sum([tr(hf.P[:,:,ik]+0.5I) for ik in 1:size(hf.P,3)])/(size(hf.P,3)*size(hf.P,1))-4 ) )
     
@@ -375,12 +375,7 @@ function init_P_strong_coupling(hf::HartreeFock;
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     # this function initializes the density matrix into a Chern state of the strong coupling spectrum 
     # first need to recreate the density matrix based on CNP 
-    tmpP0 = reshape(P0,hf.nb*hf.q,hf.nη*hf.ns,hf.nb*hf.q,hf.nη*hf.ns,:)
     # hf.H .= H0
-    tmpP0[:,4,:,4,:] .= 0.0
-    for ik in 1:size(hf.P,3),iq in 1:size(tmpP0,1)
-        tmpP0[iq,4,iq,4,ik] = -0.5
-    end
     hf.P .= P0 
 
     # add a wavevector 

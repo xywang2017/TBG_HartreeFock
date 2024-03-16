@@ -1,2 +1,2 @@
 
-julia proj/runHF_server.jl 3 8 -2.0 ${5} 07 ${1} 1.2 nostrain nosymmetric ${2} ${3} ${4}
+julia proj/runHF_server.jl 1 12 -2.0 ${5} 07 ${1} 1.24 nostrain symmetric ${2} ${3} ${4}
