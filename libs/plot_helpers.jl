@@ -75,6 +75,52 @@ function plot_spectrav2(metadata::String;savename::String="tmp.pdf")
     return nothing
 end
 
+
+
+## plot Hartree Fock spectra
+function plot_spectrav3(metadata::String;savename::String="tmp.pdf")
+    hf = load(metadata,"hf");
+    H = reshape(hf.H,2hf.q,4,2hf.q,4,:,hf.nq^2)
+    H = H[:,:,:,:,1,:] 
+    Σz0 = reshape(hf.Σz0,2hf.q,4,2hf.q,4,:)
+    subblocks = [[1],[2],[3,4]]
+    lbls = ["K↑","K'↑","{K↓,K'↓}"]
+    ϵk = []
+    σz = []
+    for sb in subblocks
+        ϵk0 = zeros(Float64,2hf.q*length(sb),hf.nq^2)
+        σz0 = zeros(Float64,2hf.q*length(sb),hf.nq^2)
+        for ik in 1:size(ϵk0,2)
+            F = eigen(Hermitian(reshape(H[:,sb,:,sb,ik],:,length(sb)*2hf.q)))
+            ϵk0[:,ik] = F.values 
+            for iq in 1:size(ϵk0,1)
+                σz0[iq,ik] = real(F.vectors[:,iq]'*reshape(Σz0[:,sb,:,sb,ik],:,length(sb)*2hf.q)*F.vectors[:,iq])
+            end
+        end
+        push!(ϵk,ϵk0[:])
+        push!(σz,σz0[:])
+    end
+
+    fig = figure(figsize=(3,3))
+    for ib in 1:length(subblocks)
+        ϵ0 = ϵk[ib]
+        σ0 = σz[ib]
+        pl = scatter(ones(length(ϵ0))*ib,ϵ0,c=σ0,cmap="coolwarm",s=6,vmin=-0.4,vmax=0.4,marker="o")
+        if ib ==1 
+            colorbar(pl)
+        end
+    end
+    axhline(hf.μ,ls=":",c="gray")
+    ylabel("E (meV)")
+    xlim([0.5,3.5])
+    xticks(collect(eachindex(subblocks)),lbls)
+    tight_layout()
+    savefig(savename,transparent=true,dpi=600)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
 ## plot Hartree Fock spectra per flavor
 function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
     hf = load(metadata,"hf");

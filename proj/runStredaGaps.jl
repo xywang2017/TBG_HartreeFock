@@ -4,15 +4,15 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = ""
+dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+# dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 110
+twist_angle = 120
 foldername = dir*"$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -26,6 +26,7 @@ for s in -3:3, t in -12:12
     push!(sts,[s,t])
 end
 sts = unique(sts)
+μs = ComplexF64[]
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -56,7 +57,11 @@ for iϕ in eachindex(ϕs)
             push!(ns,ν)
             Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
+            if ϕ == 1//12 
+                push!(μs,ν+1im*load(metadata,"hf").μ)
+            end
         end
+        
     end
     # gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
@@ -80,7 +85,15 @@ tight_layout()
 display(fig)
 close(fig)
 
+# -----
 
+fig = figure(figsize=(4,3))
+plot(real(μs),imag(μs),"b-o",ms=3)
+xlabel(L"n/n_s")
+ylabel("μ (meV)")
+tight_layout()
+display(fig)
+close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 energies1 = zeros(Float64,length(ϕs),3)
