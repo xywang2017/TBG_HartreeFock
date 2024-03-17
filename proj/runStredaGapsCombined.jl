@@ -22,7 +22,7 @@ sts = unique(sts)
 fig, ax = subplots(2,3,figsize=(10,6),sharex=true,sharey=true)
 twist_angles = [138,132,128,124,120,105]
 ax[1,1].set_xlim([-4.1,0.1])
-ax[1,1].set_ylim([-0.01,0.59])
+ax[1,1].set_ylim([0.05,0.59])
 for i in eachindex(twist_angles)
     twist_angle = twist_angles[i]
     r, c = (i-1)÷3 + 1, (i-1)%3 + 1
@@ -30,8 +30,8 @@ for i in eachindex(twist_angles)
     # ax[r,c].set_title(L"θ=%$(θ0)^\circ")
     ax[r,c].text(-1.15,0.55,L"θ=%$(θ0)^\circ",size=11,c="k")
     # ax[r,c].text(-3.95,0.7,L"θ=%$(θ0)^\circ",size=11,c="k")
-    foldername = dir*"zeeman/$(twist_angle)_strain"
-    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+    foldername = dir*"zeeman/$(twist_angle)_nostrain"
+    params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
     initParamsWithStrain(params)
     # for lines in -4:0
     #     ax[r,c].axvline(lines,ls=":",c="gray",lw=0.5)
@@ -66,7 +66,7 @@ for i in eachindex(twist_angles)
     ax2 = ax[r,c].twinx()
     mn, mx = ax[r,c].get_ylim()
     ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
-    ax2.set_yticks(collect(0:5:0.9*flux_conversion(mx,params)))
+    ax2.set_yticks(collect(5:5:0.9*flux_conversion(mx,params)))
     if c==3
         ax2.set_ylabel("B (T)",fontsize=13)
     end
@@ -82,7 +82,7 @@ end
 # ax[1,1].set_ylim([0,0.8])
 # ax[1,1].set_yticks(collect(0:0.2:0.5))
 tight_layout()
-savefig(joinpath(fpath,"fig1_strain_color.png"),transparent=true,dpi=600)
+savefig(joinpath(fpath,"fig1_nostrain_color.png"),transparent=true,dpi=600)
 display(fig)
 close(fig)
 
