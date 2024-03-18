@@ -5,14 +5,14 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
-dir = ""
+# dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 118
+twist_angle = 120
 foldername = dir*"$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
-params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
@@ -30,7 +30,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig, ax = subplots(figsize=(6,5))
+fig, ax = subplots(figsize=(5,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -80,7 +80,7 @@ ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-# savefig("$(twist_angle).png",transparent=false,dpi=600)
+savefig("$(twist_angle).png",transparent=false,dpi=600)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)

@@ -32,8 +32,8 @@ function init_P(hf::HartreeFock; _Init::String="BM",
         # init_P_valley_spin_rotation(hf;α=1.0)
         # init_P_valley_rotation(hf;α=1.0)
     elseif isequal(_Init,"Flavor U(4)")
-        # init_P_intra_valley_spin_rotation(hf;α=1.0)
-        init_P_valley_rotation(hf;α=1.0)
+        init_P_intra_valley_spin_rotation(hf;α=1.0)
+        # init_P_valley_rotation(hf;α=1.0)
         # init_P_valley_spin_rotation(hf;α=1.0)
     end
     # init_P_intra_valley_spin_rotation(hf;α=1.0)
@@ -332,10 +332,12 @@ function init_P_sublattice_no_momentum(hf::HartreeFock)
 
     idx = sortperm(σzτz[:,1])
     for iq in 1:(4hf.q+4hf.p)
-        push!(idx_chern_minus,idx[iq])
+        # push!(idx_chern_minus,idx[iq])
+        push!(idx_chern_plus,idx[iq])
     end
     for iq in (4hf.q+4hf.p+1):length(idx)
-        push!(idx_chern_plus,idx[iq])
+        # push!(idx_chern_plus,idx[iq])
+        push!(idx_chern_minus,idx[iq])
     end
 
     # println(sum(σzτz[idx_chern_minus,:])/size(σzτz,2))
