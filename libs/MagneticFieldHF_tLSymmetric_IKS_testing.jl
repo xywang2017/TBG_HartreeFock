@@ -73,7 +73,7 @@ function ZeemanUnit(params::Params)
     ee = 1.6e-19
     aa = 2.46e-10 
     V0 = 2π * hbar^2 / (2*me*params.area*aa^2) / ee * 1000 # in units of meV 
-    return V0 *0.0
+    return V0
 end
 
 function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,QIKS::Complex{Int}=0+0im, φ::Float64=0.0,

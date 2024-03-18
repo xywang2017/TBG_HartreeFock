@@ -10,8 +10,8 @@ dir =  "/Volumes/Data/Code/TBG_HartreeFock/"
 dir1 = "/Volumes/Data/ReRuns/"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 # dir1 = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/ReRuns/"
-# dir = ""
-# dir1 = ""
+dir = ""
+dir1 = ""
 #
 ## Hartree Fock related 
 p = parse(Int,ARGS[1])
