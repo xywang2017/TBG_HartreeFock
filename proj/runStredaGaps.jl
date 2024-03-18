@@ -9,7 +9,7 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 120
-foldername = dir*"$(twist_angle)_nostrain"
+foldername = dir*"$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -98,8 +98,8 @@ close(fig)
 Δss = []
 energies1 = zeros(Float64,length(ϕs),3)
 energies = zeros(Float64,length(ϕs),3)
-sts = [[-1,-3],[-2,-2],[-3,-1],[0,-4]]
-# sts = [[0,-4]]
+sts = [[-1,-3],[-2,-2],[-3,-1]]
+sts = [[-3,-1]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -109,10 +109,10 @@ for i in eachindex(sts)
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
+            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="tL_init_HF_$(p)_$(q)_nu_$(νstr)")
+            energies1[iϕ,i] = load(metadata,"iter_energy")[end]
             metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
-            # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
-            # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
-            # energies[iϕ,i] = load(metadata,"iter_energy")[end]
+            energies[iϕ,i] = load(metadata,"iter_energy")[end]
             if !isempty(metadata)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
@@ -265,7 +265,7 @@ fig,ax = subplots(1,3,figsize=(5,2.5),sharex=true,sharey=true)
 lblstr = ["(-1,-3)","(-2,-2)","(-3,-1)"]
 colors = ["tab:blue","tab:red","tab:green","tab:orange","cyan"]
 for j in 1:3
-    if j==3
+    if false # j==3
         ax[j].plot(ϕs[4:end],energies[4:end,4-j]-energies1[4:end,4-j],".-",ms=4,label=lblstr[4-j],c=colors[j+1])
     else
         ax[j].plot(ϕs,energies[:,4-j]-energies1[:,4-j],".-",ms=4,label=lblstr[4-j],c=colors[j+1])
@@ -274,7 +274,7 @@ for j in 1:3
     ax[j].legend(loc="lower right")
     
 end
-ax[1].set_ylim([-0.35,0.06])
+# ax[1].set_ylim([-0.35,0.06])
 # ax[2].set_ylim([-0.3,0.1])
 # ax[3].set_ylim([-0.3,0.1])
 ax[2].set_xlabel(L"ϕ/ϕ_0")
@@ -283,7 +283,7 @@ ax[3].set_xlim([0.01,0.53])
 ax[3].set_xticks([0.1,0.3,0.5])
 tight_layout()
 subplots_adjust(wspace=0.0)
-savefig("test.png",dpi=600,transparent=true)
+savefig("test.png",dpi=600,transparent=false)
 display(fig)
 close(fig)
 
