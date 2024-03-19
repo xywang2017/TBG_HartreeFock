@@ -247,12 +247,14 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         metadata = metadatas[j]
         hf = load(metadata,"hf");
         νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+        # if true # (hf.p/hf.q!=1/3 && hf.p/hf.q!=4/11 && hf.p/hf.q!=1/2)
+        # if hf.p/hf.q < 1/3
         ϵk = hf.ϵk
         σzτz = hf.σzτz
         idx = sortperm(ϵk[:])
         ϵsorted = ϵk[idx] 
         chern = σzτz[idx]
-        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=3,vmin=-1,vmax=1,marker="o")
+        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=3,vmin=-1,vmax=1,marker="o",edgecolor="none")
         # if j in indices
         #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
         # else
@@ -282,8 +284,9 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         else
             ϵF = ϵsorted[end]
             Δ = 0 
-        end
+        # end
         push!(Δs,Δ)
+    end
         # push!(Δs,(ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ]) +1] - ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ])]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
@@ -293,8 +296,8 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
     # axvline([(2//9+1//4)/2],ls=":",c="k")
     # axvline([1//8+1//7]/2,ls=":",c="k")
     xlim([0,0.55])
-    xticks([0.2,0.4])
-    # ylim([-49,55])
+    xticks([0.1,0.3,0.5])
+    ylim([-44,44])
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
@@ -420,8 +423,8 @@ end
 function plot_density_matrix_bm(fname::String;ik::Int=1,savename::String="test.png")
     # plot at a given k point, 2qx4 x 2qx4 matrix 
     hf = load(fname,"hf");
-    fig = figure(figsize=(3.6,3))
-    # fig = figure(figsize=(2.5,2.5))
+    # fig = figure(figsize=(3.6,3))
+    fig = figure(figsize=(2.5,2.5))
     P0 = view(hf.P,:,:,ik) + 0.5I
     # P0 = view(hf.H,:,:,ik)
     pl = imshow(abs.(P0),vmin=0,vmax=1,origin="lower",cmap="Blues",extent=(1,8hf.q+1,1,8hf.q+1).-0.5)

@@ -99,7 +99,7 @@ close(fig)
 energies1 = zeros(Float64,length(ϕs),3)
 energies = zeros(Float64,length(ϕs),3)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-3,-1]]
+sts = [[-2,-1]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -122,7 +122,7 @@ for i in eachindex(sts)
     idx = Int[]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collectivev2(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 
