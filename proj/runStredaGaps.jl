@@ -4,23 +4,23 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
-foldername = dir*"$(twist_angle)_nostrain"
+twist_angle = 105
+foldername = dir*"zeeman/$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
-# params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2125.6)
-params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
-# ϕs = ϕs[ϕs.>=1//8]
+ϕs = ϕs[ϕs.>=1//12]
 sts = []
 for s in -3:3, t in -12:12
     push!(sts,[s,t])
@@ -30,7 +30,7 @@ sts = unique(sts)
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
-fig, ax = subplots(figsize=(5,4))
+fig, ax = subplots(figsize=(7,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
@@ -96,10 +96,13 @@ display(fig)
 close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
-energies1 = zeros(Float64,length(ϕs),3)
-energies = zeros(Float64,length(ϕs),3)
+# energies1 = zeros(Float64,length(ϕs),3)
+# energies = zeros(Float64,length(ϕs),3)
+# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
+# ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
+# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-1]]
+sts = [[-2,0]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -109,10 +112,14 @@ for i in eachindex(sts)
         p,q = numerator(ϕ), denominator(ϕ)
         νstr = round(Int,1000*(s+t*p/q))
         if abs(s+t*p/q) < 4
-            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="tL_init_HF_$(p)_$(q)_nu_$(νstr)")
-            energies1[iϕ,i] = load(metadata,"iter_energy")[end]
-            metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)")
-            energies[iϕ,i] = load(metadata,"iter_energy")[end]
+            # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="tL_init_HF_$(p)_$(q)_nu_$(νstr)")
+            # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
+            if q <=12
+                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+            else
+                metadata = find_lowest_energy_datafile("$(fname1)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+            end
+            # energies[iϕ,i] = load(metadata,"iter_energy")[end]
             if !isempty(metadata)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
