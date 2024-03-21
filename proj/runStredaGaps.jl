@@ -9,14 +9,14 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
+twist_angle = 138
 foldername = dir*"zeeman/$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
-
+flux_conversion(1.0/12,params)
 w0 = "07"
 
 ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))

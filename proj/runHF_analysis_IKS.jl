@@ -23,11 +23,11 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = 0,-4
+s,t = -0.5,-3
 p,q = 1, 6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_0_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 # plot_spectra(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
@@ -83,9 +83,9 @@ display(fig)
 close(fig)
 
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
-mtg_data = "MinHao/NonInt/105_strain/_$(p)_$(q)_mtg_1_0_metadata.jld2";
+mtg_data = "MinHao/NonInt/105_strain/_$(p)_$(q)_mtg_0_0_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
-    γ = 1e3
+    # γ = 1e3
     hf = load(metadata,"hf");
     U2 = zeros(ComplexF64,size(hf.H));
     energies = zeros(Float64,size(hf.ϵk))
