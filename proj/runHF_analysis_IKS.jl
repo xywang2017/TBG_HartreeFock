@@ -15,9 +15,9 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
-# dir = ""
-# dir1 = ""
-foldername = dir*"zeeman/$(twist_angle)_strain"
+dir = ""
+dir1 = ""
+foldername = dir*"$(twist_angle)_strain"
 # foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
