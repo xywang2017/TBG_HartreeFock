@@ -1,4 +1,5 @@
 using PyPlot,JLD2
+using DelimitedFiles
 fpath = pwd()
 include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
@@ -57,9 +58,6 @@ for iϕ in eachindex(ϕs)
             push!(ns,ν)
             Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
-            if ϕ == 1//12 
-                push!(μs,ν+1im*load(metadata,"hf").μ)
-            end
         end
         
     end
@@ -100,13 +98,14 @@ close(fig)
 # energies = zeros(Float64,length(ϕs),3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
-# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
+ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,0]]
+sts = [[-2.5,-1]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
     metadatas = String[]
+    μs = Float64[]
     for iϕ in eachindex(ϕs)
         ϕ = ϕs[iϕ] 
         p,q = numerator(ϕ), denominator(ϕ)
@@ -123,9 +122,15 @@ for i in eachindex(sts)
             if !isempty(metadata)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
+                hf = load(metadata,"hf");
+                # writedlm("SBCI_spectra/_-2.5_-1_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
+                push!(μs,hf.μ)
+            else 
+                push!(μs,NaN)
             end
         end
     end
+    writedlm("SBCI_spectra/_-2.5_-1_s$(s)_t$(t)_chemicalpotential.txt",[numerator.(ϕs[:]) denominator.(ϕs[:]) μs[:]])
     idx = Int[]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))

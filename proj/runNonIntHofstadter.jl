@@ -1,4 +1,5 @@
 using PyPlot
+using DelimitedFiles
 using JLD2
 fpath = pwd()
 include(joinpath(fpath,"libs/bmLL_IKS.jl"))
@@ -67,6 +68,7 @@ function plot_LL_spectrum()
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
+    foldername = "NonIntHofstadterData"
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
@@ -74,6 +76,9 @@ function plot_LL_spectrum()
         # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
         plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],"o",ms=2,markeredgecolor="none",color="r")
         plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],"o",ms=2,markeredgecolor="none",color="gray")
+        writedlm("$(foldername)/_$(p)_$(q)_spin_up.txt",energies.+μB*ϕ)
+        writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies.-μB*ϕ)
+    
     end
     # ylim([0.06,0.51])
     # ylim([-26,26])

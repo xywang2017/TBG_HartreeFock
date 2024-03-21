@@ -1,8 +1,8 @@
 using PyPlot,JLD2
 using Printf 
 fpath = pwd()
-# include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
-include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
+include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
+# include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 #
@@ -11,17 +11,19 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 twist_angles = [105; collect(106:2:138)] 
 twist_angle = 105
 # for twist_angle in twist_angles
-dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/zeeman/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
 dir = ""
+dir1 = ""
 foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -0.5, -3
-p,q = 3, 8
+p,q = 1, 6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
@@ -80,7 +82,7 @@ display(fig)
 close(fig)
 
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
-mtg_data = "NonInt/120_strain/_$(p)_$(q)_mtg_0_0_metadata.jld2";
+mtg_data = "MinHao/NonInt/105_strain/_$(p)_$(q)_mtg_1_0_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
     hf = load(metadata,"hf");
     U2 = zeros(ComplexF64,size(hf.H));
@@ -90,11 +92,11 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
         U2[:,:,ik] = F.vectors 
         energies[:,ik] = F.values
     end 
-    ldim = size(load(dir*hf.metadata[1],"Vec"),1)
+    ldim = size(load(dir1*hf.metadata[1],"Vec"),1)
     U1 = zeros(ComplexF64,ldim*hf.nη*hf.ns,size(hf.H,2),size(hf.H,3))
     U1tmp = reshape(U1,:,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,size(hf.H,3))
     for iη in 1:hf.nη 
-        jldopen(dir*hf.metadata[iη]) do file 
+        jldopen(dir1*hf.metadata[iη]) do file 
             for is in 1:hf.ns 
                 U1tmp[:,iη,is,:,iη,is,:] = reshape(file["Vec"],ldim,2hf.q,:)
             end
@@ -128,7 +130,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
 end
 
 μ = load(metadata,"hf").μ
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,0.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-15.0);
 # mtg = load(mtg_data,"MTG");
 
 
@@ -136,7 +138,7 @@ rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,0.0);
 
 fig, ax = subplots(1,1,figsize=(5,8))
 ldos1 = reshape(sum(ldos,dims=3),size(rvec))
-# ldos1 = ldos[:,:,2]
+ldos1 = ldos[:,:,1]
 # ldos2 = ldos[:,:,2]
 ldos1 ./= maximum(ldos1)
 

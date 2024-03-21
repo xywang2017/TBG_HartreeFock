@@ -1,4 +1,4 @@
-include("bmLL.jl")
+include("bmLL_IKS.jl")
 using SpecialFunctions
 
 mutable struct Coords 
@@ -146,7 +146,7 @@ function Ψ(z::ComplexF64,η::Int,n::Int,γ::Int,l::Int,k::ComplexF64,params::Pa
 end
 
 function Φ(n::Int,x::Float64)
-    if n < 150
+    if n <= 150
         ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*loggamma(n+1))*hermiteh(n,x)
     else
         # ψ=1/π^(1/4)*exp(-n/2*log(2)-x^2/2-0.5*loggamma(n+1))*hermiteh(n,big(x))

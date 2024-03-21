@@ -3,4 +3,6 @@
 *.pdf
 *.mp4
 *.png
+*.txt
+*.zip
 .DS_Store
