@@ -15,22 +15,22 @@ dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
-dir = ""
-dir1 = ""
-foldername = dir*"$(twist_angle)_strain"
+# dir = ""
+# dir1 = ""
+foldername = dir*"zeeman/$(twist_angle)_strain"
 # foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -0.5,-3
+s,t = -2/3,-3
 p,q = 1, 6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_0_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_1_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-# plot_spectra(metadata;savename="test.png")
-plot_density_matrix_bm(metadata,ik=1)
+plot_spectra(metadata;savename="test.png")
+# plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
 
@@ -83,7 +83,7 @@ display(fig)
 close(fig)
 
 # ---------------------------- real space density modulation at a given energy ---------------------- # 
-mtg_data = "MinHao/NonInt/105_strain/_$(p)_$(q)_mtg_0_0_metadata.jld2";
+mtg_data = "MinHao/NonInt/105_strain/_$(p)_$(q)_mtg_1_0_metadata.jld2";
 function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::Float64=0.5)
     # γ = 1e3
     hf = load(metadata,"hf");
@@ -140,7 +140,7 @@ rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-15.0);
 
 fig, ax = subplots(1,1,figsize=(5,8))
 ldos1 = reshape(sum(ldos,dims=3),size(rvec))
-ldos1 = ldos[:,:,1]
+# ldos1 = ldos[:,:,1]
 # ldos2 = ldos[:,:,2]
 ldos1 ./= maximum(ldos1)
 
@@ -159,8 +159,11 @@ close(fig)
 
 
 
+using DelimitedFiles
 
-
+writedlm("Xgrid.txt",real(rvec))
+writedlm("Ygrid.txt",imag(rvec))
+writedlm("NormLDOS_1_6_-0.667_-3_-15meV_ValenceBand.txt",ldos1)
 # ------------
 hf = load(metadata,"hf");
 fig = figure(figsize=(4,3))

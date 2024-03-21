@@ -15,7 +15,7 @@ q = 6 #parse(Int,ARGS[4])
 ϕ = p//q
 twist_angle = 1.05  # parse(Float64,ARGS[5])
 _is_strain = "strain" # ARGS[6]
-q1 = 0
+q1 = 1
 q2 = 0 
 q0 = q1 + 1im*q2 
 

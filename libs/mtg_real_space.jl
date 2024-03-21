@@ -107,7 +107,7 @@ function constructMTGRealSpaceWavefunctions(iz::Int,A::MTG;q0::Complex{Int}=0+0i
                                 exp(-1im * s * projector_norm(Kr,A.params.a2)*projector_norm(A.params.a1,A.params.a2)) 
                 Φz = Ψ(_z,3-2iη,n,γ,l,_k,A.params,A.lB)
                 for ik1 in 1:A.nq, iq in 1:A.q
-                    k1 = A.latt.k2[ik1+(iq-1)*A.nq]
+                    k1 = A.latt.k1[ik1+(iq-1)*A.nq]
                     Wz[:,iH,r,l,iq,ik1,ik2] += expfactor * exp(1im*2π*k1*s) * Φz 
                 end
             end
