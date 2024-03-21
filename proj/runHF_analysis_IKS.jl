@@ -132,7 +132,7 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
 end
 
 μ = load(metadata,"hf").μ
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-15.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-4.0);
 # mtg = load(mtg_data,"MTG");
 
 
@@ -163,7 +163,7 @@ using DelimitedFiles
 
 writedlm("Xgrid.txt",real(rvec))
 writedlm("Ygrid.txt",imag(rvec))
-writedlm("NormLDOS_1_6_-0.667_-3_-15meV_ValenceBand.txt",ldos1)
+writedlm("NormLDOS_1_6_-0.667_-3_-4meV_ConductionBand.txt",ldos1)
 # ------------
 hf = load(metadata,"hf");
 fig = figure(figsize=(4,3))
