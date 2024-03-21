@@ -6,16 +6,16 @@ include(joinpath(fpath,"libs/bmLL_IKS.jl"))
 
 BLAS.set_num_threads(1)
 
-ϕmin = 1//32
+ϕmin = 1//40
 str = "K"
 w0 = 0.7
 w0str = "07"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = ""
-ϕs = unique(sort([p//q for q in 1:32 for p in 1:q]))
+ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  105
+twist_angle =  120
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     fname = "NonInt/Hofstadter/$(twist_angle)_strain"
@@ -25,7 +25,7 @@ function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 32÷denominator(ϕ) 
+    nq = 40÷denominator(ϕ) 
     # if q ==7 
     #     nq =2  
     # end
@@ -60,7 +60,7 @@ function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_strain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
     fig = figure(figsize=(4.3,3))
-    ϕs = unique(sort([p//q for q in 1:32 for p in 1:q]))
+    ϕs = unique(sort([p//q for q in 1:40 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # ϕs = ϕs[ϕs .>= 1//12]
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
@@ -68,20 +68,20 @@ function plot_LL_spectrum()
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
-    foldername = "NonIntHofstadterData"
+    # foldername = "NonIntHofstadterData"
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
         energies = reshape(data["$(ϕ)"],2q,:)
         # plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
         # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
-        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],"o",ms=2,markeredgecolor="none",color="r")
-        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],"o",ms=2,markeredgecolor="none",color="gray")
-        writedlm("$(foldername)/_$(p)_$(q)_spin_up.txt",energies.+μB*ϕ)
-        writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies.-μB*ϕ)
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=2,markeredgecolor="none",color="r")
+        plot(ones(length(energies[(q-p+1):end,:]))*ϕ,energies[(q-p+1):end,:][:],".",ms=2,markeredgecolor="none",color="gray")
+        # writedlm("$(foldername)/_$(p)_$(q)_spin_up.txt",energies.+μB*ϕ)
+        # writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies.-μB*ϕ)
     
     end
     # ylim([0.06,0.51])
-    # ylim([-26,26])
+    ylim([-26,26])
     xlim([0.01,0.52])
     xlabel(L"ϕ/ϕ_0")
     ylabel(L"\rm E_0\ (meV)")

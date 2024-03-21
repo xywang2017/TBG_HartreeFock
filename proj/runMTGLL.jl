@@ -91,7 +91,7 @@ end
 
 fig,ax = subplots(1,4,figsize=(8,4))
 for i in 1:4 
-    idx = 4
+    idx = 12
     vmax = maximum(abs2.(ψ[:,:,idx,1,:]))
     r,c = (i-1)%2 + 1, (i-1)÷2 + 1
     pl=ax[i].pcolormesh(real(rvec), imag(rvec), reshape(abs2.(ψ[r,c,idx,1,:]),mtg.coord.lr,:), cmap="bwr",vmin=0,vmax=vmax)
