@@ -6,7 +6,6 @@ include(joinpath(fpath,"libs/MagneticFieldHF_IKS.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 
 #
--34.615145243629016
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
@@ -24,7 +23,7 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2/3,-3
+s,t = -0.5,-3
 p,q = 1, 6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
