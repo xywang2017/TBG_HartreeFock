@@ -1,7 +1,7 @@
 using PyPlot 
 
 ## plot Hartree Fock spectra
-function plot_spectra(metadata::String;savename::String="tmp.pdf")
+function plot_spectra(metadata::String;savename::String="tmp.pdf",lines::Vector{Float64}=Float64[])
     hf = load(metadata,"hf");
     ϵk = hf.ϵk
     σzτz = hf.σzτz
@@ -14,7 +14,11 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf")
     pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=8,vmin=-1,vmax=1)
     colorbar(pl)
     
-    axhline(hf.μ,ls=":",c="gray")
+    if !isempty(lines)
+        for i in eachindex(lines)
+            axhline(lines[i],ls=":",c="gray")
+        end
+    end
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
     tight_layout()

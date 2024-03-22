@@ -23,13 +23,13 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2/3,-3
+s,t = -0.5,-3
 p,q = 1, 6
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectra(metadata;savename="test.png")
+plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ-16])
 # plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
@@ -125,14 +125,14 @@ function plot_realspace_cdw(metadata::String,mtg_data::String,ϵ0::Float64;γ::F
     ir = reshape(1:length(rvec),size(rvec))
     ldos = zeros(Float64,size(rvec,1),size(rvec,2),2)
     for x in 1:size(ldos,1), y in 1:size(ldos,2), jj in 1:2 
-        ldos[x,y,jj] = sum(  abs2.(ψ[jj,ir[x,y],:,:]) ./ ((ϵ0 .- energies).^2 .+ γ^2) )* γ/π
-        # ldos[x,y,jj] = sum(  abs2.(ψ[jj,ir[x,y],:,:]) .* (sign.(hf.μ .- energies) .+1 ) ) / 2
+        # ldos[x,y,jj] = sum(  abs2.(ψ[jj,ir[x,y],:,:]) ./ ((ϵ0 .- energies).^2 .+ γ^2) )* γ/π
+        ldos[x,y,jj] = sum(  abs2.(ψ[jj,ir[x,y],:,:]) .* (sign.(hf.μ .- energies) .+1 ) ) / 2
     end
     return rvec, ldos
 end
 
 μ = load(metadata,"hf").μ
-rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,-15.0);
+rvec, ldos  = plot_realspace_cdw(metadata,mtg_data,μ-16);
 # mtg = load(mtg_data,"MTG");
 
 
@@ -145,7 +145,7 @@ ldos1 = reshape(sum(ldos,dims=3),size(rvec))
 ldos1 ./= maximum(ldos1)
 
 for jj in -3:3
-    pl=ax.pcolormesh(real(rvec).+jj*real(params.a1), imag(rvec).+jj*imag(params.a1),ldos1, cmap="bwr",vmin=0,vmax=1)
+    pl=ax.pcolormesh(real(rvec).+jj*real(params.a1), imag(rvec).+jj*imag(params.a1),ldos1,vmin=0,vmax=1)
 end
 points = reshape(-3:3,:,1)*params.a1 .+ reshape(-3:3,1,:)*params.a2 
 ax.scatter(real(points),imag(points),s=5,c="k")
