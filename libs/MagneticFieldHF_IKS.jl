@@ -77,7 +77,7 @@ function ZeemanUnit(params::Params)
     return V0
 end
 
-function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,QIKS::Complex{Int}=0+0im,
+function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-6,QIKS::Complex{Int}=0+0im,
         ν::Float64=0.0,ϕ::Rational{Int}=1//10,prefix::String="",_Init::String="CNP",savename::String="placeholder.txt",
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     p, q = numerator(ϕ), denominator(ϕ)
@@ -363,6 +363,13 @@ function update_P(hf::HartreeFock;Δ::Float64=0.0,_oda::Bool=true)
     norm_convergence = calculate_norm_convergence(λ*P_new + (1-λ)*hf.P,hf.P)
     
     hf.P .= λ*P_new + (1-λ)*hf.P
+
+    # tmpP = reshape(hf.P,hf.nη*hf.ns*hf.nb*hf.q,hf.nη*hf.ns*hf.nb*hf.q,hf.q,hf.nq^2)
+    # if mod(hf.q,3) ==0
+    #     for j in 1:2, i in (j+3):3:hf.q 
+    #         tmpP[:,:,mod(i-1,hf.q)+1,:] = exp.(1im*angle.(tmpP[:,:,mod(i-1,hf.q)+1,:])) .* abs.(tmpP[:,:,j,:])
+    #     end
+    # end
     return norm_convergence,λ
 end
 
