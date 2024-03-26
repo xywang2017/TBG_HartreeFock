@@ -87,8 +87,8 @@ function plot_spectrav3(metadata::String;savename::String="tmp.pdf")
     H = reshape(hf.H,2hf.q,4,2hf.q,4,:,hf.nq^2)
     H = H[:,:,:,:,1,:] 
     Σz0 = reshape(hf.Σz0,2hf.q,4,2hf.q,4,:)
-    subblocks = [[1],[2],[3,4]]
-    lbls = ["K↑","K'↑","{K↓,K'↓}"]
+    subblocks = [[1],[2],[3],[4]]
+    lbls = ["K↑","K'↑","K↓","K'↓"]
     ϵk = []
     σz = []
     for sb in subblocks
@@ -374,6 +374,67 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
     xticks([0.1,0.2,0.3,0.4,0.5],fontsize=13)
     ylabel("E (meV)",fontsize=13)
     xlabel(L"ϕ/ϕ_0",fontsize=13)
+    tight_layout()
+    savefig(savename,dpi=600,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
+
+
+## plot Hartree Fock spectra collectively, color by spin + valley polarization
+function plot_spectra_collectivev3(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
+    # fig = figure(figsize=(3,2.5))
+    fig, ax = subplots(1,2,figsize=(5,3),sharex=true,sharey=true)
+    # fig = figure(figsize=(6,4))
+    ϕs = Float64[]
+    μs = Float64[]
+    colors = ["tab:blue","tab:orange","tab:red","tab:green"]
+    markers = ["<",">","<",">"]
+    labels=["K↑","K'↑","K↓","K'↓"]
+    for j in eachindex(metadatas) 
+        if j in indices
+            metadata = metadatas[j]
+            hf = load(metadata,"hf");
+            ϵk = zeros(Float64,2hf.q,size(hf.H,3),4)
+            H = reshape(hf.H,2hf.q,4,2hf.q,4,:)
+            P = reshape(hf.P,2hf.q,4,2hf.q,4,:)
+            tmp = zeros(ComplexF64,size(H,1),size(H,3),size(H,5))
+            a, b = 4, 3
+            if norm(P[:,a,:,a,1]+0.5I)> norm(P[:,b,:,b,1]+0.5I)
+                tmp .= H[:,a,:,a,:]
+                H[:,a,:,a,:] = H[:,b,:,b,:]
+                H[:,b,:,b,:] = tmp 
+            end
+            for ik in 1:size(ϵk,2), iηs in 1:4
+                F = eigen(Hermitian(H[:,iηs,:,iηs,ik]))
+                ϵk[:,ik,iηs] = F.values 
+            end
+            if !occursin("_tL_",metadata)
+                ϵk = reshape(ϵk,2hf.q,hf.q,hf.nq^2,4)[:,1,:,:]
+            end
+            for iηs in [1,2]
+                ax[2].scatter(ones(length(ϵk[:,:,iηs]))*hf.p/hf.q,ϵk[:,:,iηs],c=colors[iηs],s=6,marker="o",edgecolors="none")
+            end
+            for iηs in [3,4]
+                ax[1].scatter(ones(length(ϵk[:,:,iηs]))*hf.p/hf.q,ϵk[:,:,iηs],c=colors[iηs],s=6,marker="o",edgecolors="none")
+                # ax[1].scatter(ones(length(ϵk[:,:,iηs]))*hf.p/hf.q,ϵk[:,:,iηs],c="tab:red",s=6,marker="o",edgecolors="none")
+            end
+            push!(μs,hf.μ)
+            push!(ϕs,hf.p/hf.q)
+        end
+    end 
+    for jj in 1:2
+        ax[jj].plot(ϕs,μs,":",c="k",lw=0.5)
+    end
+    ax[1].set_xlim([0.01,0.55])
+    # ax[1].set_ylim([-35,39])
+    ax[1].set_ylim([-39,49])
+    # ax[1].set_yticks(collect(-30:20:30),fontsize=12)
+    ax[1].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    ax[2].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    # ylabel("E (meV)",fontsize=13)
+    # xlabel(L"ϕ/ϕ_0",fontsize=13)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)

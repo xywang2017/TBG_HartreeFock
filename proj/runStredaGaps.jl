@@ -9,14 +9,13 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 120
+twist_angle = 128
 foldername = dir*"zeeman/$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
-flux_conversion(1.0/12,params)
 w0 = "07"
 
 ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
@@ -27,7 +26,6 @@ for s in -3:3, t in -12:12
     push!(sts,[s,t])
 end
 sts = unique(sts)
-μs = ComplexF64[]
 # -------------------------Streda Line Plot ---------------------------------- # 
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
@@ -63,9 +61,6 @@ for iϕ in eachindex(ϕs)
     end
     # gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
-    # if ! isempty(ns)
-    #     writedlm("105_fillings_gaps/$(p)_$(q)_fillings_gaps.txt",[ns gaps])
-    # end
 end
 ax.set_xlim([-4.3,0.3])
 ax.set_ylim([-0.01,0.55])
@@ -83,24 +78,16 @@ savefig("$(twist_angle).png",transparent=false,dpi=600)
 display(fig)
 close(fig)
 
-# -----
 
-fig = figure(figsize=(4,3))
-plot(real(μs),imag(μs),"b-o",ms=3)
-xlabel(L"n/n_s")
-ylabel("μ (meV)")
-tight_layout()
-display(fig)
-close(fig)
 # -----------------------------Hofstadter spectrum plot ---------------------------- # 
 Δss = []
 # energies1 = zeros(Float64,length(ϕs),3)
 # energies = zeros(Float64,length(ϕs),3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
-ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
+# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,0]]
+sts = [[-2,-2]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -124,17 +111,17 @@ for i in eachindex(sts)
                 # println(load(metadata,"iter_energy")[end])
                 hf = load(metadata,"hf");
                 # writedlm("SBCI_spectra/_-2.5_-1_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
-                push!(μs,hf.μ)
+                # push!(μs,hf.μ)
             else 
-                push!(μs,NaN)
+                # push!(μs,NaN)
             end
         end
     end
     # writedlm("SBCI_spectra/_-2.5_-1_s$(s)_t$(t)_chemicalpotential.txt",[numerator.(ϕs[:]) denominator.(ϕs[:]) μs[:]])
-    idx = Int[]
+    idx = collect(9:23)
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collectivev3(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 

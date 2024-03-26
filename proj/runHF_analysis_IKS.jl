@@ -15,24 +15,25 @@ twist_angle = 120
 dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
 dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
-dir = ""
-dir1 = ""
+# dir = ""
+# dir1 = ""
 foldername = dir*"$(twist_angle)_nostrain"
 # foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2,1
-p,q = 1, 7
+s,t = -2,-2
+p,q = 1, 12
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
+# plot_spectrav3(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
+plot_spectrav3(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
-plot_density_matrix_global_order_parameters(metadata)
+# plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 nq = 12÷q 
