@@ -1,5 +1,5 @@
 using LinearAlgebra
-
+using Random
 mutable struct Lattice 
     k1::Vector{Float64}
     k2::Vector{Float64}
@@ -25,8 +25,9 @@ function constructLatticeIKS(latt::Lattice,params::Params;lk::Int=12,_valley::St
     # lmax = (lk-1)/2
     # latt.k1 = collect((-lmax):lmax) ./ lk 
     # latt.k2 = collect((-lmax):lmax) ./ lk 
-    latt.k1 = collect(0:(lk-1)) ./ lk
-    latt.k2 = collect(0:(lk-1)) ./ lk 
+    δk = rand(Float64) / lk 
+    latt.k1 = collect(0:(lk-1)) ./ lk .+δk
+    latt.k2 = collect(0:(lk-1)) ./ lk .+δk
 
     if isequal(_valley,"Kprime")
         latt.k1 .+= real(q0)/lk 
