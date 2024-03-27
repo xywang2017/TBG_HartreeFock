@@ -9,7 +9,7 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 128
+twist_angle = 120
 foldername = dir*"zeeman/$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 # params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -87,7 +87,7 @@ close(fig)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-2]]
+sts = [[-2,0]]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -118,10 +118,11 @@ for i in eachindex(sts)
         end
     end
     # writedlm("SBCI_spectra/_-2.5_-1_s$(s)_t$(t)_chemicalpotential.txt",[numerator.(ϕs[:]) denominator.(ϕs[:]) μs[:]])
-    idx = collect(9:23)
+    idx = collect(1:23)
+    idx = Int[collect(1:14);collect(17:22)]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collectivev3(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 

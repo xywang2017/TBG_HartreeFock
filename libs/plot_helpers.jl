@@ -241,77 +241,67 @@ end
 
 ## plot Hartree Fock spectra collectively
 function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[])
-    fig = figure(figsize=(3,2.5))
+    fig = figure(figsize=(3.5,3))
     # fig = figure(figsize=(5,4))
     ϕs = Float64[]
     Δs = Float64[]
     cmap =["coolwarm","bwr"]
     μs = Float64[]
     for j in eachindex(metadatas) 
-        metadata = metadatas[j]
-        hf = load(metadata,"hf");
-        νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
-        # if true # (hf.p/hf.q!=1/3 && hf.p/hf.q!=4/11 && hf.p/hf.q!=1/2)
-        # if hf.p/hf.q < 1/3
-        ϵk = hf.ϵk
-        σzτz = hf.σzτz
-        idx = sortperm(ϵk[:])
-        ϵsorted = ϵk[idx] 
-        chern = σzτz[idx]
-        pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=5,vmin=-1,vmax=1,marker="o",edgecolor="none")
-        # if j in indices
-        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
-        # else
-        #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
-        # end
-        # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
-        if j == length(metadatas)
-             colorbar(pl,shrink=0.8)
-        end
-        # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
-        push!(μs,hf.μ)
-        push!(ϕs,hf.p/hf.q)
+        if j in indices
+            metadata = metadatas[j]
+            hf = load(metadata,"hf");
+            νF = 8*round(Int,(hf.ν+4)/8*length(hf.ϵk)) / length(hf.ϵk)-4
+            # if true # (hf.p/hf.q!=1/3 && hf.p/hf.q!=4/11 && hf.p/hf.q!=1/2)
+            # if hf.p/hf.q < 1/3
+            ϵk = hf.ϵk
+            σzτz = hf.σzτz
+            idx = sortperm(ϵk[:])
+            ϵsorted = ϵk[idx] 
+            chern = σzτz[idx]
+            pl=scatter(ones(length(ϵsorted))*hf.p/hf.q,ϵsorted,c=chern,cmap="coolwarm",s=6,vmin=-1,vmax=1,marker="o",edgecolor="none")
+            # if j in indices
+            #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0,0.6,0],markeredgecolor="none",markersize=1.5)
+            # else
+            #     plot(ones(length(ϵsorted[ϵsorted.<=hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.<=hf.μ],"o",c=[0.8,0,0],markeredgecolor="none",markersize=1.5)
+            # end
+            # plot(ones(length(ϵsorted[ϵsorted.>hf.μ]))*hf.p/hf.q,ϵsorted[ϵsorted.>hf.μ],"o",c="gray",markeredgecolor="none",markersize=1.5)
+            if j == 1
+                 colorbar(pl,shrink=0.8)
+            end
+            # plot([hf.p/hf.q-0.01,hf.p/hf.q+0.01],[hf.μ,hf.μ],":",c="k",lw=0.5)
+            push!(μs,hf.μ)
+            push!(ϕs,hf.p/hf.q)
         
-        ν = eachindex(ϵsorted) ./ length(ϵsorted)
-        i = 1
-        while (νF+4)/8 > ν[i]
-            i += 1
+            ν = eachindex(ϵsorted) ./ length(ϵsorted)
+            i = 1
+            while (νF+4)/8 > ν[i]
+                i += 1
+            end
+            ν = eachindex(ϵsorted) ./ length(ϵsorted)
+            if i<length(chern)
+                # i = i-1
+                ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
+                i = length(ϵsorted[ϵsorted .<=hf.μ])
+                Δ = ϵsorted[i+1] - ϵsorted[i]
+            else
+                ϵF = ϵsorted[end]
+                Δ = 0 
+            end
+            push!(Δs,Δ)
         end
-        # push!(ϵFs,(ϵsorted[i+1] + ϵsorted[i])/2) 
-        # push!(Δs,max((ϵsorted[i+1] - ϵsorted[i]),(ϵsorted[i] - ϵsorted[i-1])))
-        ν = eachindex(ϵsorted) ./ length(ϵsorted)
-        if i<length(chern)
-            # i = i-1
-            ϵF = (ϵsorted[i+1] + ϵsorted[i])/2 
-            i = length(ϵsorted[ϵsorted .<=hf.μ])
-            Δ = ϵsorted[i+1] - ϵsorted[i]
-        else
-            ϵF = ϵsorted[end]
-            Δ = 0 
-        # end
-        push!(Δs,Δ)
-    end
         # push!(Δs,(ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ]) +1] - ϵsorted[length(ϵsorted[ϵsorted .<=hf.μ])]))
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
-    # title(titlestr)
-    # xticks(collect(0.1:0.2:0.5))
-    # axvline([(2//9+1//4)/2],ls=":",c="k")
-    # axvline([1//8+1//7]/2,ls=":",c="k")
-    xlim([0,0.55])
-    xticks([0.2,0.4])
-    ylim([-44,24])
-    ylabel("E (meV)")
-    xlabel(L"ϕ/ϕ_0")
-    # ticklist = [1/2,1/3,2/7,1/4,1/5,1/6,1/8,1/10,1/14]
-    # ticklistLabels= [L"$\frac{1}{2}$",L"$\frac{1}{3}$",
-    #             L"$\frac{2}{7}$",L"$\frac{1}{4}$",L"$\frac{1}{5}$",
-    #             L"$\frac{1}{6}$",L"$\frac{1}{8}$",L"$\frac{1}{10}$",L"$\frac{1}{14}$"]
-    # ticklist = [1/4,1/8]
-    # ticklistLabels= [L"$\frac{1}{4}$",L"$\frac{1}{8}$"]
-    # xticks(ticklist,ticklistLabels)
-    # title(titlestr)
+    ylim([-35,39])
+    # ylabel("E (meV)")
+    # xlabel(L"ϕ/ϕ_0")
+    plot(ϕs,μs,":",c="k",lw=0.5)
+    xlim([0.01,0.55])
+    ylim([-35,39])
+    # yticks(collect(-30:20:30),fontsize=12)
+    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -333,47 +323,46 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
     a0 = Float64[1 0; 0 1]
     az = Float64[1 0; 0 -1]
     for j in eachindex(metadatas) 
-        metadata = metadatas[j]
-        hf = load(metadata,"hf");
-        ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
-        sz = zeros(Float64,size(ϵk))
-        ηz = zeros(Float64,size(ϵk))
-        Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
-        Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
-        for ik in 1:size(ϵk,2)
-            H = hf.H[:,:,ik]
-            H[abs.(H) .<1e-2] .= 0.0
-            F = eigen(Hermitian(H))
-            ϵk[:,ik] = F.values 
-            for iq in 1:size(hf.H,1)
-                sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
-                ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
+        if j in indices
+            metadata = metadatas[j]
+            hf = load(metadata,"hf");
+            ϵk = zeros(Float64,size(hf.H,1),size(hf.H,3))
+            sz = zeros(Float64,size(ϵk))
+            ηz = zeros(Float64,size(ϵk))
+            Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
+            Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
+            for ik in 1:size(ϵk,2)
+                H = hf.H[:,:,ik]
+                # H[abs.(H) .<1e-2] .= 0.0
+                F = eigen(Hermitian(H))
+                ϵk[:,ik] = F.values 
+                for iq in 1:size(hf.H,1)
+                    sz[iq,ik] = real(F.vectors[:,iq]'*Osz*F.vectors[:,iq])
+                    ηz[iq,ik] = real(F.vectors[:,iq]'*Oηz*F.vectors[:,iq] )
+                end
             end
+            if !occursin("_tL_",metadata)
+                ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
+                ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
+            end
+            # pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=6,vmin=0,vmax=1,marker="o",edgecolors="none")
+            # scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=6,marker="o",edgecolors="none")
+            idx = sortperm(abs.(ηz[:]))
+            pl=scatter(ones(length(ϵk[idx]))*hf.p/hf.q,ϵk[idx],c=abs.(ηz[idx]),cmap="coolwarm",s=6,vmin=0,vmax=1,marker="o",edgecolors="none")
+            if j == length(metadatas)
+                #  colorbar(pl,shrink=0.8)
+            end
+            push!(μs,hf.μ)
+            push!(ϕs,hf.p/hf.q)
         end
-        if !occursin("_tL_",metadata)
-            ϵk = reshape(ϵk,8hf.q,hf.q,hf.nq^2)[:,1,:]
-            ηz = reshape(ηz,8hf.q,hf.q,hf.nq^2)[:,1,:]
-        end
-        pl=scatter(ones(length(ϵk[ϵk .< hf.μ]))*hf.p/hf.q,ϵk[ϵk .< hf.μ],c=abs.(ηz[ϵk .< hf.μ]),cmap="coolwarm",s=6,vmin=0,vmax=1,marker="o",edgecolors="none")
-        scatter(ones(length(ϵk[ϵk .>= hf.μ]))*hf.p/hf.q,ϵk[ϵk .>= hf.μ],c="gray",s=6,marker="o",edgecolors="none")
-        # pl=scatter(ones(length(ϵk[ϵk .> hf.μ]))*hf.p/hf.q,ϵk[ϵk .> hf.μ],c=abs.(ηz[ϵk .> hf.μ]),cmap="coolwarm",s=2,vmin=0,vmax=1,marker="o")
-        if j == length(metadatas)
-            #  colorbar(pl,shrink=0.8)
-        end
-        push!(μs,hf.μ)
-        push!(ϕs,hf.p/hf.q)
-
-        # if hf.q == 12  && hf.p == 1
-        #     println(abs.(ηz[ϵk .< hf.μ]))
-        # end
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
     xlim([0.01,0.55])
-    ylim([-44,44])
-    yticks(collect(-40:20:20),fontsize=13)
-    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=13)
-    ylabel("E (meV)",fontsize=13)
-    xlabel(L"ϕ/ϕ_0",fontsize=13)
+    ylim([-35,39])
+    yticks(collect(-30:20:30),fontsize=12)
+    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    # ylabel("E (meV)",fontsize=12)
+    # xlabel(L"ϕ/ϕ_0",fontsize=12)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -428,8 +417,8 @@ function plot_spectra_collectivev3(metadatas::Vector{String};savename::String="t
         ax[jj].plot(ϕs,μs,":",c="k",lw=0.5)
     end
     ax[1].set_xlim([0.01,0.55])
-    # ax[1].set_ylim([-35,39])
-    ax[1].set_ylim([-39,49])
+    ax[1].set_ylim([-35,39])
+    # ax[1].set_ylim([-39,49])
     # ax[1].set_yticks(collect(-30:20:30),fontsize=12)
     ax[1].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)
     ax[2].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)

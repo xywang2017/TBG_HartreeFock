@@ -381,6 +381,10 @@ function init_P_strong_coupling(hf::HartreeFock;
     # hf.H .= H0
     hf.P .= P0 
 
+    tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,:)
+    tmp = tmpP[:,1,:,1,:]
+    tmpP[:,1,:,1,:] = tmpP[:,3,:,3,:]
+    tmpP[:,3,:,3,:] = tmp 
     # add a wavevector 
     # tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
     # for iq in 2:hf.q 

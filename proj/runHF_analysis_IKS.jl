@@ -23,17 +23,17 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2,-2
+s,t = -2,2
 p,q = 1, 12
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="1_0_0_0_chern_tL_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-# plot_spectrav3(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
-plot_spectrav3(metadata;savename="test.png")
+plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
+# plot_spectrav3(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
-# plot_density_matrix_global_order_parameters(metadata)
+plot_density_matrix_global_order_parameters(metadata)
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 nq = 12÷q 
