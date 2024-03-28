@@ -25,9 +25,9 @@ function constructLatticeIKS(latt::Lattice,params::Params;lk::Int=12,_valley::St
     # lmax = (lk-1)/2
     # latt.k1 = collect((-lmax):lmax) ./ lk 
     # latt.k2 = collect((-lmax):lmax) ./ lk 
-    δk = rand(Float64) / lk 
-    latt.k1 = collect(0:(lk-1)) ./ lk .+δk
-    latt.k2 = collect(0:(lk-1)) ./ lk .+δk
+    # δk = rand(Float64) / lk 
+    latt.k1 = collect(0:(lk-1)) ./ lk # .+δk
+    latt.k2 = collect(0:(lk-1)) ./ lk #.+δk
 
     if isequal(_valley,"Kprime")
         latt.k1 .+= real(q0)/lk 
