@@ -9,16 +9,16 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
-twist_angle = 105
-foldername = dir*"zeeman/$(twist_angle)_strain"
+twist_angle = 120
+foldername = dir*"zeeman/$(twist_angle)_nostrain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
-params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
-# params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+# params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 ϕs = ϕs[ϕs.>=1//12]
 sts = []
@@ -83,11 +83,12 @@ close(fig)
 Δss = []
 # energies1 = zeros(Float64,length(ϕs),3)
 # energies = zeros(Float64,length(ϕs),3)
-ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
+# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-1.5,-2]]
+sts = [[-2,-1]]
+energies = Float64[]
 for i in eachindex(sts) 
     st = sts[i]
     s,t = st[1], st[2]
@@ -101,7 +102,7 @@ for i in eachindex(sts)
             # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="tL_init_HF_$(p)_$(q)_nu_$(νstr)")
             # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
             if q <=12
-                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
+                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="flavor_tL_init_HF_nu_$(p)_$(q)_$(νstr).jld2")
             else
                 metadata = find_lowest_energy_datafile("$(fname1)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
             end
@@ -111,6 +112,7 @@ for i in eachindex(sts)
                 # println(load(metadata,"iter_energy")[end])
                 hf = load(metadata,"hf");
                 # writedlm("SBCI_spectra/_-2.5_-1_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
+                push!(energies,load(metadata,"iter_energy")[end])
                 # push!(μs,hf.μ)
             else 
                 # push!(μs,NaN)

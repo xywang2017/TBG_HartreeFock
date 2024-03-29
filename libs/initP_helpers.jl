@@ -378,13 +378,13 @@ function init_P_strong_coupling(hf::HartreeFock;
         P0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1),H0::Array{ComplexF64,3}=ones(ComplexF64,1,1,1))
     # this function initializes the density matrix into a Chern state of the strong coupling spectrum 
     # first need to recreate the density matrix based on CNP 
-    # hf.H .= H0
+    hf.H .= H0
     hf.P .= P0 
 
-    tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,:)
-    tmp = tmpP[:,1,:,1,:]
-    tmpP[:,1,:,1,:] = tmpP[:,3,:,3,:]
-    tmpP[:,3,:,3,:] = tmp 
+    # tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,:)
+    # tmp = tmpP[:,1,:,1,:]
+    # tmpP[:,1,:,1,:] = tmpP[:,3,:,3,:]
+    # tmpP[:,3,:,3,:] = tmp 
     # add a wavevector 
     # tmpP = reshape(hf.P,2hf.q,hf.nη*hf.ns,2hf.q,hf.nη*hf.ns,hf.q,hf.nq^2)
     # for iq in 2:hf.q 
@@ -394,7 +394,7 @@ function init_P_strong_coupling(hf::HartreeFock;
     #     tmpP[:,4,:,1,iq,:] .*= exp(1im*hf.p/hf.q*2π*(iq-1))
     #     # tmpP[:,:,:,:,iq,:] .= tmpP[:,:,:,:,1,:]
     # end
-    # update_P(hf;_oda=false)
+    update_P(hf;_oda=false)
     println("Initialization based on populating excitation spectra of CNP")
     return nothing
 end
