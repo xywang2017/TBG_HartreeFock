@@ -91,10 +91,10 @@ function constructbmLL(A::bmLL,params::Params;
             file["PΣz"] = A.PΣz
         end
 
-        ng = 3
+        ng = 1  # need to set ng = 3 for Hartree Fock calculations; ng=1 needed for quantum geometry
         A.gvec = reshape(collect(-ng:ng),:,1)*A.params.g1 .+ reshape(collect(-ng*A.q:ng*A.q),1,:)*A.params.g2 ./A.q
 
-        G0 = abs(ng*A.params.g1+ng*A.params.g2)*1.00001
+        G0 = abs(ng*A.params.g1+ng*A.params.g2)*3.00001
         if _calculate_overlap
             A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
             # for m in -ng:ng, n in -ng*A.q:ng*A.q 
