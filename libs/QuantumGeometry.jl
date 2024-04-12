@@ -18,7 +18,8 @@ mutable struct QuantumGeometryBM
 
     δqs::Array{ComplexF64}  # q vectors to compute [Λ_q(k)]_α,β
 
-    Λq::Array{ComplexF64,4}  # 2q x 2q x length(kvec) x n δqs , input to calculating geometric aspects 
+    Λq::Array{ComplexF64,4}  # 2q x 2q x length(kvec) x n δqs , input to calculating geometric aspects
+    U1::Array{ComplexF64,3} 
     
     F::Array{Float64,3}  # α x β x length(kvec)   Non-abelian quantum berry curvature
     G::Array{Float64,3}  # α x β x length(kvec)   Non-abelian quantum metric
@@ -28,7 +29,7 @@ mutable struct QuantumGeometryBM
     QuantumGeometryBM() = new()
 end
 
-function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,
+function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,U1::Array{ComplexF64,3}=zeros(ComplexF64,0,0,0),
                     nq::Int=2,fname::String="",savename::String="",_valley::String="K",q0::Complex{Int}=0+0im)
     qg = QuantumGeometryBM()
 
@@ -44,6 +45,14 @@ function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,
     constructLatticeIKS(qg.latt,qg.params;lk = qg.nq*qg.q,_valley=qg._valley,q0=q0)
 
     qg.Λq = zeros(ComplexF64,2qg.q,2qg.q,qg.nq^2*qg.q,length(qg.δqs))
+    if isempty(U1)
+        qg.U1 = zeros(ComplexF64,2qg.q,2qg.q,qg.nq^2*qg.q)
+        for ib in 1:(2qg.q) 
+            qg.U1[ib,ib,:] = 1.0+0.0im 
+        end
+    else
+        qg.U1 = U1 
+    end
     constructΛq(qg)
 
     tmpF = computeBerryCurvature(qg)
@@ -65,6 +74,7 @@ function constructΛq(qg::QuantumGeometryBM)
 
     Λ = zeros(ComplexF64,2qg.q*qg.nq^2*qg.q,2qg.q*qg.nq^2*qg.q)
     tmpΛ = reshape(Λ,2qg.q,qg.q,qg.nq,qg.nq,2qg.q,qg.q,qg.nq,qg.nq)
+    tmpU1 = reshape(qg.U1,2qg.q,2qg.q,qg.q,qg.nq,qg.nq)
     for iq in eachindex(qg.δqs)
         δq1, δq2 = Int(real(qg.δqs[iq])), Int(imag(qg.δqs[iq]))
         for ik2 in 1:size(kvec,2), ik1 in 1:size(kvec,1)
@@ -78,7 +88,8 @@ function constructΛq(qg::QuantumGeometryBM)
                 _ik1, _rk = mod(ik1-1,qg.nq) + 1, div(ik1-1,qg.nq) + 1
                 _ip1, _rp = mod(ip1-1,qg.nq) + 1, div(ip1-1,qg.nq) + 1
                 tmpΛ = reshape(Λ,2qg.q,qg.q,qg.nq,qg.nq,2qg.q,qg.q,qg.nq,qg.nq)
-                qg.Λq[:,:,ik,iq] = tmpΛ[:,_rk,_ik1,ik2,:,_rp,_ip1,ip2]
+                qg.Λq[:,:,ik,iq] = tmpU1[:,:,_rk,_ik1,ik2]'*
+                                    tmpΛ[:,_rk,_ik1,ik2,:,_rp,_ip1,ip2]*tmpU1[:,:,_rp,_ip1,ip2]
             end
         end
 

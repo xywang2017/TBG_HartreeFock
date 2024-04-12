@@ -9,31 +9,42 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 120
+twist_angle = 105
 # for twist_angle in twist_angles
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
-dir1 = "/Volumes/Data/Reruns/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+# dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
-# dir = ""
-# dir1 = ""
-foldername = dir*"$(twist_angle)_nostrain"
+dir = ""
+dir1 = ""
+foldername = dir*"$(twist_angle)_strain"
 # foldername = dir*"$(twist_angle)_strain"
-params = Params(ϵ=0.00,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
+params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -2,0
-p,q = 1, 10
+s,t = 0,-4
+p,q = 1, 4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="flavor_tL_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
 # plot_spectrav3(metadata;savename="test.png")
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 plot_density_matrix_global_order_parameters(metadata)
+
+hf = load(metadata,"hf");
+H = hf.H[(4q+1):6q,(4q+1):6q,:];
+U1 = zeros(ComplexF64,size(H,1),size(H,2),q*size(H,3))
+tmpU1 = reshape(U1,size(H,1),size(H,2),q,size(H,3))
+for ik in 1:size(H,3)
+    F = eigen(Hermitian(H[:,:,ik]))
+    for iq in 1:q
+        tmpU1[:,:,iq,ik] = F.vectors
+    end
+end
 
 # ----------------------------------IKS Analysis-------------------------------------------- # 
 nq = 12÷q 
