@@ -37,7 +37,7 @@ bm = bmLL();
 constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
 
 
@@ -48,14 +48,15 @@ kvec = reshape( reshape(qg.latt.k1[1:qg.nq],:,1,1)*qg.params.g1 .+
     reshape((0:(qg.q-1))./qg.q,1,:,1)*qg.params.g1, qg.q*qg.nq,qg.nq ) ./abs(params.g1)
 
 # pcolormesh(imag(kvec),real(kvec),reshape(qg.F[q,q,:],:,qg.nq)/π,cmap="bwr")
-imshow(reshape((qg.F[1,1,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(reshape((qg.F[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+# imshow(reshape((tmpF),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 # axis("equal")
 colorbar()
 tight_layout()
 display(fig)
 close(fig)
 
-[sum(qg.F[i,i,:]) for i in 1:(2q)]
+[sum(qg.F[i,i,:]) for i in 1:(2q)]  /(2π)
 # ---------------------------- Structure factor ----------------------- # 
 fig = figure(figsize=(8,2))
 imshow(reshape(abs.(qg.Λq[qg.q,qg.q,:,9]),:,qg.nq)',origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5,cmap="bwr")

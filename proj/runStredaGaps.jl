@@ -87,7 +87,7 @@ close(fig)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
-sts = [[-2,-1]]
+sts = [[0,-4]]
 energies = Float64[]
 for i in eachindex(sts) 
     st = sts[i]
@@ -102,7 +102,7 @@ for i in eachindex(sts)
             # metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="tL_init_HF_$(p)_$(q)_nu_$(νstr)")
             # energies1[iϕ,i] = load(metadata,"iter_energy")[end]
             if q <=12
-                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="flavor_tL_init_HF_nu_$(p)_$(q)_$(νstr).jld2")
+                metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_nu_$(νstr).jld2")
             else
                 metadata = find_lowest_energy_datafile("$(fname1)/_$(p)_$(q)";test_str="nu_$(νstr).jld2")
             end
@@ -124,7 +124,7 @@ for i in eachindex(sts)
     # idx = Int[collect(1:14);collect(17:22)]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collectivev3(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     push!(Δss,Δs)
 end
 
