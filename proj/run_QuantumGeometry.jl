@@ -37,22 +37,19 @@ bm = bmLL();
 constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg, tmpF = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
-
-
+σF = sqrt(sum(abs2.(tmpF*imag(params.g1'*params.g2) / q / (2π) .+ 1))/(nq^2*q) )
+Tη = (sum(tmpG) - abs(sum(tmpF))) *imag(params.g1'*params.g2) / (q*length(tmpG))
 # ---------------------------- Berry curvature ----------------------- # 
 fig = figure(figsize=(4,3))
-kvec = reshape( reshape(qg.latt.k1[1:qg.nq],:,1,1)*qg.params.g1 .+ 
-    reshape(qg.latt.k2[1:qg.nq],1,1,:)*qg.params.g2 .+ 
-    reshape((0:(qg.q-1))./qg.q,1,:,1)*qg.params.g1, qg.q*qg.nq,qg.nq ) ./abs(params.g1)
-
-# pcolormesh(imag(kvec),real(kvec),reshape(qg.F[q,q,:],:,qg.nq)/π,cmap="bwr")
-imshow(reshape((qg.F[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-# imshow(reshape((tmpF),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+# imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+# imshow(reshape((tmpG),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(reshape(tmpG,:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+colorbar(shrink=0.7)
 # axis("equal")
-colorbar()
 tight_layout()
+savefig("test.png",transparent=true,dpi=500)
 display(fig)
 close(fig)
 
