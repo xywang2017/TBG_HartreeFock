@@ -11,6 +11,9 @@ mutable struct Lattice
 end
 
 function constructLattice(latt::Lattice,params::Params;lk::Int=12)
+    # lmax = (lk-1)/2
+    # latt.k1 = collect((-lmax):lmax) ./ lk 
+    # latt.k2 = collect((-lmax):lmax) ./ lk 
     latt.k1 = collect(0:(lk-1)) ./ lk
     latt.k2 = collect(0:(lk-1)) ./ lk 
     latt.kvec = (reshape(latt.k1,:,1)*params.g1 .+ reshape(latt.k2,1,:)*params.g2)[:]

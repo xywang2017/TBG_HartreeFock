@@ -20,7 +20,8 @@ mutable struct QuantumGeometryBM
 
     Λq::Array{ComplexF64,4}  # 2q x 2q x length(kvec) x n δqs , input to calculating geometric aspects 
     
-    Q::Array{ComplexF64,5}  # α x β x length(kvec) x μ x ν  Non-abelian quantum geometric tensor 
+    F::Array{Float64,3}  # α x β x length(kvec)   Non-abelian quantum berry curvature
+    G::Array{Float64,3}  # α x β x length(kvec)   Non-abelian quantum metric
 
     savename::String
 
@@ -37,7 +38,7 @@ function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,
     qg.p = numerator(ϕ)
     qg.q = denominator(ϕ)
     qg.nq = nq 
-    qg.δqs = Complex{Int}[i+j*1im for i in [-1,0,1] for j in [-1,0,1]]
+    qg.δqs = Complex{Int}[i+j*1im for i in -1:1 for j in -1:1]
 
     qg.latt = Lattice() 
     constructLatticeIKS(qg.latt,qg.params;lk = qg.nq*qg.q,_valley=qg._valley,q0=q0)
@@ -45,7 +46,6 @@ function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,
     qg.Λq = zeros(ComplexF64,2qg.q,2qg.q,qg.nq^2*qg.q,length(qg.δqs))
     constructΛq(qg)
 
-    qg.Q = zeros(ComplexF64,2qg.q,2qg.q,qg.nq^2*qg.q,2,2)   # Q(m,n,k;x,y)
     computeBerryCurvature(qg)
     computeMetric(qg)
 
@@ -88,10 +88,27 @@ function constructΛq(qg::QuantumGeometryBM)
 end
 
 function computeBerryCurvature(qg::QuantumGeometryBM)
+    ll = qg.nq^2*qg.q
+    qg.F = zeros(Float64,2qg.q,2qg.q,qg.nq^2*qg.q)   # berry curvature
+    δqs = [1+0im;0+1im;-1+0im;0-1im]
+    iqs = [findfirst(x->x==δq,qg.δqs) for δq in δqs] 
+    # U = [real(qg.params.g1) real(qg.params.g2); imag(qg.params.g1) imag(qg.params.g2)]
+    # Λ = transpose(U)*U 
+    Λq = reshape(qg.Λq,2qg.q,2qg.q,qg.nq*qg.q,qg.nq,length(qg.δqs))
+    for ik1 in 1:(qg.nq*qg.q), ik2 in 1:qg.nq
+        F = Λq[:,:,ik1,ik2,iqs[1]]*
+            Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
+            Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
+            Λq[:,:,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
+        ik = (ik2-1)*(qg.nq*qg.q) + ik1
+        qg.F[:,:,ik] = imag(log.(F))
+    end
+    
+    #qg.F ./= abs(imag(qg.params.g1'*qg.params.g2)/(qg.nq*qg.q)^2)
     return nothing 
 end
 
 function computeMetric(qg::QuantumGeometryBM)
-    
+    qg.G = zeros(Float64,2qg.q,2qg.q,qg.nq^2*qg.q)   # metric 
     return nothing 
 end

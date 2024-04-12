@@ -91,20 +91,21 @@ function constructbmLL(A::bmLL,params::Params;
             file["PΣz"] = A.PΣz
         end
 
-        ng = 1  # need to set ng = 3 for Hartree Fock calculations; ng=1 needed for quantum geometry
+        ng = 2  # need to set ng = 3 for Hartree Fock calculations; ng=1 needed for quantum geometry
         A.gvec = reshape(collect(-ng:ng),:,1)*A.params.g1 .+ reshape(collect(-ng*A.q:ng*A.q),1,:)*A.params.g2 ./A.q
 
-        G0 = abs(ng*A.params.g1+ng*A.params.g2)*3.00001
+        G0 = abs(ng*A.params.g1+ng*A.params.g2)*1.00001
         if _calculate_overlap
             A.Λ = zeros(ComplexF64,2A.q*A.q*A.nq^2,2A.q*A.q*A.nq^2)
-            # for m in -ng:ng, n in -ng*A.q:ng*A.q 
-            for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
+            for m in -1:1, n in -1:1
+            # for m in -ng:ng, n in (ng*A.q):-1:(-ng*A.q)
                 G = m*A.params.g1+n/A.q*A.params.g2
                 if abs(G) <G0*cos(pi/6)/abs(cos(mod(angle(G),pi/3)-pi/6))
                     # @time begin
-                        if mod(n,A.q) == 0
-                            println("m:",m," n:",n÷A.q)
-                        end
+                        # if mod(n,A.q) == 0
+                        #     println("m:",m," n:",n÷A.q)
+                        # end
+                        println("m:",m," n:",n)
                         computeCoulombOverlap_v2(A,m,n)  # q^2/(2q-1) times faster than computeCoulombOverlap(A,m,n)!
                         jldopen(fname, "a") do file
                             file["$(m)_$(n)"] = A.Λ
