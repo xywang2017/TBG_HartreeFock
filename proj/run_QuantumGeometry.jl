@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 4
+p, q = 1, 3
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
@@ -25,7 +25,7 @@ else
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
 end
 initParamsWithStrain(params)
-nq = 4 #12÷q
+nq = 6 #12÷q
 
 # -------------------------- BM structure factor Related ----------------------- # 
 if isequal(str,"K")
@@ -33,9 +33,9 @@ if isequal(str,"K")
 else
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_$(q1)_$(q2)_metadata.jld2")
 end
-# bm = bmLL();
-# constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
-#         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
+bm = bmLL();
+constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
+        _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
 qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq, U1 = U1,fname=fname,_valley=str,q0=QIKS);
 
