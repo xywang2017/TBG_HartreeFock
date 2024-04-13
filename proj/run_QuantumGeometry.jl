@@ -37,7 +37,7 @@ bm = bmLL();
 constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq, U1 = U1,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,U1=U1,fname=fname,_valley=str,q0=QIKS);
 
 σF = sqrt(sum(abs2.(tmpF*imag(params.g1'*params.g2) / q / (2π) .+ 1))/(nq^2*q) )
 Tη = (sum(tmpG) - abs(sum(tmpF))) *imag(params.g1'*params.g2) / (q*length(tmpG))

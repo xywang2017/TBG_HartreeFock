@@ -48,7 +48,7 @@ function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,U1::Arr
     if isempty(U1)
         qg.U1 = zeros(ComplexF64,2qg.q,2qg.q,qg.nq^2*qg.q)
         for ib in 1:(2qg.q) 
-            qg.U1[ib,ib,:] = 1.0+0.0im 
+            qg.U1[ib,ib,:] .= 1.0+0.0im 
         end
     else
         qg.U1 = U1 
