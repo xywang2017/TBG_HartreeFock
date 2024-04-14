@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 3
+p, q = 1, 4
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
@@ -25,7 +25,7 @@ else
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
 end
 initParamsWithStrain(params)
-nq = 6 #12÷q
+nq = 10 #12÷q
 
 # -------------------------- BM structure factor Related ----------------------- # 
 if isequal(str,"K")
@@ -37,7 +37,7 @@ bm = bmLL();
 constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
         _hBN=false,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,U1=U1,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
 σF = sqrt(sum(abs2.(tmpF*imag(params.g1'*params.g2) / q / (2π) .+ 1))/(nq^2*q) )
 Tη = (sum(tmpG) - abs(sum(tmpF))) *imag(params.g1'*params.g2) / (q*length(tmpG))
@@ -45,7 +45,7 @@ Tη = (sum(tmpG) - abs(sum(tmpF))) *imag(params.g1'*params.g2) / (q*length(tmpG)
 fig = figure(figsize=(4,3))
 # imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 # imshow(reshape((tmpG),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-imshow(-reshape(tmpF,:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(reshape(tmpG-abs.(tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 colorbar(shrink=0.7)
 # axis("equal")
 tight_layout()

@@ -109,11 +109,11 @@ function computeBerryCurvature(qg::QuantumGeometryBM)
 
     δ = 1/(qg.nq*qg.q)
     for ik1 in 1:(qg.nq*qg.q), ik2 in 1:qg.nq
+        ik = (ik2-1)*(qg.nq*qg.q) + ik1
         F = Λq[:,:,ik1,ik2,iqs[1]]*
             Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
             Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
             Λq[:,:,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
-        ik = (ik2-1)*(qg.nq*qg.q) + ik1
         qg.F[:,:,ik] = imag(log.(F)) ./δ^2 
 
         FF = Λq[idxF,idxF,ik1,ik2,iqs[1]]*
@@ -121,6 +121,7 @@ function computeBerryCurvature(qg::QuantumGeometryBM)
             Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
             Λq[idxF,idxF,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
         tmpF[ik] = imag(log(FF))  ./δ^2 
+        # tmpF[ik] = imag(FF)  ./δ^2 
     end
     
     # above calculates δ^2 Im(⟨∂1u|∂2u⟩-⟨∂2u|∂1u⟩)
@@ -150,22 +151,29 @@ function computeMetric(qg::QuantumGeometryBM)
     for ik1 in 1:(qg.nq*qg.q), ik2 in 1:qg.nq
         ik = (ik2-1)*(qg.nq*qg.q) + ik1
         
-        g11 = ( I - Λq[:,:,ik1,ik2,iqs[1]] * 
-                        Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) ./ δ^2 
-        g22 = ( I - Λq[:,:,ik1,ik2,iqs[3]] * 
-                        Λq[:,:,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) ./ δ^2 
-        g12 = ( I - Λq[:,:,ik1,ik2,iqs[5]] * 
-                        Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) ./ δ^2 .- (g11+g22)
+        # g11 = ( I - Λq[:,:,ik1,ik2,iqs[1]] * 
+        #                 Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) ./ δ^2 
+        # g22 = ( I - Λq[:,:,ik1,ik2,iqs[3]] * 
+        #                 Λq[:,:,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) ./ δ^2 
+        # g12 = ( I - Λq[:,:,ik1,ik2,iqs[5]] * 
+        #                 Λq[:,:,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) ./ δ^2 .- (g11+g22)
         
-        g12 ./= 2.0 
+        # g12 ./= 2.0 
 
-        qg.G[:,:,ik] = Λ[1,1]*real(g11) + Λ[2,2]*real(g22) + Λ[1,2] * real(g12) * 2
+        # qg.G[:,:,ik] = Λ[1,1]*real(g11) + Λ[2,2]*real(g22) + Λ[1,2] * real(g12) * 2
 
-        g11 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[1]] * 
+        # g11 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[1]] * 
+        #                 Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) / δ^2 
+        # g22 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[3]] * 
+        #                 Λq[idxG,idxG,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) / δ^2 
+        # g12 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[5]] * 
+        #                 Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) / δ^2 - (g11+g22)
+        
+        g11 = -log(Λq[idxG,idxG,ik1,ik2,iqs[1]] * 
                         Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) / δ^2 
-        g22 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[3]] * 
+        g22 = -log(Λq[idxG,idxG,ik1,ik2,iqs[3]] * 
                         Λq[idxG,idxG,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) / δ^2 
-        g12 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[5]] * 
+        g12 = -log(Λq[idxG,idxG,ik1,ik2,iqs[5]] * 
                         Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) / δ^2 - (g11+g22)
         
         g12 /= 2.0 
