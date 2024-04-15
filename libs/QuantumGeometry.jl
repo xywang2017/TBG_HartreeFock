@@ -55,8 +55,8 @@ function computeQuantumGeometryBM(params::Params;ϕ::Rational{Int}=1//10,U1::Arr
     end
     constructΛq(qg)
 
-    tmpF = computeBerryCurvature(qg)
-    tmpG = computeMetric(qg)
+    tmpF = computeBerryCurvaturev2(qg)
+    tmpG = computeMetricv2(qg)
 
     if !isempty(savename)
         save(savename,"QuantumGeometryBM",qg)
@@ -135,6 +135,46 @@ function computeBerryCurvature(qg::QuantumGeometryBM)
     return tmpF
 end
 
+
+function computeBerryCurvaturev2(qg::QuantumGeometryBM)
+    # works for Dan Parker's result with hBN
+    qg.F = zeros(Float64,qg.q-qg.p,qg.q-qg.p,qg.nq^2*qg.q)   # berry curvature
+    δqs = [1+0im;0+1im;-1+0im;0-1im]
+    iqs = [findfirst(x->x==δq,qg.δqs) for δq in δqs] 
+    Λq = reshape(qg.Λq,2qg.q,2qg.q,qg.nq*qg.q,qg.nq,length(qg.δqs))
+
+    idxF = qg.q
+    tmpF = zeros(Float64,size(qg.Λq,3)) # single band
+
+    idxs = (qg.q+p+1):(2qg.q)
+    δ = 1/(qg.nq*qg.q)
+    for ik1 in 1:(qg.nq*qg.q), ik2 in 1:qg.nq
+        ik = (ik2-1)*(qg.nq*qg.q) + ik1
+        F = Λq[idxs,idxs,ik1,ik2,iqs[1]]*
+            Λq[idxs,idxs,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
+            Λq[idxs,idxs,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
+            Λq[idxs,idxs,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
+        qg.F[:,:,ik] = imag(log.(F)) ./δ^2 
+
+        FF = Λq[idxF,idxF,ik1,ik2,iqs[1]]*
+            Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
+            Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
+            Λq[idxF,idxF,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
+        tmpF[ik] = imag(log(FF))  ./δ^2 
+        # tmpF[ik] = imag(FF)  ./δ^2 
+    end
+    
+    # above calculates δ^2 Im(⟨∂1u|∂2u⟩-⟨∂2u|∂1u⟩)
+    # need to get Im(⟨∂xu|∂yu⟩-⟨∂yu|∂xu⟩)
+    U = [real(qg.params.g1) real(qg.params.g2);imag(qg.params.g1) imag(qg.params.g2)]
+    Uinv = inv(U)
+    conversion_coeff = Uinv[1,1]*Uinv[2,2] - Uinv[2,1]*Uinv[1,2] 
+    # conversion_coeff = 1
+    qg.F .*= conversion_coeff 
+    tmpF .*= conversion_coeff
+    return tmpF
+end
+
 function computeMetric(qg::QuantumGeometryBM)
     qg.G = zeros(Float64,2qg.q,2qg.q,qg.nq^2*qg.q)   # metric 
     δqs = [1+0im;-1+0im;0+1im;0-1im;1+1im;-1-1im]
@@ -169,6 +209,49 @@ function computeMetric(qg::QuantumGeometryBM)
         # g12 = ( I - Λq[idxG,idxG,ik1,ik2,iqs[5]] * 
         #                 Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) / δ^2 - (g11+g22)
         
+        g11 = -log(Λq[idxG,idxG,ik1,ik2,iqs[1]] * 
+                        Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) / δ^2 
+        g22 = -log(Λq[idxG,idxG,ik1,ik2,iqs[3]] * 
+                        Λq[idxG,idxG,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) / δ^2 
+        g12 = -log(Λq[idxG,idxG,ik1,ik2,iqs[5]] * 
+                        Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) / δ^2 - (g11+g22)
+        
+        g12 /= 2.0 
+
+        tmpG[ik] =  Λ[1,1]*real(g11) + Λ[2,2]*real(g22) + Λ[1,2] * real(g12) * 2
+    end
+    return tmpG
+end
+
+
+function computeMetricv2(qg::QuantumGeometryBM)
+    qg.G = zeros(Float64,qg.q-qg.p,qg.q-qg.p,qg.nq^2*qg.q)   # metric 
+    δqs = [1+0im;-1+0im;0+1im;0-1im;1+1im;-1-1im]
+    iqs = [findfirst(x->x==δq,qg.δqs) for δq in δqs] 
+    Λq = reshape(qg.Λq,2qg.q,2qg.q,qg.nq*qg.q,qg.nq,length(qg.δqs))
+
+    idxs = (qg.q+qg.p+1):(2qg.q)
+    idxG = qg.q
+    tmpG = zeros(Float64,size(qg.Λq,3)) # single band
+
+    U = [real(qg.params.g1) real(qg.params.g2);imag(qg.params.g1) imag(qg.params.g2)]
+    Uinv = inv(U)
+    Λ = Uinv*transpose(Uinv)
+    δ = 1/(qg.nq*qg.q)
+    for ik1 in 1:(qg.nq*qg.q), ik2 in 1:qg.nq
+        ik = (ik2-1)*(qg.nq*qg.q) + ik1
+        
+        g11 = ( I - Λq[idxs,idxs,ik1,ik2,iqs[1]] * 
+                        Λq[idxs,idxs,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) ./ δ^2 
+        g22 = ( I - Λq[idxs,idxs,ik1,ik2,iqs[3]] * 
+                        Λq[idxs,idxs,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]] ) ./ δ^2 
+        g12 = ( I - Λq[idxs,idxs,ik1,ik2,iqs[5]] * 
+                        Λq[idxs,idxs,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[6]] ) ./ δ^2 .- (g11+g22)
+        
+        g12 ./= 2.0 
+
+        qg.G[:,:,ik] = Λ[1,1]*real(g11) + Λ[2,2]*real(g22) + Λ[1,2] * real(g12) * 2
+
         g11 = -log(Λq[idxG,idxG,ik1,ik2,iqs[1]] * 
                         Λq[idxG,idxG,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]] ) / δ^2 
         g22 = -log(Λq[idxG,idxG,ik1,ik2,iqs[3]] * 
