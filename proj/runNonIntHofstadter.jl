@@ -6,13 +6,13 @@ include(joinpath(fpath,"libs/bmLL_IKS.jl"))
 
 BLAS.set_num_threads(1)
 
-ϕmin = 1//12
+ϕmin = 1//14
 str = "K"
 w0 = 0.8
 w0str = "08"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = ""
-ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
+ϕs = unique(sort([p//q for q in 1:14 for p in 1:q]))
 ϕs = ϕs[ϕs .<=0.5]
 
 twist_angle =  106
@@ -60,8 +60,8 @@ end
 function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fig = figure(figsize=(4.3,3))
-    ϕs = unique(sort([p//q for q in 1:12 for p in 1:q]))
+    fig = figure(figsize=(3,4))
+    ϕs = unique(sort([p//q for q in 1:14 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # ϕs = ϕs[ϕs .>= 1//12]
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
@@ -75,14 +75,15 @@ function plot_LL_spectrum()
         energies = reshape(data["$(ϕ)"],2q,:)
         # plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
         # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
-        plot(ones(length(energies[1:(q+p),:]))*ϕ,energies[1:(q+p),:][:],".",ms=2,markeredgecolor="none",color="r")
-        plot(ones(length(energies[(q+p+1):end,:]))*ϕ,energies[(q+p+1):end,:][:],".",ms=2,markeredgecolor="none",color="gray")
+        plot(ones(length(energies[1:(q+p),:]))*ϕ,energies[1:(q+p),:][:],".",ms=3,markeredgecolor="none",color="r")
+        plot(ones(length(energies[(q+p+1):end,:]))*ϕ,energies[(q+p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
         # writedlm("$(foldername)/_$(p)_$(q)_spin_up.txt",energies.+μB*ϕ)
         # writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies.-μB*ϕ)
     
     end
     # ylim([0.06,0.51])
     # ylim([-26,26])
+    yticks(collect(-10:5:10))
     xlim([0.01,0.52])
     xlabel(L"ϕ/ϕ_0")
     ylabel(L"\rm E_0\ (meV)")

@@ -8,10 +8,10 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.8, "08"
-p, q = 1, 4
+p, q = 1, 8
 ϕ = p//q
 twist_angle = 1.06
-_is_strain = "strain"
+_is_strain = "nostrain"
 q1, q2  = 0, 0 
 QIKS = q1 + 1im*q2 
 
@@ -26,7 +26,7 @@ else
 end
 params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
 initParamsWithStrain(params)
-nq = 8 #12÷q
+nq = 2 #12÷q
 
 # -------------------------- BM structure factor Related ----------------------- # 
 if isequal(str,"K")
@@ -40,14 +40,16 @@ constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
 # -------------------------- Quantum Geometry Related ----------------------- # 
 qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
-tmpF = [tr(qg.F[:,:,ik]) for ik in 1:size(qg.F,3)]
-tmpG = [tr(qg.G[:,:,ik]) for ik in 1:size(qg.F,3)]
-σF = sqrt(sum(abs2.(tmpF*imag(params.g1'*params.g2) / q / (2π) .+ 1))/(nq^2*q) )
-Tη = (sum(tmpG) - abs(sum(tmpF))) *imag(params.g1'*params.g2) / (q*length(tmpG))
+area = imag(params.g1'*params.g2) / q 
+tmpF = [tr(qg.F[:,:,ik]) for ik in 1:size(qg.F,3)];
+tmpG = [tr(qg.G[:,:,ik]) for ik in 1:size(qg.F,3)];
+σF = sqrt(sum(abs2.(tmpF * area / (2π) .- 1))/(nq^2*q) )
+# σF = sum(abs.(tmpF * area / (2π) .- 1))/(nq^2*q) 
+Tη = (sum(tmpG) - abs(sum(tmpF))) *area / (nq^2*q)
 # ---------------------------- Berry curvature ----------------------- # 
 fig = figure(figsize=(4,3))
 # imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-imshow(reshape((tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(reshape((tmpG),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 # imshow(reshape(tmpG-abs.(tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 colorbar(shrink=0.7)
 # axis("equal")
@@ -56,7 +58,7 @@ savefig("test.png",transparent=true,dpi=500)
 display(fig)
 close(fig)
 
-[sum(qg.F[i,i,:]) for i in 1:(2q)]  /(2π)
+[sum(qg.F[i,i,:]) for i in 1:(q-p)] *area / (nq^2*q) /(2π)
 # ---------------------------- Structure factor ----------------------- # 
 fig = figure(figsize=(8,2))
 imshow(reshape(abs.(qg.Λq[qg.q,qg.q,:,9]),:,qg.nq)',origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5,cmap="bwr")
