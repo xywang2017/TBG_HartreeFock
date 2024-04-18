@@ -50,7 +50,7 @@ end
 
 @inline function V(q::ComplexF64,Lm::Float64) ::Float64
     res = 1e-6
-    ϵr = 15.0
+    ϵr = 1.0
     return ( abs(q) < res ) ? 0 : 2π/(ϵr*abs(q))*tanh(abs(q)*4*Lm/2)
 end
 
@@ -99,7 +99,7 @@ function run_HartreeFock(hf::HartreeFock,params::Params;precision::Float64=1e-5,
     if hf.nq ==0 
         hf.nq = 1
     end
-    hf.nq = 6
+    hf.nq = 4
     _q1, _q2 = real(QIKS), imag(QIKS)
     hf.metadata = [prefix*"_$(p)_$(q)_K_metadata.jld2",
                    prefix*"_$(p)_$(q)_Kprime_$(_q1)_$(_q2)_metadata.jld2"]

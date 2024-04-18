@@ -7,11 +7,11 @@ include(joinpath(fpath,"libs/QuantumGeometry.jl"))
 BLAS.set_num_threads(1)
 
 str = "K"
-w0, w0str = 0.8, "08"
-p, q = 1, 8
+w0, w0str = 0.7, "07"
+p, q = 1, 4
 ϕ = p//q
-twist_angle = 1.06
-_is_strain = "nostrain"
+twist_angle = 1.05
+_is_strain = "strain"
 q1, q2  = 0, 0 
 QIKS = q1 + 1im*q2 
 
@@ -24,9 +24,9 @@ if isequal(_is_strain,"nostrain")
 else
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482)
 end
-params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
+# params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
 initParamsWithStrain(params)
-nq = 2 #12÷q
+nq = 16÷q
 
 # -------------------------- BM structure factor Related ----------------------- # 
 if isequal(str,"K")
@@ -34,22 +34,21 @@ if isequal(str,"K")
 else
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_$(q1)_$(q2)_metadata.jld2")
 end
-bm = bmLL();
-constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
-        _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
+# bm = bmLL();
+# constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
+#         _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF, tmpG = computeQuantumGeometryBM(params;U1=U1,ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
-area = imag(params.g1'*params.g2) / q 
-tmpF = [tr(qg.F[:,:,ik]) for ik in 1:size(qg.F,3)];
-tmpG = [tr(qg.G[:,:,ik]) for ik in 1:size(qg.F,3)];
-σF = sqrt(sum(abs2.(tmpF * area / (2π) .- 1))/(nq^2*q) )
-# σF = sum(abs.(tmpF * area / (2π) .- 1))/(nq^2*q) 
-Tη = (sum(tmpG) - abs(sum(tmpF))) *area / (nq^2*q)
+# tmpF = [qg.F[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
+# tmpG = [qg.G[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
+# σF = sqrt(sum(abs2.(tmpF / (2π)*(q-p).- 1))/(nq^2*q*(q-p)) )
+σF = sqrt(sum(abs2.(tmpF / (2π).+ 1))/(nq^2*q) )
+Tη = (sum(tmpG) - abs(sum(tmpF))) / (nq^2*q)
 # ---------------------------- Berry curvature ----------------------- # 
 fig = figure(figsize=(4,3))
 # imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-imshow(reshape((tmpG),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(-reshape(tmpF,:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 # imshow(reshape(tmpG-abs.(tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 colorbar(shrink=0.7)
 # axis("equal")
