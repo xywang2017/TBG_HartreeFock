@@ -48,7 +48,7 @@ Tη = (sum(tmpG) - abs(sum(tmpF))) / (nq^2*q)
 # ---------------------------- Berry curvature ----------------------- # 
 fig = figure(figsize=(4,3))
 # imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-imshow(-reshape(tmpF,:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
+imshow(reshape(tmpG,:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 # imshow(reshape(tmpG-abs.(tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
 colorbar(shrink=0.7)
 # axis("equal")

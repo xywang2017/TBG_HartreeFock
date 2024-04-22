@@ -23,7 +23,7 @@ params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=1
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = 0,-4
+s,t = 0,-2
 p,q = 1, 4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
@@ -37,7 +37,7 @@ plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
 
 hf = load(metadata,"hf");
 H = hf.H[(4q+1):6q,(4q+1):6q,:];
-H = hf.H[(1):2q,(1):2q,:];
+# H = hf.H[(1):2q,(1):2q,:];
 U1 = zeros(ComplexF64,size(H,1),size(H,2),q*size(H,3))
 tmpU1 = reshape(U1,size(H,1),size(H,2),q,size(H,3))
 for ik in 1:size(H,3)
