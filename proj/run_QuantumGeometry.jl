@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 4
+p, q = 1, 3
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
@@ -46,14 +46,24 @@ qg, tmpF, tmpG = computeQuantumGeometryBM(params;U1=U1,ϕ=ϕ,nq=nq,fname=fname,_
 σF = sqrt(sum(abs2.(tmpF / (2π).+ 1))/(nq^2*q) )
 Tη = (sum(tmpG) - abs(sum(tmpF))) / (nq^2*q)
 # ---------------------------- Berry curvature ----------------------- # 
-fig = figure(figsize=(4,3))
-# imshow(reshape((qg.G[q,q,:]),:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-imshow(reshape(tmpG,:,qg.nq),origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-# imshow(reshape(tmpG-abs.(tmpF),:,qg.nq)*imag(params.g1'*params.g2)/q,origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5)
-colorbar(shrink=0.7)
-# axis("equal")
+fig,ax = subplots(2,1,figsize=(8,4))
+lk = length(qg.latt.k1)
+kvec = (reshape(qg.latt.k1,:,1) .+ 1im*reshape(qg.latt.k2,1,:))[:,1:qg.nq]
+pl= ax[1].pcolormesh(real(kvec),imag(kvec),reshape(tmpG,:,qg.nq),cmap="bwr")
+colorbar(pl,shrink=0.7,ax=ax[1])
+pl = ax[2].pcolormesh(real(kvec),imag(kvec),-reshape(tmpF,:,qg.nq),cmap="bwr")
+colorbar(pl,shrink=0.7,ax=ax[2])
+for i in 1:2 
+    ax[i].axis("equal")
+    ax[i].axis("off")
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+    for j in (1:(q-1))/q
+        ax[i].axvline(j-0.5/(nq*q),c="k",ls=":")
+    end
+end
 tight_layout()
-savefig("test.png",transparent=true,dpi=500)
+savefig("_$(p)_$(q)_strain_Int.png",transparent=true,dpi=500)
 display(fig)
 close(fig)
 

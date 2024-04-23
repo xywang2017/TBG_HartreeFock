@@ -29,8 +29,8 @@ p,q = 1, 4
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectra(metadata;savename="test.png",lines=[load(metadata,"hf").μ])
-# plot_spectrav3(metadata;savename="test.png")
+plot_spectra(metadata;savename="test.png",lines=[-10.0,4])
+plot_spectrav3(metadata;savename="test.png",lines=[-2.5,2.5])
 plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 # plot_density_matrix_global_order_parameters(metadata)
@@ -199,7 +199,7 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
     U2 = zeros(ComplexF64,size(hf.H));
     energies = zeros(Float64,size(hf.ϵk))
     for ik in 1:size(hf.H,3) 
-        F = eigen(Hermitian(view(hf.H,:,:,ik)))
+        F = eigen(Hermitian(view(hf.H0,:,:,ik)))
         U2[:,:,ik] = F.vectors 
         energies[:,ik] = F.values
     end 
@@ -208,21 +208,22 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
     U1tmp = reshape(U1,:,hf.nη,hf.ns,2hf.q,hf.nη,hf.ns,size(hf.H,3))
     for iη in 1:hf.nη 
         jldopen(dir*hf.metadata[iη]) do file 
+            tmp = reshape(file["Vec"],ldim,2hf.q,hf.q,hf.nq^2)
             for is in 1:hf.ns 
-                U1tmp[:,iη,is,:,iη,is,:] = reshape(file["Vec"],ldim,2hf.q,:)
+                U1tmp[:,iη,is,:,iη,is,:] = view(tmp,:,:,1,:)
             end
         end
     end
 
-    # Utot = zeros(ComplexF64,size(U1))
-    # for ik in 1:size(U1,3)
-    #     Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
-    # end
-
-    Utot = zeros(ComplexF64,size(U2))
-    for ik in 1:size(U2,3)
-        Utot[:,:,ik] = view(U2,:,:,ik)
+    Utot = zeros(ComplexF64,size(U1))
+    for ik in 1:size(U1,3)
+        Utot[:,:,ik] = view(U1,:,:,ik) * view(U2,:,:,ik)
     end
+
+    # Utot = zeros(ComplexF64,size(U2))
+    # for ik in 1:size(U2,3)
+    #     Utot[:,:,ik] = view(U2,:,:,ik)
+    # end
 
     ldosLL = zeros(Float64,size(Utot,1))
     for ib in eachindex(ldosLL)
@@ -232,26 +233,30 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
 end
 
 μ = load(metadata,"hf").μ
-ldosLL  = plot_orbital_decomposition(metadata,-8.0,0.0);
+ldosLL  = plot_orbital_decomposition(metadata,-10.0,4.0);
+ldosLL  = plot_orbital_decomposition(metadata,-2.5,0.0);
 
 
 # ----------------------------------------------------------------
-# ldosLL_toplot = sum(reshape(ldosLL,:,p,2,2,2),dims=(2,3,4,5))[:];
-ldosLL_toplot = sum(reshape(ldosLL,:,2,2),dims=(2,3))[:];
+ldosLL_toplot = sum(reshape(ldosLL,:,p,2,2,2),dims=(2,3,4,5))[:];
+# ldosLL_toplot = sum(reshape(ldosLL,:,2,2),dims=(2,3))[:];
+nLL = 25*q÷p
+idx = (-(nLL-1)):(nLL-1)
+# idx = (-q+1):q
+tmp = ldosLL_toplot[1:2:end]
+tmp = [ldosLL_toplot[(end-1):-2:2]; tmp ]
+writedlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt",[idx tmp])
+
+
 fig, ax = subplots(figsize=(4,3))
-# nLL = 25*q÷p
-# idx = (-(nLL-1)):(nLL-1)
-idx = (-q+1):q
-# tmp = ldosLL_toplot[1:2:end] + ldosLL_toplot[1:2:end]
-# tmp = [ldosLL_toplot[(end-1):-2:2] + ldosLL_toplot[(end-1):-2:2]; tmp ]
-# ax.plot(idx,tmp*100,"g.-",ms=2)
-ax.plot(idx,ldosLL_toplot,"g.-",ms=2)
-# ax.set_xlim([-79,79])
-# ax.set_ylim([-2,19])
-# ax.set_yticks(collect(0:5:15))
+data1 = readdlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt")
+# ax.plot(data1[:,1],data1[:,2]*100,"k-o",label="NonInt",ms=2)
+data2 = readdlm("_$(p)_$(q)_orbital_decomposition_Int.txt")
+# ax.plot(data2[:,1],data2[:,2]*100,"b-o",label="(0,-4)",ms=2)
+ax.plot(data2[:,1],(data2[:,2]-data1[:,2])*100,"b-",label="diff",ms=2)
+ax.legend()
 ax.set_xlabel("LL index")
 ax.set_ylabel("Orbital weight (%)")
-ax.set_title("1.05 strain (0,-2) $(p)/$(q)")
 tight_layout()
 # savefig("105_flux_$(p)_$(q).png",dpi=600)
 display(fig)

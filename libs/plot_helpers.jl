@@ -82,9 +82,9 @@ end
 
 
 ## plot Hartree Fock spectra
-function plot_spectrav3(metadata::String;savename::String="tmp.pdf")
+function plot_spectrav3(metadata::String;savename::String="tmp.pdf",lines::Vector{Float64}=Float64[])
     hf = load(metadata,"hf");
-    H = reshape(hf.H,2hf.q,4,2hf.q,4,:,hf.nq^2)
+    H = reshape(hf.H0,2hf.q,4,2hf.q,4,:,hf.nq^2)
     H = H[:,:,:,:,1,:] 
     Σz0 = reshape(hf.Σz0,2hf.q,4,2hf.q,4,:)
     subblocks = [[1],[2],[3],[4]]
@@ -109,15 +109,17 @@ function plot_spectrav3(metadata::String;savename::String="tmp.pdf")
     for ib in 1:length(subblocks)
         ϵ0 = ϵk[ib]
         σ0 = σz[ib]
-        pl = scatter(ones(length(ϵ0))*ib,ϵ0,c=σ0,cmap="coolwarm",s=6,vmin=-0.4,vmax=0.4,marker="o")
+        pl = scatter(ones(length(ϵ0))*1,ϵ0,c=σ0,cmap="coolwarm",s=6,vmin=-0.4,vmax=0.4,marker="o")
         if ib ==1 
             colorbar(pl)
         end
     end
-    axhline(hf.μ,ls=":",c="gray")
+    for line in lines 
+        axhline(line,ls=":",c="gray")
+    end
     ylabel("E (meV)")
-    xlim([0.5,3.5])
-    xticks(collect(eachindex(subblocks)),lbls)
+    # xlim([0.5,3.5])
+    # xticks(collect(eachindex(subblocks)),lbls)
     tight_layout()
     savefig(savename,transparent=true,dpi=600)
     display(fig)
