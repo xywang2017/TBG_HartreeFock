@@ -26,7 +26,7 @@ else
 end
 # params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
 initParamsWithStrain(params)
-nq = 16÷q
+nq = 24÷q
 
 # -------------------------- BM structure factor Related ----------------------- # 
 if isequal(str,"K")
