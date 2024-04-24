@@ -5,12 +5,12 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-# dir = ""
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
-foldername = dir*"zeeman/$(twist_angle)_strain"
+foldername = dir*"$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -91,6 +91,8 @@ close(fig)
 ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-1/3,-4]]
+sts = [[0,-4]]
+ϕs = [1//4,1//3]
 energies = Float64[]
 for i in eachindex(sts) 
     st = sts[i]

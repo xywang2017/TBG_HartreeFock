@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 3
+p, q = 1, 4
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
