@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 4
+p, q = 1, 3
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
@@ -63,11 +63,11 @@ for i in 1:2
     end
 end
 tight_layout()
-savefig("_$(p)_$(q)_strain_Int.png",transparent=true,dpi=500)
+# savefig("_$(p)_$(q)_strain_Int.png",transparent=true,dpi=500)
 display(fig)
 close(fig)
 
-[sum(qg.F[i,i,:]) for i in 1:(q-p)] *area / (nq^2*q) /(2π)
+writedlm("_$(p)_$(q)_Int_G.txt",reshape(tmpG,:,qg.nq))
 # ---------------------------- Structure factor ----------------------- # 
 fig = figure(figsize=(8,2))
 imshow(reshape(abs.(qg.Λq[qg.q,qg.q,:,9]),:,qg.nq)',origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5,cmap="bwr")

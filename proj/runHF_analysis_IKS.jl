@@ -24,14 +24,14 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = 0,-4
-p,q = 1, 4
+p,q = 1, 3
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
 plot_spectra(metadata;savename="test.png",lines=[-10.0,4])
 plot_spectrav3(metadata;savename="test.png",lines=[-2.5,2.5])
-plot_density_matrix_bm(metadata,ik=1)
+# plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
 # plot_density_matrix_global_order_parameters(metadata)
 
@@ -250,15 +250,16 @@ writedlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt",[idx tmp])
 
 fig, ax = subplots(figsize=(4,3))
 data1 = readdlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt")
-# ax.plot(data1[:,1],data1[:,2]*100,"k-o",label="NonInt",ms=2)
+ax.plot(data1[:,1],data1[:,2]*100,"k-o",label="NonInt",ms=3)
 data2 = readdlm("_$(p)_$(q)_orbital_decomposition_Int.txt")
-# ax.plot(data2[:,1],data2[:,2]*100,"b-o",label="(0,-4)",ms=2)
-ax.plot(data2[:,1],(data2[:,2]-data1[:,2])*100,"b-",label="diff",ms=2)
+ax.plot(data2[:,1],data2[:,2]*100,"b-o",label="(0,-4)",ms=3)
+# ax.plot(data2[:,1],(data2[:,2]-data1[:,2])*100,"b-",label="diff",ms=2)
 ax.legend()
+ax.set_xlim([-15,15])
 ax.set_xlabel("LL index")
 ax.set_ylabel("Orbital weight (%)")
 tight_layout()
-# savefig("105_flux_$(p)_$(q).png",dpi=600)
+savefig("_$(p)_$(q)_orbital_decomposition.png",dpi=600)
 display(fig)
 close(fig)
 
