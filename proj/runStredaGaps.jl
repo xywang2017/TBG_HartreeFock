@@ -5,12 +5,12 @@ include(joinpath(fpath,"libs/MagneticFieldHF.jl"))
 include(joinpath(fpath,"libs/plot_helpers.jl"))
 #
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-# dir = "/Volumes/Data/Code/TBG_HartreeFock/"
-dir = ""
+dir = "/Volumes/Data/Code/TBG_HartreeFock/"
+# dir = ""
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
-foldername = dir*"$(twist_angle)_strain"
+foldername = dir*"zeeman/$(twist_angle)_strain"
 fname1 = dir*"MinHao/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
@@ -88,11 +88,11 @@ close(fig)
 # energies = zeros(Float64,length(ϕs),3)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8]  #(-0.5,-3) (-1.5,-2)
 # ϕs = [1//12, 1//9 ,2//15 , 1//6 , 2//9 , 4//15 , 1//3] #(-2/3,-3)
-ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
+# ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-1/3,-4]]
-sts = [[0,-4]]
-ϕs = [1//4,1//3]
+sts = [[0,0]]
+# ϕs = [1//4,1//3]
 energies = Float64[]
 for i in eachindex(sts) 
     st = sts[i]
@@ -116,7 +116,7 @@ for i in eachindex(sts)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
                 hf = load(metadata,"hf");
-                # writedlm("ForMinHao/SBCI_spectra/_-2.5_-1_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
+                writedlm("Symmetric_spectra/_0_0_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
                 push!(energies,load(metadata,"iter_energy")[end])
                 # push!(μs,hf.μ)
             else 
@@ -125,6 +125,7 @@ for i in eachindex(sts)
         end
     end
     # writedlm("SBCI_spectra/_-2.5_-1_s$(s)_t$(t)_chemicalpotential.txt",[numerator.(ϕs[:]) denominator.(ϕs[:]) μs[:]])
+    
     idx = collect(eachindex(ϕs))
     # idx = Int[collect(1:14);collect(17:22)]
     # idx = collect(1:14)

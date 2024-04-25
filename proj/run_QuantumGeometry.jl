@@ -8,7 +8,7 @@ BLAS.set_num_threads(1)
 
 str = "K"
 w0, w0str = 0.7, "07"
-p, q = 1, 3
+p, q = 1, 4
 ϕ = p//q
 twist_angle = 1.05
 _is_strain = "strain"
@@ -38,7 +38,7 @@ end
 # constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
 #         _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
-qg, tmpF, tmpG = computeQuantumGeometryBM(params;U1=U1,ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
+qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
 # tmpF = [qg.F[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
 # tmpG = [qg.G[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
@@ -49,6 +49,7 @@ Tη = (sum(tmpG) - abs(sum(tmpF))) / (nq^2*q)
 fig,ax = subplots(2,1,figsize=(8,4))
 lk = length(qg.latt.k1)
 kvec = (reshape(qg.latt.k1,:,1) .+ 1im*reshape(qg.latt.k2,1,:))[:,1:qg.nq]
+kvec = reshape(qg.latt.kvec,nq*q,:)[:,1:nq]
 pl= ax[1].pcolormesh(real(kvec),imag(kvec),reshape(tmpG,:,qg.nq),cmap="bwr")
 colorbar(pl,shrink=0.7,ax=ax[1])
 pl = ax[2].pcolormesh(real(kvec),imag(kvec),-reshape(tmpF,:,qg.nq),cmap="bwr")
@@ -67,7 +68,8 @@ tight_layout()
 display(fig)
 close(fig)
 
-writedlm("_$(p)_$(q)_Int_G.txt",reshape(tmpG,:,qg.nq))
+writedlm("_$(p)_$(q)_Ky.txt",imag(kvec))
+# writedlm("_$(p)_$(q)_Int_G.txt",reshape(tmpG,:,qg.nq))
 # ---------------------------- Structure factor ----------------------- # 
 fig = figure(figsize=(8,2))
 imshow(reshape(abs.(qg.Λq[qg.q,qg.q,:,9]),:,qg.nq)',origin="lower",extent=(1,nq+1,1,q*nq+1).-0.5,cmap="bwr")
