@@ -296,14 +296,14 @@ function plot_spectra_collective(metadatas::Vector{String};savename::String="tmp
         # axhline((ϵsorted[i+1] + ϵsorted[i])/2,ls=":",c="gray")
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
-    ylim([-35,39])
+    # ylim([-35,39])
     # ylabel("E (meV)")
     # xlabel(L"ϕ/ϕ_0")
     plot(ϕs,μs,":",c="k",lw=0.5)
-    xlim([0.01,0.55])
-    ylim([-35,39])
+    xlim([0.01,0.52])
+    # ylim([-35,39])
     # yticks(collect(-30:20:30),fontsize=12)
-    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    # xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
     tight_layout()
     savefig(savename,dpi=600,transparent=true)
     display(fig)
@@ -333,6 +333,7 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
             ηz = zeros(Float64,size(ϵk))
             Osz = kron(az,kron(a0,Array{Float64,2}(I,2hf.q,2hf.q)))
             Oηz = kron(a0,kron(az,Array{Float64,2}(I,2hf.q,2hf.q)))
+            tmpH = reshape(hf.H,2hf.q,4,2hf.q,4,:)
             for ik in 1:size(ϵk,2)
                 H = hf.H[:,:,ik]
                 # H[abs.(H) .<1e-2] .= 0.0
@@ -359,10 +360,10 @@ function plot_spectra_collectivev2(metadatas::Vector{String};savename::String="t
         end
     end 
     plot(ϕs,μs,":",c="k",lw=0.5)
-    xlim([0.01,0.55])
-    ylim([-35,39])
-    yticks(collect(-30:20:30),fontsize=12)
-    xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    xlim([0.01,0.52])
+    # ylim([-35,39])
+    # yticks(collect(-30:20:30),fontsize=12)
+    # xticks([0.1,0.2,0.3,0.4,0.5],fontsize=12)
     # ylabel("E (meV)",fontsize=12)
     # xlabel(L"ϕ/ϕ_0",fontsize=12)
     tight_layout()
@@ -391,12 +392,12 @@ function plot_spectra_collectivev3(metadatas::Vector{String};savename::String="t
             H = reshape(hf.H,2hf.q,4,2hf.q,4,:)
             P = reshape(hf.P,2hf.q,4,2hf.q,4,:)
             tmp = zeros(ComplexF64,size(H,1),size(H,3),size(H,5))
-            a, b = 4, 3
-            if norm(P[:,a,:,a,1]+0.5I)> norm(P[:,b,:,b,1]+0.5I)
-                tmp .= H[:,a,:,a,:]
-                H[:,a,:,a,:] = H[:,b,:,b,:]
-                H[:,b,:,b,:] = tmp 
-            end
+            # a, b = 4, 3
+            # if norm(P[:,a,:,a,1]+0.5I)> norm(P[:,b,:,b,1]+0.5I)
+            #     tmp .= H[:,a,:,a,:]
+            #     H[:,a,:,a,:] = H[:,b,:,b,:]
+            #     H[:,b,:,b,:] = tmp 
+            # end
             for ik in 1:size(ϵk,2), iηs in 1:4
                 F = eigen(Hermitian(H[:,iηs,:,iηs,ik]))
                 ϵk[:,ik,iηs] = F.values 
@@ -433,6 +434,51 @@ function plot_spectra_collectivev3(metadatas::Vector{String};savename::String="t
     return nothing
 end
 
+
+## plot Hartree Fock spectra for a given valley spin flavor
+function plot_spectra_collectivev4(metadatas::Vector{String};savename::String="tmp.pdf",titlestr::String=" ",indices::Vector{Int}=Int[],iηs::Int=3)
+    fig,ax = subplots(figsize=(4,3))
+    # fig = figure(figsize=(6,4))
+    ϕs = Float64[]
+    μs = Float64[]
+    for j in eachindex(metadatas) 
+        if j in indices
+            metadata = metadatas[j]
+            hf = load(metadata,"hf");
+            q, p = hf.q, hf.p 
+            ϵk = zeros(Float64,2hf.q,size(hf.H,3))
+            H = reshape(hf.H,2hf.q,4,2hf.q,4,:)[:,iηs,:,iηs,:]
+            for ik in 1:size(ϵk,2)
+                F = eigen(Hermitian(H[:,:,ik]))
+                ϵk[:,ik] = F.values 
+            end
+            if !occursin("_tL_",metadata)
+                # ϵk = reshape(ϵk,2hf.q,hf.q,hf.nq^2)[:,1,:]
+            end
+            ax.plot(ones(length(ϵk[1:(q-p),:][:]))*hf.p/hf.q,ϵk[1:(q-p),:][:],".",c="gray",ms=3,markeredgecolor="none")
+            ax.plot(ones(length(ϵk[(q-p+1):(q),:][:]))*hf.p/hf.q,ϵk[(q-p+1):(q),:][:],".",c="r",ms=3,markeredgecolor="none")
+            ax.plot(ones(length(ϵk[(q+1):(2q),:][:]))*hf.p/hf.q,ϵk[(q+1):(2q),:][:],".",c="gray",ms=3,markeredgecolor="none")
+            push!(μs,hf.μ)
+            push!(ϕs,hf.p/hf.q)
+            writedlm("NonInt/Hofstadter/_$(p)_$(q)_spin_down_Int.txt",ϵk[:])
+        end
+    end 
+    ax.set_xlim([0.01,0.52])
+    ax.set_ylim([-29,29])
+    ax.set_xlabel(L"ϕ/ϕ_0")
+    ax.set_ylabel(L"\rm E_{HF}\ (meV)")
+    # ax[1].set_ylim([-39,49])
+    # ax[1].set_yticks(collect(-30:20:30),fontsize=12)
+    # ax[1].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    # ax[2].set_xticks([0.1,0.2,0.3,0.4,0.5],[0.1,0.2,0.3,0.4,0.5],fontsize=12)
+    # ylabel("E (meV)",fontsize=13)
+    # xlabel(L"ϕ/ϕ_0",fontsize=13)
+    tight_layout()
+    savefig(savename,dpi=600,transparent=true)
+    display(fig)
+    close(fig)
+    return nothing
+end
 
 
 ## plot error and energies under Hartree Fock iterations 

@@ -34,37 +34,39 @@ if isequal(str,"K")
 else
     fname = joinpath(fpath,"$(foldername)/_$(p)_$(q)_$(str)_$(q1)_$(q2)_metadata.jld2")
 end
-# bm = bmLL();
-# constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
-#         _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
+bm = bmLL();
+constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
+        _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
 qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
+# tmpF = readdlm("QuantumGeometry/_$(p)_$(q)_NonInt_F.txt")
+# tmpG = readdlm("QuantumGeometry/_$(p)_$(q)_NonInt_G.txt")
 # tmpF = [qg.F[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
 # tmpG = [qg.G[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
 # σF = sqrt(sum(abs2.(tmpF / (2π)*(q-p).- 1))/(nq^2*q*(q-p)) )
-σF = sqrt(sum(abs2.(tmpF / (2π).+ 1))/(nq^2*q) )
+σF = sqrt(sum(abs2.(tmpF / (2π).- 1))/(nq^2*q) )
 Tη = (sum(tmpG) - abs(sum(tmpF))) / (nq^2*q)
 # ---------------------------- Berry curvature ----------------------- # 
 fig,ax = subplots(2,1,figsize=(8,4))
 lk = length(qg.latt.k1)
 kvec = (reshape(qg.latt.k1,:,1) .+ 1im*reshape(qg.latt.k2,1,:))[:,1:qg.nq]
-kvec = reshape(qg.latt.kvec,nq*q,:)[:,1:nq]
+kvec = reshape(qg.latt.kvec,nq*q,:)[:,1:nq]/sqrt(abs(qg.params.g1)*abs(qg.params.g2))
 pl= ax[1].pcolormesh(real(kvec),imag(kvec),reshape(tmpG,:,qg.nq),cmap="bwr")
 colorbar(pl,shrink=0.7,ax=ax[1])
 pl = ax[2].pcolormesh(real(kvec),imag(kvec),-reshape(tmpF,:,qg.nq),cmap="bwr")
 colorbar(pl,shrink=0.7,ax=ax[2])
-for i in 1:2 
-    ax[i].axis("equal")
-    ax[i].axis("off")
-    ax[i].set_xticks([])
-    ax[i].set_yticks([])
-    for j in (1:(q-1))/q
-        ax[i].axvline(j-0.5/(nq*q),c="k",ls=":")
-    end
-end
+# for i in 1:2 
+#     ax[i].axis("equal")
+#     ax[i].axis("off")
+#     ax[i].set_xticks([])
+#     ax[i].set_yticks([])
+#     for j in (1:(q-1))/q
+#         ax[i].axvline(j-0.5/(nq*q),c="k",ls=":")
+#     end
+# end
 tight_layout()
-# savefig("_$(p)_$(q)_strain_Int.png",transparent=true,dpi=500)
+savefig("_$(p)_$(q)_strain_NonInt.png",transparent=true,dpi=500)
 display(fig)
 close(fig)
 

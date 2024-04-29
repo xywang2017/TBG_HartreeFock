@@ -8,32 +8,32 @@ BLAS.set_num_threads(1)
 
 ϕmin = 1//14
 str = "K"
-w0 = 0.8
-w0str = "08"
+w0 = 0.7
+w0str = "07"
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
 dir = ""
-ϕs = unique(sort([p//q for q in 1:14 for p in 1:q]))
+ϕs = unique(sort([p//q for q in 1:36 for p in 1:q]))
 ϕs = ϕs[ϕs .<=0.5]
 
-twist_angle =  106
+twist_angle =  105
 # calculate spectrum
 function compute_bmLL(ϕ::Rational,str::String,w0::Float64,w0str::String)
-    fname = "NonInt/Hofstadter/$(twist_angle)_nostrain"
+    fname = "NonInt/Hofstadter/$(twist_angle)_strain"
     if !isdir(fname)
         mkpath(fname)
     end
     p = numerator(ϕ)
     q = denominator(ϕ)
     bm = bmLL()
-    nq = 24÷denominator(ϕ) 
+    nq = 36÷denominator(ϕ) 
     # if q ==7 
     #     nq =2  
     # end
     println("p= ",p,", q= ",q,", nq= ",nq)
     # fname = joinpath(fpath,"$(fname)/_$(p)_$(q)_$(str)_metadata.jld2")
     fname = ""
-    # params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
-    params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
+    params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
+    # params = Params(ϵ=0.0,Da=0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482,δ=30.0)
     initParamsWithStrain(params)
     constructbmLL(bm,params;ϕ= ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0, 
         _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=false)
@@ -60,8 +60,8 @@ end
 function plot_LL_spectrum()
     fname = joinpath(dir,"NonInt/Hofstadter/$(twist_angle)_nostrain/K_NonIntHofstadter_metadata.jld2")
     data = load(fname,"hoftstadter_data");
-    fig = figure(figsize=(3,4))
-    ϕs = unique(sort([p//q for q in 1:14 for p in 1:q]))
+    fig = figure(figsize=(4,3))
+    ϕs = unique(sort([p//q for q in 1:36 for p in 1:q]))
     ϕs = ϕs[ϕs .<= 0.5]
     # ϕs = ϕs[ϕs .>= 1//12]
     params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=110*w0,vf=2482)
@@ -69,26 +69,27 @@ function plot_LL_spectrum()
     initParamsWithStrain(params)
     μB = ZeemanUnit(params)
 
-    # foldername = "NonIntHofstadterData"
+    foldername = "NonInt/Hofstadter/"
     for ϕ in ϕs
         p,q = numerator(ϕ), denominator(ϕ)
-        energies = reshape(data["$(ϕ)"],2q,:)
+        energies = reshape(data["$(ϕ)"],2q,:) .- μB*ϕ
         # plot(ones(length(energies[:]))*ϕ,energies[:].-μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:red")
         # plot(ones(length(energies[:]))*ϕ,energies[:].+μB*ϕ,".",ms=3,markeredgecolor="none",color="tab:blue")
-        plot(ones(length(energies[1:(q+p),:]))*ϕ,energies[1:(q+p),:][:],".",ms=3,markeredgecolor="none",color="r")
-        plot(ones(length(energies[(q+p+1):end,:]))*ϕ,energies[(q+p+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
+        plot(ones(length(energies[1:(q-p),:]))*ϕ,energies[1:(q-p),:][:],".",ms=3,markeredgecolor="none",color="gray")
+        plot(ones(length(energies[(q+1):end,:]))*ϕ,energies[(q+1):end,:][:],".",ms=3,markeredgecolor="none",color="gray")
+        plot(ones(length(energies[(q-p+1):(q),:]))*ϕ,energies[(q-p+1):(q),:][:],".",ms=3,markeredgecolor="none",color="r")
         # writedlm("$(foldername)/_$(p)_$(q)_spin_up.txt",energies.+μB*ϕ)
-        # writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies.-μB*ϕ)
+        # writedlm("$(foldername)/_$(p)_$(q)_spin_down.txt",energies)
     
     end
     # ylim([0.06,0.51])
     # ylim([-26,26])
-    yticks(collect(-10:5:10))
+    yticks(collect(-8:4:8))
     xlim([0.01,0.52])
     xlabel(L"ϕ/ϕ_0")
     ylabel(L"\rm E_0\ (meV)")
     tight_layout() 
-    # savefig("test.png",dpi=600,transparent=false)
+    savefig("test.png",dpi=600,transparent=true)
     display(fig)
     close(fig)
     return nothing

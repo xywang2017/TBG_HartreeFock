@@ -91,7 +91,7 @@ close(fig)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-1/3,-4]]
-sts = [[0,0]]
+sts = [[-3,0]]
 # ϕs = [1//4,1//3]
 energies = Float64[]
 for i in eachindex(sts) 
@@ -116,7 +116,7 @@ for i in eachindex(sts)
                 push!(metadatas,metadata)
                 # println(load(metadata,"iter_energy")[end])
                 hf = load(metadata,"hf");
-                writedlm("Symmetric_spectra/_0_0_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
+                # writedlm("Symmetric_spectra/_0_0_$(p)_$(q).txt",[hf.ϵk[:] hf.σzτz[:]])
                 push!(energies,load(metadata,"iter_energy")[end])
                 # push!(μs,hf.μ)
             else 
@@ -130,7 +130,7 @@ for i in eachindex(sts)
     # idx = Int[collect(1:14);collect(17:22)]
     # idx = collect(1:14)
     # idx = collect(1:length(ϕs))
-    Δs= plot_spectra_collective(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
+    Δs= plot_spectra_collectivev2(metadatas;savename="spectrum_s$(s)_t$(t).png",titlestr="(s,t)=($(s),$(t))",indices=idx);
     # push!(Δss,Δs)
 end
 
