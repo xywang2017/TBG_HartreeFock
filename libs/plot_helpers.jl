@@ -18,6 +18,8 @@ function plot_spectra(metadata::String;savename::String="tmp.pdf",lines::Vector{
         for i in eachindex(lines)
             axhline(lines[i],ls=":",c="gray")
         end
+    else 
+        axhline(hf.μ,ls=":",c="gray")
     end
     ylabel("E (meV)")
     xlabel(L"ϕ/ϕ_0")
@@ -701,8 +703,14 @@ end
 function plot_density_matrix_global_order_parameters(fname::String)
     hf = load(fname,"hf");
     
-    P = reshape(hf.P,8hf.q,8hf.q,:,hf.nq,hf.nq)
-    P = reshape(permutedims(P,(1,2,4,3,5)),8hf.q,8hf.q,:)
+    idx = Int[]
+    for i in 0:(hf.q-1)
+        push!(idx,mod(i*hf.p,hf.q)+1)
+    end
+    println(collect(1:(hf.q)))
+    println(idx)
+    P = reshape(hf.P,8hf.q,8hf.q,:,hf.nq,hf.nq)[:,:,idx,:,:]
+    # P = reshape(permutedims(P,(1,2,4,3,5)),8hf.q,8hf.q,:)
     PP = P .+ 0.5*reshape(Array{ComplexF64}(I,8hf.q,8hf.q),8hf.q,8hf.q,1)
     s0 = ComplexF64[1 0;0 1]
     sx = ComplexF64[0 1;1 0]
@@ -718,7 +726,7 @@ function plot_density_matrix_global_order_parameters(fname::String)
     fig = figure(figsize=(6,1.5))
     avgval = sum(real(Sk)) / length(Sk)
     δval = maximum(abs.(real(Sk).-avgval)) 
-    println(δval)
+    # println(δval)
     pl=imshow(real(Sk)',origin="lower",extent=(0,1,0,1/hf.q),cmap="coolwarm",vmin=0.9*minimum(abs.(real(Sk))),vmax=1.1*maximum(abs.(real(Sk))))
     # Coords = reshape(1:(hf.nq*hf.q),:,1)/(hf.nq*hf.q) .+ 1im*reshape(1:hf.nq,1,:)/(hf.nq*hf.q)
     # pl = scatter(real(Coords),imag(Coords),s=100,c=real(Sk),cmap="viridis",vmin=0,vmax=1.2*maximum(abs.(real(Sk))))

@@ -61,9 +61,9 @@ for iϕ in eachindex(ϕs)
     end
     # gaps[gaps .< 5.5] .= 0.0 
     ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
-    if !isempty(ns)
-        writedlm("ForMinHao/GapFilling/_$(p)_$(q).txt",[ns gaps])
-    end
+    # if !isempty(ns)
+    #     writedlm("ForMinHao/GapFilling/_$(p)_$(q).txt",[ns gaps])
+    # end
 end
 ax.set_xlim([-4.3,0.3])
 ax.set_ylim([-0.01,0.55])
@@ -91,7 +91,7 @@ close(fig)
 # ϕs = [1//12,1//10,1//8,1//6,3//16,3//14,1//4,3//10,3//8,5//12]  #(-2.5,-1)
 sts = [[-1,-3],[-2,-2],[-3,-1]]
 sts = [[-1/3,-4]]
-sts = [[-3,0]]
+sts = [[-1/3,-4]]
 # ϕs = [1//4,1//3]
 energies = Float64[]
 for i in eachindex(sts) 
