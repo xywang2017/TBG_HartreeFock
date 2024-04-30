@@ -24,7 +24,7 @@ initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
 s,t = -1/3,-4
-p,q = 2, 9
+p,q = 4, 15
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
 metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
