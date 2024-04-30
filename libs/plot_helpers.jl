@@ -3,9 +3,11 @@ using PyPlot
 ## plot Hartree Fock spectra
 function plot_spectra(metadata::String;savename::String="tmp.pdf",lines::Vector{Float64}=Float64[])
     hf = load(metadata,"hf");
-    ϵk = hf.ϵk
+    # ϵk = sort(hf.ϵk[:])
+    ϵk = hf.ϵk[:]
     σzτz = hf.σzτz
 
+    print(ϵk[ϵk .> hf.μ][1] - ϵk[ϵk .<hf.μ][end])
     fig = figure(figsize=(3,3))
     idx = sortperm(ϵk[:])
     ϵsorted = ϵk[idx] #./Vcoulomb

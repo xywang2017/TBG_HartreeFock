@@ -36,7 +36,7 @@ else
 end
 bm = bmLL();
 constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
-        _hBN=true,_strain=false, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
+        _hBN=true,_strain=true, _σrotation=false, _valley=str,_calculate_overlap=true,q0=QIKS);
 # -------------------------- Quantum Geometry Related ----------------------- # 
 qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
