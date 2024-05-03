@@ -40,8 +40,8 @@ constructbmLL(bm,params;ϕ=ϕ,nLL=25*q÷p,nq=nq,fname=fname,α=w0,
 # -------------------------- Quantum Geometry Related ----------------------- # 
 qg, tmpF, tmpG = computeQuantumGeometryBM(params;ϕ=ϕ,nq=nq,fname=fname,_valley=str,q0=QIKS);
 
-# tmpF = readdlm("QuantumGeometry/_$(p)_$(q)_NonInt_F.txt")
-# tmpG = readdlm("QuantumGeometry/_$(p)_$(q)_NonInt_G.txt")
+tmpF = readdlm("QuantumGeometry/_$(p)_$(q)_Int_F.txt")
+tmpG = readdlm("QuantumGeometry/_$(p)_$(q)_Int_G.txt")
 # tmpF = [qg.F[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
 # tmpG = [qg.G[ib,ib,ik] for ik in 1:size(qg.F,3) for ib in 1:size(qg.F,1)];
 # σF = sqrt(sum(abs2.(tmpF / (2π)*(q-p).- 1))/(nq^2*q*(q-p)) )
