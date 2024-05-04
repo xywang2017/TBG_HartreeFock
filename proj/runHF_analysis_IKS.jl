@@ -9,31 +9,31 @@ include(joinpath(fpath,"libs/plot_helpers.jl"))
 # Info and folder name
 # ------------------------------------------------------------------------------ # 
 twist_angles = [105; collect(106:2:138)] 
-twist_angle = 105
+twist_angle = 140
 # for twist_angle in twist_angles
 # dir = "/media/xiaoyuw@ad.magnet.fsu.edu/Data/Code/TBG_HartreeFock/"
-dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
+# dir = "/Volumes/Data/Code/TBG_HartreeFock/zeeman/"
 # dir1 = "/Volumes/Data/Reruns/"
 # dir = "/Volumes/Data/Code/TBG_HartreeFock/MinHao/"
-# dir = ""
-# dir1 = ""
+dir = ""
+dir1 = ""
 foldername = dir*"$(twist_angle)_strain"
 # foldername = dir*"$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 # ----------------------------------Hartree Fock spectrum-------------------------------------------- # 
-s,t = -1/3,-4
-p,q = 2, 9 
+s,t = 0,-4
+p,q = 1, 4
 νF = (s)+(t)*p/q
 νstr = round(Int,1000*νF)
-metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="6_0_random_init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
+metadata = find_lowest_energy_datafile("$(foldername)/_$(p)_$(q)";test_str="init_HF_$(p)_$(q)_nu_$(νstr)",_printinfo=true)
 
-plot_spectra(metadata;savename="test.png",lines=Float64[])
-# plot_spectrav3(metadata;savename="test.png",lines=[-2.5,2.5])
-# plot_density_matrix_bm(metadata,ik=8)
+plot_spectra(metadata;savename="test.png",lines=Float64[-8,4])
+# plot_spectrav3(metadata;savename="test.png",lines=[-8,0.])
+plot_density_matrix_bm(metadata,ik=1)
 # test_tL2_breaking(metadata)
-plot_density_matrix_global_order_parameters(metadata)
+# plot_density_matrix_global_order_parameters(metadata)
 
 hf = load(metadata,"hf");
 H = hf.H[(4q+1):6q,(4q+1):6q,:];
@@ -199,7 +199,7 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
     U2 = zeros(ComplexF64,size(hf.H));
     energies = zeros(Float64,size(hf.ϵk))
     for ik in 1:size(hf.H,3) 
-        F = eigen(Hermitian(view(hf.H0,:,:,ik)))
+        F = eigen(Hermitian(view(hf.H,:,:,ik)))
         U2[:,:,ik] = F.vectors 
         energies[:,ik] = F.values
     end 
@@ -233,8 +233,8 @@ function plot_orbital_decomposition(metadata::String,ϵ1::Float64,ϵ2::Float64;�
 end
 
 μ = load(metadata,"hf").μ
-ldosLL  = plot_orbital_decomposition(metadata,-10.0,4.0);
-ldosLL  = plot_orbital_decomposition(metadata,-2.5,0.0);
+ldosLL  = plot_orbital_decomposition(metadata,-8.0,4.0);
+ldosLL  = plot_orbital_decomposition(metadata,-8.0,0.0);
 
 
 # ----------------------------------------------------------------
@@ -245,21 +245,21 @@ idx = (-(nLL-1)):(nLL-1)
 # idx = (-q+1):q
 tmp = ldosLL_toplot[1:2:end]
 tmp = [ldosLL_toplot[(end-1):-2:2]; tmp ]
-writedlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt",[idx tmp])
+writedlm("_$(p)_$(q)_orbital_decomposition_Int.txt",[idx tmp])
 
 
 fig, ax = subplots(figsize=(4,3))
 data1 = readdlm("_$(p)_$(q)_orbital_decomposition_NonInt.txt")
 ax.plot(data1[:,1],data1[:,2]*100,"k-o",label="NonInt",ms=3)
 data2 = readdlm("_$(p)_$(q)_orbital_decomposition_Int.txt")
-ax.plot(data2[:,1],data2[:,2]*100,"b-o",label="(0,-4)",ms=3)
+ax.plot(data2[:,1],data2[:,2]*100,"b-o",label="(-4,0)",ms=3)
 # ax.plot(data2[:,1],(data2[:,2]-data1[:,2])*100,"b-",label="diff",ms=2)
 ax.legend()
-ax.set_xlim([-15,15])
+ax.set_xlim([-6,6])
 ax.set_xlabel("LL index")
 ax.set_ylabel("Orbital weight (%)")
 tight_layout()
-savefig("_$(p)_$(q)_orbital_decomposition.png",dpi=600)
+savefig("140_$(p)_$(q)_orbital_decomposition.png",dpi=600)
 display(fig)
 close(fig)
 

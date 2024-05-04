@@ -120,7 +120,7 @@ function computeBerryCurvature(qg::QuantumGeometryBM)
             Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
             Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
             Λq[idxF,idxF,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
-        tmpF[ik] = imag(log(FF))  /δ^2 
+        tmpF[ik] = - imag(log(FF))  /δ^2 
         # tmpF[ik] = imag(FF)  ./δ^2 
     end
     
@@ -205,13 +205,13 @@ function computeBerryCurvaturev2(qg::QuantumGeometryBM)
             Λq[idxs,idxs,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
         tmp = svd(F)
         F = tmp.U*tmp.Vt 
-        qg.F[:,:,ik] = imag(log.(F)) ./δ^2 
+        qg.F[:,:,ik] = -imag(log.(F)) ./δ^2 
 
         FF = Λq[idxF,idxF,ik1,ik2,iqs[1]]*
             Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,ik2,iqs[2]]*
             Λq[idxF,idxF,mod(ik1+1-1,qg.nq*qg.q)+1,mod(ik2+1-1,qg.nq)+1,iqs[3]]*
             Λq[idxF,idxF,ik1,mod(ik2+1-1,qg.nq)+1,iqs[4]]
-        tmpF[ik] = imag(log(FF))  /δ^2 
+        tmpF[ik] = - imag(log(FF))  /δ^2 
     end
     
     # above calculates δ^2 Im(⟨∂1u|∂2u⟩-⟨∂2u|∂1u⟩)
