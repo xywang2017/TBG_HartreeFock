@@ -11,14 +11,14 @@ dir = "/Volumes/Data/Code/TBG_HartreeFock/"
 # ------------------------------------------------------------------------------ # 
 twist_angle = 105
 foldername = dir*"zeeman/$(twist_angle)_strain"
-fname1 = dir*"MinHao/$(twist_angle)_strain"
+# fname1 = dir*"MinHao/$(twist_angle)_strain"
 params = Params(ϵ=0.002,Da=0.0,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 # params = Params(ϵ=0.000,Da=-4100,φ=0.0*π/180,dθ=twist_angle*0.01*π/180,w1=110,w0=77,vf=2482)
 initParamsWithStrain(params)
 
 w0 = "07"
 
-ϕs = sort(unique([p//q for q in 1:16 for p in 1:q]))
+ϕs = sort(unique([p//q for q in 1:12 for p in 1:q]))
 ϕs = ϕs[ϕs.<=0.5]
 # ϕs = ϕs[ϕs.>=1//12]
 sts = []
@@ -30,20 +30,20 @@ sts = unique(sts)
 cs = ["r";"g";"b";"c";"m";"darkviolet";"tab:blue";
         "magenta";"peru";"tab:purple";"tab:olive";"deepskyblue";"seagreen";"gray"]
 fig, ax = subplots(figsize=(7,4))
+# fig, ax = subplots(figsize=(4,4))
 # for lines in -4:4
 #     axvline(lines,ls=":",c="gray",lw=0.5)
 # end
 for iϕ in eachindex(ϕs)
     ϕ = ϕs[iϕ] 
     p,q = numerator(ϕ), denominator(ϕ)
-    gaps = Float64[]
     fillings = sort([st[1]+st[2]*p/q for st in sts])
     fillings = unique(round.(fillings,digits=8))
     fillings = fillings[fillings .<1e-5]
-    fillings = fillings[fillings .>-4]
-    # fillings = fillings[abs.(fillings) .<4]
+    fillings = fillings[abs.(fillings) .<4]
     fillings0 = round.(fillings,digits=3)
     ns = Float64[]
+    gaps = Float64[]
     for ν in fillings
         νstr = round(Int,1000*ν)
         if q <=12
@@ -57,26 +57,42 @@ for iϕ in eachindex(ϕs)
             Δ,Pz=computegap(metadata;savename="test.png")
             push!(gaps,Δ)
         end
-        
     end
-    # gaps[gaps .< 5.5] .= 0.0 
-    ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="tab:blue",edgecolor="none")
+    ax.scatter(ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="k",edgecolor="none")
+    ax.scatter(-ns,ones(length(ns))*ϕ,s=gaps.^2 ./10,c="k",edgecolor="none")
+    
     # if !isempty(ns)
     #     writedlm("ForMinHao/GapFilling/_$(p)_$(q).txt",[ns gaps])
     # end
 end
-ax.set_xlim([-4.3,0.3])
+ax.set_xlim([-4.1,4.1])
+# ax.set_xticklabels(fontsize=13)
+# ax.set_yticklabels(fontsize=13)
+# ax.set_ylim([-0.01,0.55])
 ax.set_ylim([-0.01,0.55])
-ax.set_xlabel(L"n/n_s",fontsize=13)
-ax.set_ylabel(L"ϕ/ϕ_0",fontsize=13)
+ax.tick_params(axis="both", labelsize=12)
+ax.set_xlabel(L"n/n_s",fontsize=12)
+ax.set_ylabel(L"ϕ/ϕ_0",fontsize=12)
+
+
 ax2 = ax.twinx()
+# data = readdlm("abc.txt")
+# data_x = -data[:,1]
+# data_y = data[:,2]
+# xx = (data_x[1:(end-1)] + data_x[2:end])/2
+# yy= diff(data_y)
+# yy = yy / maximum(abs.(yy)) * 0.2 .+ 0.2
+# ax2.plot(data_x,-data_y,"r-")
+# ax2.tick_params(axis="y", labelsize=12,color="red")
+# ax2.set_ylim(-29,4)
+# ax2.set_ylabel("μ (meV)",color="red")
 mn, mx = ax.get_ylim()
 ax2.set_ylim(flux_conversion(mn,params), flux_conversion(mx,params))
 ax2.set_yticks(collect(5:5:flux_conversion(mx,params)))
 ax2.set_ylabel("B (T)",fontsize=13)
 # scatter([-0.5-3*1/3],[1/3])
 tight_layout()
-savefig("$(twist_angle).png",transparent=false,dpi=600)
+savefig("$(twist_angle).png",transparent=false,dpi=500)
 # savefig(joinpath(fpath,"$(foldername)/streda_line.png"),transparent=false,dpi=600)
 display(fig)
 close(fig)

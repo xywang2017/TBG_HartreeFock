@@ -166,10 +166,10 @@ function plot_spectra_flavor(metadata::String;savename::String="tmp.pdf")
         if c==1 
             ax[r,c].set_ylabel("E (meV)")
         end
-        ax[r,c].text(0.1,20,str[elem])
+        ax[r,c].set_title(str[elem])
     end
     tight_layout()
-    savefig("1.20_degrees_-3_-1_1_5.png",dpi=500)
+    # savefig("1.20_degrees_-3_-1_1_5.png",dpi=500)
     display(fig)
     close(fig)
     return nothing
