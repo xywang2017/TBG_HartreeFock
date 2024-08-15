@@ -54,12 +54,12 @@ function _associatedlaguerre_v1(nLL::Int, cplus::ComplexF64, cminus::ComplexF64)
         mat[i+1, i] = sqrt(i) * cplus * (1im)
         mat[i, i+1] = sqrt(i) * cminus * (1im)
     end
-    # if norm(mat - mat') > 1e-6
-    #     println("error with hermitian")
-    # end
+    if norm(mat - mat') > 1e-6
+        println("error with hermitian")
+    end
     F = eigen(Hermitian(mat))
-    # return view(F.vectors,1:nLL,:) * Diagonal(exp.(-1im * F.values)) * view(F.vectors,1:nLL,:)'
-    return F.vectors * Diagonal(exp.(-1im * F.values)) * F.vectors'
+    return view(F.vectors,1:nLL,:) * Diagonal(exp.(-1im * F.values)) * view(F.vectors,1:nLL,:)'
+    # return F.vectors * Diagonal(exp.(-1im * F.values)) * F.vectors'
 end
 
 
